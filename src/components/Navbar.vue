@@ -73,9 +73,10 @@
       <!-- Sidebar Drawer -->
       <div class="drawer-side">
         <label for="my-drawer" class="drawer-overlay"></label>
-        <ul class="menu p-4 w-64 min-h-full bg-base-200 text-base-content">
+        <ul class="menu p-4 w-64 min-h-full bg-white text-base-content text-green-900">
+          <li><a href="/dashboard">Halaman Utama</a></li>
           <li><a>Tugas</a></li>
-          <li><a>Data Pengepul</a></li>
+          <li><a href="/data-pengepul">Data Pengepul</a></li>
           <li><a>Daftar Artikel</a></li>
           <li><a>Daftar Harga</a></li>
           <li><a>Permintaan Jadwal</a></li>
