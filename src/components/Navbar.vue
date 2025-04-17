@@ -1,4 +1,4 @@
-<template>
+ <template>
   <div class="drawer">
     <input id="my-drawer" type="checkbox" class="drawer-toggle" />
     <div class="drawer-content">
@@ -36,9 +36,9 @@
         </div>
       </div>
 
-      <!-- Cards -->
+      <!-- Cards
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 p-4">
-        <!-- Total Tugas -->
+        Total Tugas
         <div class="rounded-[30px] shadow-md bg-white">
           <div class="p-4">
             <div class="flex items-center gap-3">
@@ -51,10 +51,10 @@
               12
             </div>
           </div>
-        </div>
+        </div> -->
 
         <!-- Tugas Berlangsung -->
-        <div class="rounded-[30px] shadow-md bg-white">
+        <!-- <div class="rounded-[30px] shadow-md bg-white">
           <div class="p-4">
             <div class="flex items-center gap-3">
               <svg class="w-6 h-6 text-green-900" fill="currentColor" viewBox="0 0 20 20">
@@ -66,10 +66,10 @@
               05
             </div>
           </div>
-        </div>
+        </div> -->
 
         <!-- Tugas Selesai -->
-        <div class="rounded-[30px] shadow-md bg-white">
+        <!-- <div class="rounded-[30px] shadow-md bg-white">
           <div class="p-4">
             <div class="flex items-center gap-3">
               <svg class="w-6 h-6 text-green-900" fill="currentColor" viewBox="0 0 20 20">
@@ -81,8 +81,8 @@
               03
             </div>
           </div>
-        </div>
-      </div>
+        </div> -->
+      <!-- </div> -->
     </div>
 
     <!-- Sidebar Drawer -->
@@ -95,10 +95,10 @@
         </div>
         <ul class="w-full">
           <li><a href="/dashboard">Halaman Utama</a></li>
-          <li><a href="#">Tugas</a></li>
+          <li><a href="/tugas">Tugas</a></li>
           <li><a href="/data-pengepul">Data Pengepul</a></li>
           <li><a href="#">Daftar Artikel</a></li>
-          <li><a href="#">Daftar Harga</a></li>
+          <li><a href="/data-statistik">Daftar Harga</a></li>
           <li><a href="#">Permintaan Jadwal</a></li>
           <li><a href="#">Daftar Transaksi</a></li>
         </ul>
