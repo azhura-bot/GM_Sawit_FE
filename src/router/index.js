@@ -6,6 +6,7 @@ import DataPengepul from "../views/DataPengepulView.vue";
 import TambahPengepul from "../views/TambahDataPengepulView.vue";
 import DataBeritaView from "../views/DataBeritaView.vue";
 import DataStatistikView from "../views/DataStatistikView.vue";
+import DataJadwalView from "../views/DataJadwalView.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -44,6 +45,11 @@ const router = createRouter({
             path: '/data-statistik',
             name: 'DataStatistik',
             component: DataStatistikView
+        },
+        {
+            path: '/data-jadwal',
+            name: 'DataJadwal',
+            component: DataJadwalView
         },
     ]
 })

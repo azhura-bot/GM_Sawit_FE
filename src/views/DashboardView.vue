@@ -2,6 +2,6 @@
     <Navbar />
 </template>
 
-<script setup>
+<!-- <script setup>
 import Navbar from '../components/Navbar.vue';
-</script>
+</script> -->
