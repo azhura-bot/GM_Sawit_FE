@@ -2,16 +2,15 @@
   <div class="drawer">
     <input id="my-drawer" type="checkbox" class="drawer-toggle" />
     <div class="drawer-content">
-
       <!-- Dashboard Header Card -->
       <div class="m-4 mt-6 bg-[#E9FBD0] rounded-3xl p-6 shadow-md">
         <div class="flex items-center justify-between">
           <!-- Kiri: Icon & Title -->
           <div class="flex items-center gap-4">
             <label for="my-drawer" class="cursor-pointer w-14 h-14 bg-white rounded-full flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
             </label>
 
             <div>
@@ -19,17 +18,6 @@
               <p class="text-green-900 text-sm">Dashboard</p>
             </div>
           </div>
-
-          <!-- Tengah: Search -->
-          <!-- <div class="flex items-center gap-4">
-            <input type="text" placeholder="Search..." class="rounded-full px-6 py-3 w-96 outline-none" />
-            <div class="w-14 h-14 bg-white rounded-full flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-          </div> -->
 
           <!-- Kanan: User Info -->
           <div class="flex items-center gap-4">
@@ -47,44 +35,45 @@
           <h2 class="text-green-900 font-bold text-4xl">23 Maret 2025</h2>
         </div>
       </div>
+
+      <!-- Cards -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 p-4">
-
-      <!-- Total Task -->
-      <div class="rounded-[30px] shadow-md bg-white">
-        <div class="p-4">
-          <div class="flex items-center gap-3">
-            <svg class="w-6 h-6 text-green-900" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M4 3h12a1 1 0 011 1v2H3V4a1 1 0 011-1zM3 8h14v1H3V8zm0 3h14v1H3v-1zm0 3h14v1H3v-1z"/>
-            </svg>
-            <h2 class="text-green-900 font-semibold text-lg">Total Tugas</h2>
-          </div>
-          <div class="bg-lime-100 text-green-900 mt-4 text-5xl font-bold text-center rounded-2xl p-6">
-            12
-          </div>
-        </div>
-      </div>
-
-      <!-- Ongoing Task -->
-      <div class="rounded-[30px] shadow-md bg-white">
-        <div class="p-4">
-          <div class="flex items-center gap-3">
-            <svg class="w-6 h-6 text-green-900" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M5 4h10v2H5V4zm0 4h10v2H5V8zm0 4h10v2H5v-2z"/>
-            </svg>
-            <h2 class="text-green-900 font-semibold text-lg">Tugas yang Sedang Berlangsung</h2>
-          </div>
-          <div class="bg-lime-400 text-green-900 mt-4 text-5xl font-bold text-center rounded-2xl p-6">
-            05
-          </div>
-        </div>
-      </div>
-
-        <!-- Task Completed -->
+        <!-- Total Tugas -->
         <div class="rounded-[30px] shadow-md bg-white">
           <div class="p-4">
             <div class="flex items-center gap-3">
               <svg class="w-6 h-6 text-green-900" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-4l-3-3 1.41-1.41L9 11.17l4.59-4.59L15 8l-6 6z"/>
+                <path d="M4 3h12a1 1 0 011 1v2H3V4a1 1 0 011-1zM3 8h14v1H3V8zm0 3h14v1H3v-1zm0 3h14v1H3v-1z" />
+              </svg>
+              <h2 class="text-green-900 font-semibold text-lg">Total Tugas</h2>
+            </div>
+            <div class="bg-lime-100 text-green-900 mt-4 text-5xl font-bold text-center rounded-2xl p-6">
+              12
+            </div>
+          </div>
+        </div>
+
+        <!-- Tugas Berlangsung -->
+        <div class="rounded-[30px] shadow-md bg-white">
+          <div class="p-4">
+            <div class="flex items-center gap-3">
+              <svg class="w-6 h-6 text-green-900" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M5 4h10v2H5V4zm0 4h10v2H5V8zm0 4h10v2H5v-2z" />
+              </svg>
+              <h2 class="text-green-900 font-semibold text-lg">Tugas yang Sedang Berlangsung</h2>
+            </div>
+            <div class="bg-lime-400 text-green-900 mt-4 text-5xl font-bold text-center rounded-2xl p-6">
+              05
+            </div>
+          </div>
+        </div>
+
+        <!-- Tugas Selesai -->
+        <div class="rounded-[30px] shadow-md bg-white">
+          <div class="p-4">
+            <div class="flex items-center gap-3">
+              <svg class="w-6 h-6 text-green-900" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-4l-3-3 1.41-1.41L9 11.17l4.59-4.59L15 8l-6 6z" />
               </svg>
               <h2 class="text-green-900 font-semibold text-lg">Tugas yang Telah Selesai</h2>
             </div>
@@ -94,24 +83,24 @@
           </div>
         </div>
       </div>
-
     </div>
 
     <!-- Sidebar Drawer -->
     <div class="drawer-side">
       <label for="my-drawer" class="drawer-overlay"></label>
-      <div class="menu p-4 w-64 min-h-full bg-base-200 text-base-content">
+      <div class="menu p-4 w-64 min-h-full bg-white text-base-content text-green-900">
         <div class="flex flex-col items-center justify-center mb-4">
           <img src="../assets/logo.png" alt="Logo" class="w-24 mb-2" />
           <span class="text-lg font-bold">Sawit Sawit</span>
         </div>
         <ul class="w-full">
-          <li><a>Tugas</a></li>
-          <li><a>Data Pengepul</a></li>
-          <li><a>Daftar Artikel</a></li>
-          <li><a>Daftar Harga</a></li>
-          <li><a>Permintaan Jadwal</a></li>
-          <li><a>Daftar Transaksi</a></li>
+          <li><a href="/dashboard">Halaman Utama</a></li>
+          <li><a href="#">Tugas</a></li>
+          <li><a href="/data-pengepul">Data Pengepul</a></li>
+          <li><a href="#">Daftar Artikel</a></li>
+          <li><a href="#">Daftar Harga</a></li>
+          <li><a href="#">Permintaan Jadwal</a></li>
+          <li><a href="#">Daftar Transaksi</a></li>
         </ul>
       </div>
     </div>
