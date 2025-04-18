@@ -25,15 +25,22 @@
               <h1 class="text-green-900 font-bold">Jackson Miguel Wong</h1>
               <p class="text-green-900 text-sm">Manajer</p>
             </div>
-            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile" class="w-14 h-14 rounded-full" />
+            <router-link to="/profile"> 
+              <img
+                src="https://randomuser.me/api/portraits/men/32.jpg"
+                alt="Profile"
+                class="w-14 h-14 rounded-full hover:brightness-90 transition"
+              />
+            </router-link>
           </div>
+
         </div>
 
         <!-- Tanggal -->
-        <div class="mt-10">
+        <!-- <div class="mt-10">
           <p class="text-green-900 text-md">Tanggal</p>
           <h2 class="text-green-900 font-bold text-4xl">23 Maret 2025</h2>
-        </div>
+        </div> -->
       </div>
 
       <!-- Cards

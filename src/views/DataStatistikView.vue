@@ -6,21 +6,30 @@
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-2xl font-bold text-green-900">Statistik hingga saat ini</h2>
           <div class="flex gap-2">
-            <button class="bg-gray-100 px-3 py-1 rounded-full text-sm">🔍 Filter</button>
-            <button class="bg-gray-100 px-2 py-1 rounded-full text-sm">◀</button>
-            <button class="bg-gray-100 px-2 py-1 rounded-full text-sm">▶</button>
+            <button class="bg-gray-100 px-3 py-1 rounded-full text-sm hover:bg-gray-200 hover:shadow-md transition-all">
+              🔍 Filter
+            </button>
+            <button class="bg-gray-100 px-2 py-1 rounded-full text-sm hover:bg-gray-200 hover:shadow-md transition-all">
+              ◀
+            </button>
+            <button class="bg-gray-100 px-2 py-1 rounded-full text-sm hover:bg-gray-200 hover:shadow-md transition-all">
+              ▶
+            </button>
           </div>
         </div>
         <div class="h-40 bg-gradient-to-t from-green-200 to-white rounded-md"></div>
         <!-- Grafik Dummy -->
       </div>
+
   
       <!-- Presentase Kenaikan & Penurunan -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <!-- Kenaikan -->
         <div class="bg-lime-100 p-6 rounded-2xl shadow-md relative">
           <div class="absolute top-4 right-4">
-            <button class="bg-white px-3 py-1 rounded-full text-sm">🔍 Filter</button>
+            <button class="bg-gray-100 px-3 py-1 rounded-full text-sm hover:bg-gray-200 hover:shadow-md transition-all">
+              🔍 Filter
+            </button>
           </div>
           <h3 class="text-xl font-bold text-green-900 mb-2">Presentase Kenaikan</h3>
           <div class="text-4xl font-extrabold text-green-900 mb-4">12%</div>
@@ -30,7 +39,9 @@
         <!-- Penurunan -->
         <div class="bg-lime-100 p-6 rounded-2xl shadow-md relative">
           <div class="absolute top-4 right-4">
-            <button class="bg-white px-3 py-1 rounded-full text-sm">🔍 Filter</button>
+            <button class="bg-gray-100 px-3 py-1 rounded-full text-sm hover:bg-gray-200 hover:shadow-md transition-all">
+              🔍 Filter
+            </button>
           </div>
           <h3 class="text-xl font-bold text-green-900 mb-2">Presentase Penurunan</h3>
           <div class="text-4xl font-extrabold text-green-900 mb-4">5%</div>
@@ -48,9 +59,14 @@
           </div>
   
           <div class="flex gap-3">
-            <button class="bg-green-700 text-white px-4 py-2 rounded-full font-semibold">Kenaikan</button>
-            <button class="bg-gray-200 text-green-900 px-4 py-2 rounded-full font-semibold">Penurunan</button>
+            <button class="bg-green-700 text-white px-4 py-2 rounded-full font-semibold hover:bg-green-800 hover:shadow-md transition-all">
+              Kenaikan
+            </button>
+            <button class="bg-gray-200 text-green-900 px-4 py-2 rounded-full font-semibold hover:bg-gray-300 hover:shadow-md transition-all">
+              Penurunan
+            </button>
           </div>
+
   
           <div class="space-y-4">
             <input type="text" placeholder="Harga per Kg" class="w-full p-3 rounded-full bg-gray-200 focus:outline-none" />
