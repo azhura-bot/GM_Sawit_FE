@@ -104,7 +104,7 @@
           <li><a href="/dashboard">Halaman Utama</a></li>
           <li><a href="/tugas">Tugas</a></li>
           <li><a href="/data-pengepul">Data Pengepul</a></li>
-          <li><a href="#">Daftar Artikel</a></li>
+          <li><a href="/data-berita">Daftar Artikel</a></li>
           <li><a href="/data-statistik">Daftar Harga</a></li>
           <li><a href="/data-jadwal">Permintaan Jadwal</a></li>
           <li><a href="#">Daftar Transaksi</a></li>

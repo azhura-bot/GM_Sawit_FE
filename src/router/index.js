@@ -5,6 +5,8 @@ import TugasView from "../views/TugasView.vue";
 import DataPengepul from "../views/DataPengepulView.vue";
 import TambahPengepul from "../views/TambahDataPengepulView.vue";
 import DataBeritaView from "../views/DataBeritaView.vue";
+import TambahBeritaView from "../views/TambahBeritaView.vue";
+import EditBeritaView from "../views/EditBeritaView.vue";
 import DataStatistikView from "../views/DataStatistikView.vue";
 import DataJadwalView from "../views/DataJadwalView.vue";
 import ProfileView from "../views/ProfileView.vue";
@@ -41,6 +43,16 @@ const router = createRouter({
             path: '/data-berita',
             name: 'DataBerita',
             component: DataBeritaView
+        },
+        {
+            path: '/tambah-berita',
+            name: 'TambahBerita',
+            component: TambahBeritaView
+        },
+        {
+            path: '/edit-berita',
+            name: 'EditBerita',
+            component: EditBeritaView
         },
         {
             path: '/data-statistik',
