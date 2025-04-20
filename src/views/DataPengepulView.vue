@@ -36,7 +36,7 @@
     </div>
 
     <!-- Judul -->
-    <h2 class="font-bold text-green-800 text-xl mb-4 text-center">Data Pengepul</h2>
+    <h2 class="font-bold text-green-800 text-xl mb-4">Data Pengepul</h2>
 
     <!-- Grid card pengepul -->
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
