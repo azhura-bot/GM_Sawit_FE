@@ -49,7 +49,7 @@
           <span class="text-lg font-bold">Sawit Sawit</span>
         </div>
         <ul class="w-full">
-          <li><a href="/dashboard">Halaman Utama</a></li>
+          <li><a href="/">Halaman Utama</a></li>
           <li><a href="/tugas">Tugas</a></li>
           <li><a href="/data-pengepul">Data Pengepul</a></li>
           <li><a href="/data-berita">Daftar Artikel</a></li>
