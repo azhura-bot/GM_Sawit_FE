@@ -107,7 +107,7 @@
           <li><a href="/data-berita">Daftar Artikel</a></li>
           <li><a href="/data-statistik">Daftar Harga</a></li>
           <li><a href="/data-jadwal">Permintaan Jadwal</a></li>
-          <li><a href="#">Daftar Transaksi</a></li>
+          <li><a href="/data-transaksi">Daftar Transaksi</a></li>
         </ul>
       </div>
     </div>

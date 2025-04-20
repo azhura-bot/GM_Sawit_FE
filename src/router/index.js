@@ -10,6 +10,7 @@ import EditBeritaView from "../views/EditBeritaView.vue";
 import DataStatistikView from "../views/DataStatistikView.vue";
 import DataJadwalView from "../views/DataJadwalView.vue";
 import ProfileView from "../views/ProfileView.vue";
+import DataTransaksiView from "../views/DataTransaksiView.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -69,6 +70,11 @@ const router = createRouter({
             name: 'Profile',
             component: ProfileView
         },
+        {
+            path: '/data-transaksi',
+            name: 'DataTransaksi',
+            component: DataTransaksiView
+        }
     ]
 })
 
