@@ -1,8 +1,99 @@
 <template>
-  <div class="m-4 mt-6 bg-white rounded-3xl p-6 shadow-md">
-    <!-- Header dengan tombol pencarian dan tambah -->
+  <div class="m-4 mt-6 bg-white rounded-3xl p-6 shadow-md relative">
+    <!-- Modal Edit -->
+    <div
+      v-if="showModal"
+      class="absolute inset-0 flex items-center justify-center z-50 transition-all duration-300"
+    >
+      <div
+        class="bg-white rounded-2xl shadow-xl w-[700px] p-8 flex flex-col gap-6 border border-gray-100 animate-fade-in-scale"
+      >
+        <h3 class="text-green-900 font-bold text-xl">Edit Data Pengepul</h3>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="text-sm text-gray-600">Nama Pengepul</label>
+            <input
+              type="text"
+              v-model="form.nama"
+              class="w-full border rounded-xl px-4 py-2 mt-1 outline-none focus:ring-2 focus:ring-green-300"
+            />
+          </div>
+          <div>
+            <label class="text-sm text-gray-600">Tanggal Perekrutan</label>
+            <input
+              type="date"
+              v-model="form.tanggal"
+              class="w-full border rounded-xl px-4 py-2 mt-1 outline-none focus:ring-2 focus:ring-green-300"
+            />
+          </div>
+          <div>
+            <label class="text-sm text-gray-600">Email</label>
+            <input
+              type="email"
+              v-model="form.email"
+              class="w-full border rounded-xl px-4 py-2 mt-1 outline-none focus:ring-2 focus:ring-green-300"
+            />
+          </div>
+          <div>
+            <label class="text-sm text-gray-600">Nomor Handphone</label>
+            <input
+              type="text"
+              v-model="form.nomor"
+              class="w-full border rounded-xl px-4 py-2 mt-1 outline-none focus:ring-2 focus:ring-green-300"
+            />
+          </div>
+        </div>
+
+        <div class="flex justify-center gap-4 mt-4">
+          <button
+            @click="showModal = false"
+            class="bg-[#00A5E0] text-white font-semibold px-6 py-2 rounded-full text-sm"
+          >
+            Batalkan
+          </button>
+          <button
+            @click="simpanPerubahan"
+            class="bg-[#3E8914] text-white font-semibold px-6 py-2 rounded-full text-sm"
+          >
+            Simpan Perubahan
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Delete -->
+    <div
+      v-if="showDeleteModal"
+      class="absolute inset-0 flex items-center justify-center z-50 transition-all duration-300"
+    >
+      <div
+        class="bg-white rounded-2xl shadow-xl w-[700px] p-8 flex flex-col items-center gap-6 border border-gray-100 animate-fade-in-scale"
+      >
+        <img src="/warning-image.png" alt="Warning" class="w-16 h-16" />
+        <h3 class="text-green-900 font-bold text-2xl">Apakah anda yakin?</h3>
+        <p class="text-gray-800 text-center text-lg">
+          Untuk menghapus data pengepul ini?
+        </p>
+        <div class="flex gap-4">
+          <button
+            @click="showDeleteModal = false"
+            class="bg-[#00A5E0] text-white font-semibold px-6 py-2 rounded-full text-sm"
+          >
+            Tidak
+          </button>
+          <button
+            @click="hapusPengepul"
+            class="bg-[#3E8914] text-white font-semibold px-6 py-2 rounded-full text-sm"
+          >
+            Ya
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Header dan Search -->
     <div class="flex flex-col md:flex-row justify-between items-center mb-6">
-      <!-- Search bar -->
       <div class="w-full md:w-1/2 bg-[#DDF7B1] rounded-full flex items-center px-4 py-2 text-green-900">
         <input
           type="text"
@@ -16,7 +107,6 @@
         </svg>
       </div>
 
-      <!-- Tombol filter & tambah -->
       <div class="flex gap-3 mt-4 md:mt-0">
         <button class="bg-gray-200 text-green-900 px-4 py-2 rounded-full text-sm">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none"
@@ -45,10 +135,7 @@
         :key="i"
         class="bg-white shadow-md p-4 rounded-2xl relative flex flex-col gap-2 text-center text-green-900"
       >
-        <!-- Foto -->
         <div class="w-16 h-16 bg-gray-300 rounded-full mx-auto mb-2"></div>
-
-        <!-- Info -->
         <p class="font-bold">Nama Pengepul</p>
         <p class="text-sm">Tanggal Perekrutan<br />10/02/2025</p>
         <p class="mt-2 text-sm">
@@ -56,16 +143,15 @@
           Nomor Handphone
         </p>
 
-        <!-- Tombol aksi -->
         <div class="absolute top-2 right-2 flex gap-2">
-          <button class="text-orange-500 hover:text-orange-600">
+          <button @click="openEdit(i)" class="text-orange-500 hover:text-orange-600">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
               viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 16H9v-2.828z" />
             </svg>
           </button>
-          <button class="text-red-500 hover:text-red-600">
+          <button @click="openDelete(i)" class="text-red-500 hover:text-red-600">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
               viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -77,3 +163,41 @@
     </div>
   </div>
 </template>
+
+<script setup>
+import { ref } from 'vue'
+
+const showModal = ref(false)
+const showDeleteModal = ref(false)
+const form = ref({
+  nama: '',
+  tanggal: '',
+  email: '',
+  nomor: '',
+})
+
+const openEdit = (index) => {
+  // Simulasikan data yang akan diisi ke form
+  form.value = {
+    nama: 'Contoh Nama',
+    tanggal: '2025-02-10',
+    email: 'contoh@email.com',
+    nomor: '081234567890'
+  }
+  showModal.value = true
+}
+
+const openDelete = (index) => {
+  showDeleteModal.value = true
+}
+
+const simpanPerubahan = () => {
+  console.log('Data disimpan:', form.value)
+  showModal.value = false
+}
+
+const hapusPengepul = () => {
+  console.log('Data dihapus!')
+  showDeleteModal.value = false
+}
+</script>
