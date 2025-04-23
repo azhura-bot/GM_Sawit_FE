@@ -11,6 +11,7 @@ import DataStatistikView from "../views/DataStatistikView.vue";
 import DataJadwalView from "../views/DataJadwalView.vue";
 import ProfileView from "../views/ProfileView.vue";
 import DataTransaksiView from "../views/DataTransaksiView.vue";
+import PengajuanJadwalView from "../views/Petani/PengajuanJadwalView.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -74,7 +75,12 @@ const router = createRouter({
             path: '/data-transaksi',
             name: 'DataTransaksi',
             component: DataTransaksiView
-        }
+        },
+        {
+            path: '/pengajuan-jadwal',
+            name: 'PengajuanJadwal',
+            component: PengajuanJadwalView
+        },
     ]
 })
 
