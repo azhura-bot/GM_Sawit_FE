@@ -10,12 +10,14 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.4",
+    "apexcharts": "^4.7.0",
     "cally": "^0.8.0",
     "daisyui": "^5.0.22",
     "tailwindcss": "^4.1.4",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0",
-    "vue-sawit": "file:"
+    "vue-sawit": "file:",
+    "vue3-apexcharts": "^1.8.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.2",
