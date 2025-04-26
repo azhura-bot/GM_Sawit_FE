@@ -18,6 +18,7 @@ import DetailTugasView from "../views/pengepul/DetailTugasView.vue";
 import ArtikelPengepulView from "../views/pengepul/ArtikelPengepulView.vue";
 import DetailArtikelPengepulView from "../views/pengepul/DetailArtikelPengepulView.vue";
 
+
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
