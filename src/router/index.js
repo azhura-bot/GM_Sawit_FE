@@ -21,6 +21,7 @@ import HomePetaniView from "../views/Petani/HomePetaniView.vue";
 import HargaPengepulView from "../views/pengepul/HargaPengepulView.vue";
 import LaporanPengepulView from "../views/pengepul/LaporanPengepulView.vue";
 import ProfilPengepulView from "../views/pengepul/ProfilPengepulView.vue";
+import EditProfilePengepulView from "../views/pengepul/EditProfilePengepulView.vue";
 
 
 const router = createRouter({
@@ -130,6 +131,11 @@ const router = createRouter({
             path: '/profile-pengepul',
             name: 'ProfilePengepul',
             component: ProfilPengepulView
+        },
+        {
+            path: '/edit-profile-pengepul',
+            name: 'EditProfilePengepul',
+            component: EditProfilePengepulView
         },
         {
             path: '/home-petani',

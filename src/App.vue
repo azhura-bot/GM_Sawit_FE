@@ -27,7 +27,8 @@ const hideNavbarRoutes = [
    '/harga-pengepul',
    '/laporan-pengepul',
   '/home-petani',
-  '/profile-pengepul'
+  '/profile-pengepul',
+  '/edit-profile-pengepul'
 
 ]
 
