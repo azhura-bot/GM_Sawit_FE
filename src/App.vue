@@ -25,6 +25,8 @@ const hideNavbarRoutes = [
   '/artikel-pengepul',
   '/detail-artikel-pengepul',
   '/home-petani',
+  '/riwayat-petani',  
+  '/pengajuan-jadwal-petani',
 
 ]
 

@@ -19,7 +19,7 @@
         <h2>Menu</h2>
             <div class="menu-grid">
                 
-                <router-link to="/l" class="main-image">
+                <router-link to="/pengajuan-jadwal" class="main-image">
                 <img src="@/assets/pengajuan-jadwal.png" alt="Pengajuan Jadwal" />
                 <p>Pengajuan Jadwal</p>
                 </router-link>
@@ -142,7 +142,7 @@ export default {
   position: sticky;
   top: 0;
   z-index: 10; /* Menambahkan z-index untuk memastikan header selalu di atas */
-}
+  }
 
   
   .circle {
