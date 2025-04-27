@@ -17,6 +17,7 @@ import TugasUatamaView from "../views/pengepul/TugasUatamaView.vue";
 import DetailTugasView from "../views/pengepul/DetailTugasView.vue";
 import ArtikelPengepulView from "../views/pengepul/ArtikelPengepulView.vue";
 import DetailArtikelPengepulView from "../views/pengepul/DetailArtikelPengepulView.vue";
+import HomePetaniView from "../views/Petani/HomePetaniView.vue";
 
 
 const router = createRouter({
@@ -111,6 +112,11 @@ const router = createRouter({
             path: '/detail-artikel-pengepul',
             name: 'DetailArtikelPengepul',
             component: DetailArtikelPengepulView
+        },
+        {
+            path: '/home-petani',
+            name: 'HomePetani',
+            component: HomePetaniView
         },
     ]
 })

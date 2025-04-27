@@ -37,15 +37,15 @@
   </template>
   
   <script>
-export default {
-  name: "ArtikelPengepulView",
-  methods: {
-    goToDetail() {
-      this.$router.push({ name: "DetailArtikelPengepul" });
+  export default {
+    name: "ArtikelPengepulView",
+    methods: {
+      goToDetail() {
+        this.$router.push({ name: "DetailArtikelPengepul" });
+      },
     },
-  },
-};
-</script>
+  };
+  </script> 
   
   <style scoped>
   .main-container {

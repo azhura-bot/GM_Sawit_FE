@@ -23,7 +23,8 @@ const hideNavbarRoutes = [
   '/tugas-utama-pengepul',
   '/detail-tugas-pengepul',
   '/artikel-pengepul',
-  '/detail-artikel-pengepul'
+  '/detail-artikel-pengepul',
+  '/home-petani',
 
 ]
 
