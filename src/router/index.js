@@ -18,6 +18,9 @@ import DetailTugasView from "../views/pengepul/DetailTugasView.vue";
 import ArtikelPengepulView from "../views/pengepul/ArtikelPengepulView.vue";
 import DetailArtikelPengepulView from "../views/pengepul/DetailArtikelPengepulView.vue";
 import HomePetaniView from "../views/Petani/HomePetaniView.vue";
+import HargaPengepulView from "../views/pengepul/HargaPengepulView.vue";
+import LaporanPengepulView from "../views/pengepul/LaporanPengepulView.vue";
+import ProfilPengepulView from "../views/pengepul/ProfilPengepulView.vue";
 
 
 const router = createRouter({
@@ -112,6 +115,21 @@ const router = createRouter({
             path: '/detail-artikel-pengepul',
             name: 'DetailArtikelPengepul',
             component: DetailArtikelPengepulView
+        },
+        {
+            path: '/harga-pengepul',
+            name: 'HargaPengepul',
+            component: HargaPengepulView
+        },
+        {
+            path: '/laporan-pengepul',
+            name: 'LaporanPengepul',
+            component: LaporanPengepulView
+        },
+        {
+            path: '/profile-pengepul',
+            name: 'ProfilePengepul',
+            component: ProfilPengepulView
         },
         {
             path: '/home-petani',

@@ -2,8 +2,8 @@
     <div class="main-container">
       <!-- Header -->
       <header class="header">
-        <div class="circle"></div>
-        <span class="username">nama User</span>
+      <router-link to="/profile-pengepul" class="circle"></router-link>
+      <span class="username">Lorem Ipsum</span>
       </header>
   
       <!-- Content -->
@@ -26,14 +26,13 @@
               <img src="@/assets/icon-artikel.png" alt="Artikel" />
             </router-link>
 
-            <div class="main-image">
+            <router-link to="/harga-pengepul" class="main-image">
               <img src="@/assets/icon-harga.png" alt="Data Harga" />
-  
-            </div>
-            <div class="main-image">
+            </router-link>
+
+            <router-link to="/laporan-pengepul" class="main-image">
               <img src="@/assets/icon-laporan.png" alt="Laporan" />
-       
-            </div>
+            </router-link>
           </div>
         </section>
   
