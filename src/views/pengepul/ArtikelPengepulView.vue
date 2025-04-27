@@ -1,51 +1,94 @@
 <template>
-    <div class="main-container">
-      <!-- Header -->
-      <header class="header">
-        <div class="circle"></div>
-        <span class="username">Lorem Ipsum</span>
-      </header>
-  
-      <!-- Content -->
-      <main class="content">
-        <!-- Judul dan Icon -->
-        <section class="title-with-icon">
-          <img src="@/assets/icon-artikel-trans.png" alt="Icon Artikel" class="icon" />
-          <h2>Artikel</h2>
-        </section>
-  
-        <!-- Search Bar -->
-        <div class="search-bar">
-          <input type="text" placeholder="Search..." class="search-input" />
-          <button class="search-button">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
-            </svg>
-          </button>
+  <div class="main-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="circle"></div>
+      <span class="username">Lorem Ipsum</span>
+    </header>
+
+    <!-- Content -->
+    <main class="content">
+      <!-- Judul dan Icon -->
+      <section class="title-with-icon">
+        <img src="@/assets/icon-artikel-trans.png" alt="Icon Artikel" class="icon" />
+        <h2>Artikel</h2>
+      </section>
+
+      <!-- Search Bar -->
+      <div class="search-bar">
+        <input type="text" placeholder="Search..." class="search-input" v-model="searchQuery" />
+        <button class="search-button" @click="searchArticles">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Artikel List -->
+      <div 
+        class="article-card" 
+        v-for="(artikel, index) in filteredArticles" 
+        :key="index" 
+        @click="goToDetail(artikel.id)"
+      >
+        <img :src="artikel.imageUrl || require('@/assets/fotosawit.jpg')" alt="Foto Artikel" class="article-image" />
+        <div class="article-content">
+          <h3>{{ artikel.title }}</h3>
+          <p>{{ artikel.description }}</p>
         </div>
+      </div>
+    </main>
+  </div>
+</template>
+
   
-        <!-- Artikel List -->
-        <div class="article-card" v-for="n in 2" :key="n" @click="goToDetail">
-          <img src="@/assets/fotosawit.jpg" alt="Foto Sawit" class="article-image" />
-          <div class="article-content">
-            <h3>Lorem Ipsum</h3>
-            <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.</p>
-          </div>
-        </div>
-      </main>
-    </div>
-  </template>
-  
-  <script>
-  export default {
-    name: "ArtikelPengepulView",
-    methods: {
-      goToDetail() {
-        this.$router.push({ name: "DetailArtikelPengepul" });
-      },
+<script>
+import axios from "axios";
+
+export default {
+  name: "ArtikelPengepulView",
+  data() {
+    return {
+      articles: [],
+      searchQuery: "",
+    };
+  },
+  computed: {
+    filteredArticles() {
+      if (!this.searchQuery) {
+        return this.articles;
+      }
+      return this.articles.filter(article => 
+        article.title.toLowerCase().includes(this.searchQuery.toLowerCase())
+      );
+    }
+  },
+  methods: {
+    async fetchArticles() {
+      try {
+        const response = await axios.get("https://s0mtl52d-8000.asse.devtunnels.ms/"); // Ganti dengan endpoint API kamu
+        this.articles = response.data; // Sesuaikan berdasarkan struktur API
+      } catch (error) {
+        console.error("Error fetching articles:", error);
+      }
     },
-  };
-  </script> 
+    goToDetail(id) {
+      this.$router.push({ 
+        name: "DetailArtikelPengepul", 
+        params: { id: id } 
+      });
+    },
+    searchArticles() {
+      // Optional: bisa diisi logika kalau mau search dari API
+      // Untuk sekarang search pakai computed property aja
+    }
+  },
+  mounted() {
+    this.fetchArticles();
+  },
+};
+</script>
+
   
   <style scoped>
   .main-container {
