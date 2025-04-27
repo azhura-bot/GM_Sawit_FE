@@ -2,8 +2,8 @@
     <div class="main-container">
       <!-- Header -->
       <header class="header">
-        <div class="circle"></div>
-        <span class="username">Lorem Ipsum</span>
+      <router-link to="/profile-pengepul" class="circle"></router-link>
+      <span class="username">Lorem Ipsum</span>
       </header>
   
       <!-- Content -->

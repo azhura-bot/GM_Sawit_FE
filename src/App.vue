@@ -24,9 +24,16 @@ const hideNavbarRoutes = [
   '/detail-tugas-pengepul',
   '/artikel-pengepul',
   '/detail-artikel-pengepul',
+   '/harga-pengepul',
+   '/laporan-pengepul',
   '/home-petani',
+<<<<<<< HEAD
   '/riwayat-petani',  
   '/pengajuan-jadwal-petani',
+=======
+  '/profile-pengepul',
+  '/edit-profile-pengepul'
+>>>>>>> 9ad616b8968f9511c0f468b67176c809e557a6d4
 
 ]
 
