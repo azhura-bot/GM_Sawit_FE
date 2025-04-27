@@ -17,23 +17,29 @@
         <!-- Menu Section -->
         <section class="menu-section">
         <h2>Menu</h2>
-        <div class="menu-grid">
-            <router-link to="/l" class="main-image">
-            <img src="@/assets/pengajuan-jadwal.png" alt="Tugas" />
-            </router-link>
+            <div class="menu-grid">
+                
+                <router-link to="/l" class="main-image">
+                <img src="@/assets/pengajuan-jadwal.png" alt="Pengajuan Jadwal" />
+                <p>Pengajuan Jadwal</p>
+                </router-link>
 
-            <router-link to="/" class="main-image">
-            <img src="@/assets/riwayat-pengajuan.png" alt="Artikel" />
-            </router-link>
+                <router-link to="/" class="main-image">
+                <img src="@/assets/riwayat-pengajuan.png" alt="Riwayat Pengajuan" />
+                <p>Riwayat Pengajuan</p>
+                </router-link>
 
-            <div class="main-image">
-            <img src="@/assets/icon-artikel.png" alt="Data Harga" />
+                <router-link to="/artikel-pengepul" class="main-image">
+                <img src="@/assets/icon-artikel.png" alt="Artikel" />
+                <p>Artikel</p>
+                </router-link>
+
+                <div class="main-image">
+                <img src="@/assets/icon-harga.png" alt="Data Harga" />
+                <p>Data Harga</p>
+                </div>
+
             </div>
-
-            <div class="main-image">
-            <img src="@/assets/icon-harga.png" alt="Laporan" />
-            </div>
-        </div>
         </section>
 
   
@@ -58,7 +64,6 @@
           </div>
         </section>
   
-        <!-- Harga Hari Ini Section -->
         <!-- Harga Hari Ini Section -->
         <section class="harga-section">
           <h2>Harga Hari Ini</h2>
@@ -168,9 +173,25 @@ export default {
   }
   
   .main-image {
-    width: 100%;
-    height: auto;
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  text-decoration: none; /* Biar router-link nggak ada underline */
+  color: inherit; /* Biar warna teks sama */
+}
+
+.main-image img {
+  width: 80px; /* Ukuran icon */
+  height: 80px;
+  margin-bottom: 8px;
+}
+
+.main-image p {
+  font-size: 14px;
+  margin: 0;
+}
+
   
   .menu-section h2,
 .trending-section h2,

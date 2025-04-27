@@ -66,7 +66,7 @@ export default {
   methods: {
     async fetchArticles() {
       try {
-        const response = await axios.get("https://s0mtl52d-8000.asse.devtunnels.ms/"); // Ganti dengan endpoint API kamu
+        const response = await axios.get("https://s0mtl52d-8000.asse.devtunnels.ms/api/artikel"); // Ganti dengan endpoint API kamu
         this.articles = response.data; // Sesuaikan berdasarkan struktur API
       } catch (error) {
         console.error("Error fetching articles:", error);
