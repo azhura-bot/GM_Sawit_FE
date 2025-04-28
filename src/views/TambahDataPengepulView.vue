@@ -1,5 +1,3 @@
-
-
 <template>
   <div class="drawer min-h-screen">
     <!-- Checkbox toggle untuk drawer -->
@@ -15,26 +13,17 @@
         <div class="bg-[#E8FCCF] p-10 rounded-2xl w-full max-w-4xl mx-auto">
           <h1 class="text-3xl font-bold mb-8 text-green-900">Tambahkan Data Pengepul</h1>
 
-          <form class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <form @submit.prevent="submitForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Nama -->
             <div class="flex flex-col">
               <label for="nama" class="mb-2 text-green-900">Nama Pengepul</label>
               <input
                 id="nama"
+                v-model="form.nama"
                 type="text"
                 class="input input-bordered rounded-full bg-white text-black placeholder-black"
                 placeholder="Masukkan nama"
-              />
-            </div>
-
-            <!-- Tanggal -->
-            <div class="flex flex-col">
-              <label for="tanggal" class="mb-2 text-green-900">Tanggal Perekrutan</label>
-              <input
-                id="tanggal"
-                type="date"
-                class="input input-bordered rounded-full bg-white text-black placeholder-black"
-                style="color-scheme: light;"
+                required
               />
             </div>
 
@@ -43,9 +32,11 @@
               <label for="email" class="mb-2 text-green-900">Email Pengepul</label>
               <input
                 id="email"
+                v-model="form.email"
                 type="email"
                 class="input input-bordered rounded-full bg-white text-black placeholder-black"
                 placeholder="@gmail.com"
+                required
               />
             </div>
 
@@ -54,40 +45,65 @@
               <label for="telepon" class="mb-2 text-green-900">Nomor Telepon</label>
               <input
                 id="telepon"
+                v-model="form.telepon"
                 type="tel"
                 class="input input-bordered rounded-full bg-white text-black placeholder-black"
                 placeholder="08xxxxxxxxxx"
+                required
+              />
+            </div>
+
+            <!-- Password -->
+            <div class="flex flex-col">
+              <label for="password" class="mb-2 text-green-900">Password</label>
+              <input
+                id="password"
+                v-model="form.password"
+                type="password"
+                class="input input-bordered rounded-full bg-white text-black placeholder-black"
+                placeholder="Password"
+                required
+              />
+            </div>
+
+            <!-- Password Confirmation -->
+            <div class="flex flex-col">
+              <label for="password_confirmation" class="mb-2 text-green-900">Konfirmasi Password</label>
+              <input
+                id="password_confirmation"
+                v-model="form.password_confirmation"
+                type="password"
+                class="input input-bordered rounded-full bg-white text-black placeholder-black"
+                placeholder="Konfirmasi Password"
+                required
               />
             </div>
 
             <!-- Tombol -->
-<div class="col-span-2 mt-4 flex gap-4">
-  <!-- Tombol Kembali -->
-  
+            <div class="col-span-2 mt-4 flex gap-4">
+              <button
+                type="submit"
+                class="btn px-10 rounded-full text-white"
+                style="background-color: #3E8914;"
+              >
+                Tambahkan
+              </button>
 
-  <!-- Tombol Tambahkan -->
-  <button
-    type="submit"
-    class="btn px-10 rounded-full text-white"
-    style="background-color: #3E8914;"
-  >
-    Tambahkan
-  </button>
-  <a
-    href="/data-pengepul"
-    class="btn px-10 rounded-full text-green-900"
-    style="background-color: #FFFFFF;" 
-  >
-    Kembali
-  </a>
-</div>
+              <router-link
+                to="/data-pengepul"
+                class="btn px-10 rounded-full text-green-900"
+                style="background-color: #FFFFFF;"
+              >
+                Kembali
+              </router-link>
+            </div>
 
           </form>
         </div>
       </div>
     </div>
 
-    <!-- Drawer sidebar yang akan ditampilkan ketika toggle aktif -->
+    <!-- Drawer sidebar -->
     <div class="drawer-side z-50">
       <label for="my-drawer" class="drawer-overlay"></label>
       <ul class="menu p-4 w-64 min-h-full bg-white text-green-900">
@@ -102,3 +118,40 @@
     </div>
   </div>
 </template>
+
+<script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import axios from 'axios'
+
+const router = useRouter()
+
+const form = ref({
+  nama: '',
+  tanggal: '',
+  email: '',
+  telepon: '',
+  password: '',
+  password_confirmation: '',
+})
+
+const submitForm = async () => {
+  try {
+    const response = await axios.post('http://127.0.0.1:8000/api/pengepul', {
+      name: form.value.nama,
+      created_at: form.value.tanggal, // Kalau tidak dipakai di backend, abaikan saja
+      email: form.value.email,
+      no_phone: form.value.telepon,
+      password: form.value.password,
+      password_confirmation: form.value.password_confirmation,
+    })
+    console.log('Data berhasil ditambahkan:', response.data)
+
+    // Redirect ke halaman data-pengepul
+    router.push('/data-pengepul')
+  } catch (error) {
+    console.error('Gagal menambahkan data:', error.response?.data || error.message)
+    alert('Gagal menambahkan data! Periksa kembali inputannya.')
+  }
+}
+</script>

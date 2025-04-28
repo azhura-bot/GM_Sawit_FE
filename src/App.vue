@@ -16,7 +16,6 @@ import Navbar from './components/Navbar.vue'
 
 const route = useRoute()
 
-// Daftar path di mana Navbar TIDAK ditampilkan
 const hideNavbarRoutes = [
   '/home-pengepul',
   '/pengajuan-jadwal',
@@ -27,13 +26,8 @@ const hideNavbarRoutes = [
    '/harga-pengepul',
    '/laporan-pengepul',
   '/home-petani',
-<<<<<<< HEAD
-  '/riwayat-petani',  
-  '/pengajuan-jadwal-petani',
-=======
   '/profile-pengepul',
   '/edit-profile-pengepul'
->>>>>>> 9ad616b8968f9511c0f468b67176c809e557a6d4
 
 ]
 

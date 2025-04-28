@@ -18,14 +18,11 @@ import DetailTugasView from "../views/pengepul/DetailTugasView.vue";
 import ArtikelPengepulView from "../views/pengepul/ArtikelPengepulView.vue";
 import DetailArtikelPengepulView from "../views/pengepul/DetailArtikelPengepulView.vue";
 import HomePetaniView from "../views/Petani/HomePetaniView.vue";
-<<<<<<< HEAD
 import RiwayatPetaniView from "../views/Petani/RiwayatPetaniView.vue";
-=======
 import HargaPengepulView from "../views/pengepul/HargaPengepulView.vue";
 import LaporanPengepulView from "../views/pengepul/LaporanPengepulView.vue";
 import ProfilPengepulView from "../views/pengepul/ProfilPengepulView.vue";
 import EditProfilePengepulView from "../views/pengepul/EditProfilePengepulView.vue";
->>>>>>> 9ad616b8968f9511c0f468b67176c809e557a6d4
 
 
 const router = createRouter({
@@ -67,9 +64,10 @@ const router = createRouter({
             component: TambahBeritaView
         },
         {
-            path: '/edit-berita',
+            path: '/edit-berita/:id',
             name: 'EditBerita',
-            component: EditBeritaView
+            component: EditBeritaView,
+            props: true,  
         },
         {
             path: '/data-statistik',
