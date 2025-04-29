@@ -91,7 +91,7 @@ const submitForm = async () => {
   }
 
   try {
-    const { data } = await axios.post('http://localhost:8000/api/artikel', formData, {
+    const { data } = await axios.post('http://127.0.0.1:8000/api/artikel', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
     console.log('Artikel berhasil ditambahkan:', data)

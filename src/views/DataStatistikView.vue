@@ -5,17 +5,22 @@
       <div class="bg-white p-6 rounded-2xl shadow-md">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-2xl font-bold text-green-900">Statistik hingga saat ini</h2>
-          <div class="flex gap-2">
-            <button class="bg-gray-100 px-3 py-1 rounded-full text-sm hover:bg-gray-200 hover:shadow-md transition-all">
-              🔍 Filter
-            </button>
-            <button class="bg-gray-100 px-2 py-1 rounded-full text-sm hover:bg-gray-200 hover:shadow-md transition-all">
-              ◀
-            </button>
-            <button class="bg-gray-100 px-2 py-1 rounded-full text-sm hover:bg-gray-200 hover:shadow-md transition-all">
-              ▶
-            </button>
+          <div class="flex justify-between items-center mb-4">
+            <!-- <h2 class="text-2xl font-bold text-green-900">Statistik hingga saat ini</h2>
+            <div class="flex gap-2">
+              <button class="bg-gray-100 px-3 py-1 rounded-full text-sm hover:bg-gray-200 hover:shadow-md transition-all">
+                🔍 Filter
+              </button>
+              <button class="bg-gray-100 px-2 py-1 rounded-full text-sm hover:bg-gray-200 hover:shadow-md transition-all">
+                ◀
+              </button>
+              <button class="bg-gray-100 px-2 py-1 rounded-full text-sm hover:bg-gray-200 hover:shadow-md transition-all">
+                ▶
+              </button>
+            </div> -->
           </div>
+            <!-- Grafik Garis -->
+        <apexchart type="line" height="350" :options="chartOptions" :series="series"></apexchart>
         </div>
         <div class="h-40 bg-gradient-to-t from-green-200 to-white rounded-md"></div>
         <!-- Grafik Dummy -->
@@ -23,9 +28,9 @@
 
   
       <!-- Presentase Kenaikan & Penurunan -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-4"> -->
         <!-- Kenaikan -->
-        <div class="bg-lime-100 p-6 rounded-2xl shadow-md relative">
+        <!-- <div class="bg-lime-100 p-6 rounded-2xl shadow-md relative">
           <div class="absolute top-4 right-4">
             <button class="bg-gray-100 px-3 py-1 rounded-full text-sm hover:bg-gray-200 hover:shadow-md transition-all">
               🔍 Filter
@@ -34,10 +39,10 @@
           <h3 class="text-xl font-bold text-green-900 mb-2">Presentase Kenaikan</h3>
           <div class="text-4xl font-extrabold text-green-900 mb-4">12%</div>
           <div class="h-20 bg-green-300 rounded-md"></div>
-        </div>
+        </div> -->
   
         <!-- Penurunan -->
-        <div class="bg-lime-100 p-6 rounded-2xl shadow-md relative">
+        <!-- <div class="bg-lime-100 p-6 rounded-2xl shadow-md relative">
           <div class="absolute top-4 right-4">
             <button class="bg-gray-100 px-3 py-1 rounded-full text-sm hover:bg-gray-200 hover:shadow-md transition-all">
               🔍 Filter
@@ -47,7 +52,7 @@
           <div class="text-4xl font-extrabold text-green-900 mb-4">5%</div>
           <div class="h-20 bg-green-300 rounded-md"></div>
         </div>
-      </div>
+      </div> -->
   
       <!-- Form Manajemen Harga -->
       <div class="bg-white p-6 rounded-2xl shadow-md grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
@@ -79,7 +84,8 @@
   
         <!-- Kalender Dummy -->
         <div>
-          <label class="font-semibold text-green-900 mb-2 block">Tanggal Input Harga</label>
+          <!-- <label class="font-semibold text-green-900 mb-2 block">Tanggal Input Harga</label> -->
+          <h3 class="text-2xl font-bold text-green-900">Tanggal Input Harga</h3>
           <div class="bg-white border rounded-xl shadow-md p-4">
             <div class="font-bold text-lg mb-2">Month 2000</div>
             <div class="grid grid-cols-7 text-center text-sm gap-y-1">

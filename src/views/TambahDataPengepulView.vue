@@ -48,7 +48,7 @@
                 v-model="form.telepon"
                 type="tel"
                 class="input input-bordered rounded-full bg-white text-black placeholder-black"
-                placeholder="08xxxxxxxxxx"
+                placeholder="+628xxxxxxxxxx"
                 required
               />
             </div>
@@ -128,7 +128,7 @@ const router = useRouter()
 
 const form = ref({
   nama: '',
-  tanggal: '',
+  // tanggal: '',
   email: '',
   telepon: '',
   password: '',
@@ -139,7 +139,7 @@ const submitForm = async () => {
   try {
     const response = await axios.post('http://127.0.0.1:8000/api/pengepul', {
       name: form.value.nama,
-      created_at: form.value.tanggal, // Kalau tidak dipakai di backend, abaikan saja
+      // created_at: form.value.tanggal, // Kalau tidak dipakai di backend, abaikan saja
       email: form.value.email,
       no_phone: form.value.telepon,
       password: form.value.password,
