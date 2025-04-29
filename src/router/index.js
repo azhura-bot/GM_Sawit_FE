@@ -110,10 +110,10 @@ const router = createRouter({
             component: DetailTugasView
         },
         {
-            path: '/artikel-pengepul',
+            path: '/artikel',
             name: 'ArtikelPengepul',
             component: ArtikelPengepulView
-        },
+        },
         {
             path: '/detail-artikel-pengepul',
             name: 'DetailArtikelPengepul',

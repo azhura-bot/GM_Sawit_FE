@@ -22,15 +22,17 @@
             <p>Pengajuan Jadwal</p>
           </router-link>
 
-          <router-link to="/riwayat-pengajuan" class="main-image">
+          <router-link to="/riwayat-petani" class="main-image">
             <img src="@/assets/riwayat-pengajuan.png" alt="Riwayat Pengajuan" />
             <p>Riwayat Pengajuan</p>
           </router-link>
 
-          <router-link to="/artikel-pengepul" class="main-image">
+          <router-link to="/artikel" class="main-image">
             <img src="@/assets/icon-artikel.png" alt="Artikel" />
             <p>Artikel</p>
           </router-link>
+
+
 
           <div class="main-image">
             <img src="@/assets/icon-harga.png" alt="Data Harga" />

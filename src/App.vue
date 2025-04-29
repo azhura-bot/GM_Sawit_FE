@@ -29,6 +29,7 @@ const hideNavbarRoutes = [
   '/profile-pengepul',
   '/edit-profile-pengepul',
   '/riwayat-petani',
+  '/artikel',
 
 ]
 
