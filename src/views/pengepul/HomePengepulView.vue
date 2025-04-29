@@ -17,11 +17,11 @@
       <section class="menu-section">
         <h2>Menu</h2>
         <div class="menu-grid">
-          <router-link to="/pengajuan-jadwal" class="menu-item">
+          <router-link to="/tugas-utama-pengepul" class="menu-item">
             <img src="@/assets/icon-tugas.png" alt="Transaksi" />
-            <p>Transaksi</p>
+            <p>Tugas</p>
           </router-link>
-          <router-link to="/artikel" class="main-image">
+          <router-link to="/artikel" class="menu-item">
             <img src="@/assets/icon-artikel.png" alt="Artikel" />
             <p>Artikel</p>
           </router-link>
@@ -69,7 +69,6 @@
       <section class="harga-section">
         <h2>Harga Hari Ini</h2>
         <h3>Statistik hingga saat ini</h3>
-
         <apexchart
           type="area"
           height="300"
@@ -183,7 +182,11 @@ export default {
   border-radius: 16px 16px 0 0;
   padding: 16px;
 }
-.image-section { border-radius: 16px; overflow: hidden; margin-bottom: 16px; }
+.image-section {
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
 
 /* Menu Section Styles */
 .menu-section h2 {
@@ -194,8 +197,10 @@ export default {
 }
 .menu-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
   gap: 16px;
+  justify-items: center;
+  text-align: center;
 }
 .menu-item {
   display: flex;
@@ -224,27 +229,57 @@ export default {
 .trending-cards {
   display: flex;
   gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 8px;
 }
 .card {
   background: #f2f2f2;
-  flex: 1;
+  flex: 0 0 auto;
+  width: 200px;
   border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
 }
-.card-image img { width: 100%; height: 100px; object-fit: cover; }
-.card-content { padding: 8px; }
-.card-content h3 { font-size: 14px; margin: 4px 0; }
-.card-content p { font-size: 12px; color: #666; }
-.no-articles { text-align: center; color: #666; font-style: italic; }
+.card-image img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+}
+.card-content {
+  padding: 8px;
+}
+.card-content h3 {
+  font-size: 14px;
+  margin: 4px 0;
+}
+.card-content p {
+  font-size: 12px;
+  color: #666;
+}
+.no-articles {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+}
 
 /* Harga Section Styles */
 .harga-section {
   margin-top: 24px;
 }
-.harga-section h2,
+.harga-section h2 {
+  margin: 24px 0 12px;
+  color: #134611;
+  font-size: 20px;
+  font-weight: bold;
+}
+
 .harga-section h3 {
   color: #134611;
 }
-.chart-image { width: 100%; margin-top: 8px; border-radius: 12px; }
+
+.chart-image {
+  width: 100%;
+  margin-top: 8px;
+  border-radius: 12px;
+}
 </style>
