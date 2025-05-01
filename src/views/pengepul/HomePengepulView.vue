@@ -207,7 +207,7 @@ export default {
   flex-direction: column;
   align-items: center;
   text-decoration: none;
-  color: inherit;
+  color:#164b1b;
 }
 .menu-item img {
   width: 48px;
