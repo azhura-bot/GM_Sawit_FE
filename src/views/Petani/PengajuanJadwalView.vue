@@ -12,38 +12,51 @@
       <section class="form-section">
         <div class="form-icon-wrapper">
           <img src="@/assets/pengajuan-jadwal.png" alt="Pengajuan Icon" class="form-icon" />
-          <p class="form-icon-text">Pengajuan Jadwal</p> <!-- Tambahin teks di sini -->
+          <p class="form-icon-text">Pengajuan Jadwal</p>
         </div>
 
-        
+        <form class="form-card" @submit.prevent="handleSubmit">
+          <p class="form-description">Masukkan data Anda pada form di bawah ini</p>
 
-        <form class="form" @submit.prevent="handleSubmit">
-          <p class="form-description">Masukan data anda pada form dibawah ini</p>
           <div class="form-group">
-            <input type="text" placeholder="Nama Petani" />
+            <label>Nama Petani</label>
+            <input type="text" placeholder="Contoh: Budi Siregar" />
           </div>
+
           <div class="form-group">
-            <input type="text" placeholder="Nomor Telephone" />
+            <label>Nomor Telephone</label>
+            <input type="text" placeholder="0812xxxxxxxx" />
           </div>
+
           <div class="form-group">
-            <input type="email" placeholder="Email" />
+            <label>Email</label>
+            <input type="email" placeholder="nama@email.com" />
           </div>
+
           <div class="form-group">
-            <input type="date" placeholder="Tanggal Pengambilan" />
+            <label>Tanggal Pengambilan</label>
+            <input type="date" />
           </div>
+
           <div class="form-group">
-            <input type="text" placeholder="Alamat" />
+            <label>Alamat</label>
+            <input type="text" v-model="alamat" placeholder="Jl. Mawar No. 1, Bogor" readonly />
+            <button type="button" class="btn map-picker" @click="openMapModal">📍 Pilih di Peta</button>
           </div>
+
+
           <div class="form-group">
-            <input type="number" placeholder="Jumlah" />
+            <label>Jumlah</label>
+            <input type="number" placeholder="Contoh: 20 kg" />
           </div>
 
           <div class="button-group">
-            <button type="button" class="btn cancel" @click="cancelForm">Cancel</button>
+            <button type="button" class="btn cancel" @click="cancelForm">Batal</button>
             <button type="submit" class="btn submit">Kirim</button>
           </div>
         </form>
       </section>
+
     </main>
 
     <!-- Modal -->
@@ -130,6 +143,17 @@ export default {
   align-items: center; /* Tengahin gambar + teks */
 }
 
+.form-card {
+  width: 100%;
+  background-color: #ffffff;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .form-icon {
   width: 80px;
   height: 80px;
@@ -164,8 +188,9 @@ export default {
 .form-description {
   text-align: center;
   color: #134611;
-  font-weight: bold;
-  margin-bottom: 16px;
+  font-weight: 500;
+  font-size: 15px;
+  margin-bottom: 8px;
 }
 
 .form {
@@ -176,43 +201,70 @@ export default {
 }
 
 .form-group {
-  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: #333;
+  font-size: 14px;
 }
 
 .form-group input {
-  width: 100%;
-  padding: 10px;
-  border: none;
-  border-radius: 9999px;
-  background-color: white;
+  padding: 12px 16px;
+  border: 1px solid #cfcfcf;
+  border-radius: 12px;
+  background-color: #f9f9f9;
+  font-size: 14px;
+  transition: border 0.3s ease;
 }
+
+.form-group input:focus {
+  outline: none;
+  border-color: #4b830d;
+  background-color: #fff;
+}
+
+
 
 .button-group {
   display: flex;
   justify-content: space-between;
-  margin-top: 16px;
+  gap: 12px;
+  margin-top: 8px;
 }
 
 .btn {
   flex: 1;
-  padding: 10px;
+  padding: 12px;
   border: none;
   border-radius: 9999px;
   font-weight: bold;
+  font-size: 14px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .cancel {
-  background-color: #009fe3;
-  color: white;
-  margin-right: 8px;
+  background-color: #d1e8f5;
+  color: #0078b7;
+}
+
+.cancel:hover {
+  background-color: #b0d9ef;
 }
 
 .submit {
   background-color: #4b830d;
   color: white;
-  margin-left: 8px;
 }
+
+.submit:hover {
+  background-color: #3a6a0a;
+}
+
 
 /* Modal Styling */
 .modal-overlay {
