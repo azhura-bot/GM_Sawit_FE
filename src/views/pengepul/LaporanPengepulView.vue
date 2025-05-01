@@ -27,24 +27,16 @@
             <input v-model="form.nomorTelepon" type="tel" />
           </div>
           <div class="form-group">
-            <label>Tanggal Pengambilan</label>
-            <input v-model="form.tanggalPengambilan" type="date" />
-          </div>
-          <div class="form-group">
             <label>Alamat</label>
             <input v-model="form.alamat" type="text" />
           </div>
           <div class="form-group">
-            <label>Jumlah</label>
+            <label>Jumlah (kg)</label>
             <input v-model="form.jumlah" type="number" />
           </div>
           <div class="form-group">
-            <label>Jam Tiba</label>
-            <input v-model="form.jamTiba" type="time" />
-          </div>
-          <div class="form-group">
-            <label>Jam Pengangkutan</label>
-            <input v-model="form.jamPengangkutan" type="time" />
+            <label>Harga Sawit</label>
+            <input v-model="form.jumlah" type="number" />
           </div>
           <div class="form-group">
             <label>Total Harga</label>
@@ -129,7 +121,7 @@ export default {
   margin-top: 12px;
   width: 100%;
   max-width: 430px;
-  border-radius: 16px 16px 0 0;
+  border-radius: 16px 16px 16px 16px;
   padding: 16px;
 }
 
