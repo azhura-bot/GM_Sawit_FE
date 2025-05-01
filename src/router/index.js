@@ -35,11 +35,6 @@ const router = createRouter({
         // },
         {
             path: "/",
-            name: 'dashboard',
-            component: DashboardView
-        },
-        {
-            path: "/tugas",
             name: 'tugas',
             component: TugasView
         },

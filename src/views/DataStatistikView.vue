@@ -1,125 +1,180 @@
 <template>
-    <div class="min-h-screen bg-gray-50 p-6 space-y-8">
-      
-      <!-- Statistik Grafik -->
-      <div class="bg-white p-6 rounded-2xl shadow-md">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-2xl font-bold text-green-900">Statistik hingga saat ini</h2>
-          <div class="flex justify-between items-center mb-4">
-            <!-- <h2 class="text-2xl font-bold text-green-900">Statistik hingga saat ini</h2>
-            <div class="flex gap-2">
-              <button class="bg-gray-100 px-3 py-1 rounded-full text-sm hover:bg-gray-200 hover:shadow-md transition-all">
-                🔍 Filter
-              </button>
-              <button class="bg-gray-100 px-2 py-1 rounded-full text-sm hover:bg-gray-200 hover:shadow-md transition-all">
-                ◀
-              </button>
-              <button class="bg-gray-100 px-2 py-1 rounded-full text-sm hover:bg-gray-200 hover:shadow-md transition-all">
-                ▶
-              </button>
-            </div> -->
-          </div>
-            <!-- Grafik Garis -->
-        <apexchart type="line" height="350" :options="chartOptions" :series="series"></apexchart>
+  <div class="min-h-screen bg-gray-50 p-6 space-y-8">
+    <!-- Statistik Grafik -->
+    <div class="bg-white p-6 rounded-2xl shadow-md">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-bold text-green-900">Statistik hingga saat ini</h2>
+      </div>
+      <apexchart type="line" height="350" :options="chartOptions" :series="series" />
+    </div>
+
+    <!-- Form Manajemen Harga -->
+    <div class="bg-white p-6 rounded-2xl shadow-md grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+      <!-- Form Input -->
+      <div class="space-y-6">
+        <div class="flex items-center gap-3">
+          <div class="bg-green-900 text-white p-3 rounded-xl text-xl">💵</div>
+          <h3 class="text-2xl font-bold text-green-900">Manajemen Data Harga Kelapa Sawit</h3>
         </div>
-        <div class="h-40 bg-gradient-to-t from-green-200 to-white rounded-md"></div>
-        <!-- Grafik Dummy -->
+
+        <div class="flex gap-3">
+          <button class="bg-green-700 text-white px-4 py-2 rounded-full font-semibold hover:bg-green-800 hover:shadow-md transition-all">
+            Kenaikan
+          </button>
+          <button class="bg-gray-200 text-green-900 px-4 py-2 rounded-full font-semibold hover:bg-gray-300 hover:shadow-md transition-all">
+            Penurunan
+          </button>
+        </div>
+
+        <div class="space-y-4">
+          <input v-model="form.harga" type="text" placeholder="Harga per Kg" class="w-full p-3 rounded-full bg-gray-200 focus:outline-none" />
+          <input v-model="form.kenaikan" type="text" placeholder="Harga kenaikan" class="w-full p-3 rounded-full bg-gray-200 focus:outline-none" />
+          <input v-model="form.presentase" type="text" placeholder="Presentase Kenaikan" class="w-full p-3 rounded-full bg-gray-200 focus:outline-none" />
+        </div>
+
+        <button @click="submitData" class="bg-green-700 text-white px-6 py-3 rounded-full font-bold">Masukan Data</button>
       </div>
 
-  
-      <!-- Presentase Kenaikan & Penurunan -->
-      <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-4"> -->
-        <!-- Kenaikan -->
-        <!-- <div class="bg-lime-100 p-6 rounded-2xl shadow-md relative">
-          <div class="absolute top-4 right-4">
-            <button class="bg-gray-100 px-3 py-1 rounded-full text-sm hover:bg-gray-200 hover:shadow-md transition-all">
-              🔍 Filter
-            </button>
+      <!-- Kalender Dinamis -->
+      <div>
+        <h3 class="text-2xl font-bold text-green-900 mb-2">Tanggal Input Harga</h3>
+        <div class="bg-white border rounded-xl shadow-md p-4">
+          <div class="flex justify-between items-center mb-4">
+            <button @click="prevMonth" class="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300">&laquo;</button>
+            <div class="font-bold text-lg">{{ monthYearLabel }}</div>
+            <button @click="nextMonth" class="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300">&raquo;</button>
           </div>
-          <h3 class="text-xl font-bold text-green-900 mb-2">Presentase Kenaikan</h3>
-          <div class="text-4xl font-extrabold text-green-900 mb-4">12%</div>
-          <div class="h-20 bg-green-300 rounded-md"></div>
-        </div> -->
-  
-        <!-- Penurunan -->
-        <!-- <div class="bg-lime-100 p-6 rounded-2xl shadow-md relative">
-          <div class="absolute top-4 right-4">
-            <button class="bg-gray-100 px-3 py-1 rounded-full text-sm hover:bg-gray-200 hover:shadow-md transition-all">
-              🔍 Filter
-            </button>
-          </div>
-          <h3 class="text-xl font-bold text-green-900 mb-2">Presentase Penurunan</h3>
-          <div class="text-4xl font-extrabold text-green-900 mb-4">5%</div>
-          <div class="h-20 bg-green-300 rounded-md"></div>
-        </div>
-      </div> -->
-  
-      <!-- Form Manajemen Harga -->
-      <div class="bg-white p-6 rounded-2xl shadow-md grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-        <!-- Info & Input -->
-        <div class="space-y-6">
-          <div class="flex items-center gap-3">
-            <div class="bg-green-900 text-white p-3 rounded-xl text-xl">💵</div>
-            <h3 class="text-2xl font-bold text-green-900">Manajemen Data Harga Kelapa Sawit</h3>
-          </div>
-  
-          <div class="flex gap-3">
-            <button class="bg-green-700 text-white px-4 py-2 rounded-full font-semibold hover:bg-green-800 hover:shadow-md transition-all">
-              Kenaikan
-            </button>
-            <button class="bg-gray-200 text-green-900 px-4 py-2 rounded-full font-semibold hover:bg-gray-300 hover:shadow-md transition-all">
-              Penurunan
-            </button>
-          </div>
+          <div class="grid grid-cols-7 text-center text-sm gap-y-1">
+            <div class="text-gray-400">Mon</div>
+            <div class="text-gray-400">Tue</div>
+            <div class="text-gray-400">Wed</div>
+            <div class="text-gray-400">Thu</div>
+            <div class="text-gray-400">Fri</div>
+            <div class="text-gray-400">Sat</div>
+            <div class="text-gray-400">Sun</div>
 
-  
-          <div class="space-y-4">
-            <input type="text" placeholder="Harga per Kg" class="w-full p-3 rounded-full bg-gray-200 focus:outline-none" />
-            <input type="text" placeholder="Harga kenaikan" class="w-full p-3 rounded-full bg-gray-200 focus:outline-none" />
-            <input type="text" placeholder="Presentase Kenaikan" class="w-full p-3 rounded-full bg-gray-200 focus:outline-none" />
-          </div>
-  
-          <button class="bg-green-700 text-white px-6 py-3 rounded-full font-bold">Masukan Data</button>
-        </div>
-  
-        <!-- Kalender Dummy -->
-        <div>
-          <!-- <label class="font-semibold text-green-900 mb-2 block">Tanggal Input Harga</label> -->
-          <h3 class="text-2xl font-bold text-green-900">Tanggal Input Harga</h3>
-          <div class="bg-white border rounded-xl shadow-md p-4">
-            <div class="font-bold text-lg mb-2">Month 2000</div>
-            <div class="grid grid-cols-7 text-center text-sm gap-y-1">
-              <div class="text-gray-400">Mon</div>
-              <div class="text-gray-400">Tue</div>
-              <div class="text-gray-400">Wed</div>
-              <div class="text-gray-400">Thu</div>
-              <div class="text-gray-400">Fri</div>
-              <div class="text-gray-400">Sat</div>
-              <div class="text-gray-400">Sun</div>
-              <!-- Angka Dummy -->
-              <div class="text-gray-400">28</div>
-              <div class="text-gray-400">29</div>
-              <div class="text-gray-400">30</div>
-              <div class="text-gray-400">31</div>
-              <div>1</div><div>2</div><div>3</div>
-              <div>4</div><div>5</div><div>6</div><div>7</div><div>8</div><div>9</div><div>10</div>
-              <div>11</div><div>12</div><div>13</div><div>14</div><div>15</div><div>16</div><div>17</div>
-              <div>18</div><div>19</div><div>20</div><div>21</div><div>22</div><div>23</div><div>24</div>
-              <div>25</div><div>26</div><div>27</div><div>28</div><div>29</div><div>30</div><div>31</div>
+            <div v-for="blank in startDay" :key="'b'+blank" class="text-gray-200">-</div>
+            <div
+              v-for="day in daysInMonth"
+              :key="day"
+              class="hover:bg-green-100 cursor-pointer rounded-full py-1"
+              :class="{ 'text-green-800 font-bold': isToday(day) }"
+            >
+              {{ day }}
             </div>
           </div>
         </div>
       </div>
-  
     </div>
-  </template>
-  
-  <script>
+  </div>
+</template>
+
+<script>
+import axios from 'axios';
+
 export default {
   name: "StatistikHarga",
+  data() {
+    const today = new Date();
+    return {
+      currentMonth: today.getMonth(),
+      currentYear: today.getFullYear(),
+      todayDate: today,
+      form: {
+        harga: '',
+        kenaikan: '',
+        presentase: ''
+      },
+      series: [],
+      chartOptions: {
+        chart: { id: "harga-chart" },
+        xaxis: { categories: [] },
+        stroke: { curve: 'smooth' },
+        title: {
+          text: "Harga Kelapa Sawit per Bulan",
+          align: 'left'
+        }
+      }
+    };
+  },
+  computed: {
+    daysInMonth() {
+      return new Date(this.currentYear, this.currentMonth + 1, 0).getDate();
+    },
+    startDay() {
+      const day = new Date(this.currentYear, this.currentMonth, 1).getDay();
+      return (day + 6) % 7; // Monday = 0
+    },
+    monthYearLabel() {
+      const months = [
+        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+        "Juli", "Agustus", "September", "Oktober", "November", "Desember",
+      ];
+      return `${months[this.currentMonth]} ${this.currentYear}`;
+    }
+  },
+  mounted() {
+    this.fetchChartData();
+  },
+  methods: {
+    async fetchChartData() {
+      try {
+        const response = await axios.get('https://api.example.com/statistik-harga');
+        const data = response.data;
+        this.series = [
+          {
+            name: "Harga Sawit",
+            data: data.map(item => item.harga)
+          }
+        ];
+        this.chartOptions.xaxis.categories = data.map(item => item.bulan);
+      } catch (error) {
+        console.error("Gagal memuat data grafik:", error);
+      }
+    },
+    async submitData() {
+      try {
+        const payload = {
+          harga: this.form.harga,
+          kenaikan: this.form.kenaikan,
+          presentase: this.form.presentase,
+        };
+        await axios.post('https://api.example.com/input-harga', payload);
+        alert("Data berhasil dikirim!");
+        this.fetchChartData();
+      } catch (error) {
+        console.error("Gagal mengirim data:", error);
+        alert("Terjadi kesalahan saat mengirim data.");
+      }
+    },
+    prevMonth() {
+      if (this.currentMonth === 0) {
+        this.currentMonth = 11;
+        this.currentYear -= 1;
+      } else {
+        this.currentMonth -= 1;
+      }
+    },
+    nextMonth() {
+      if (this.currentMonth === 11) {
+        this.currentMonth = 0;
+        this.currentYear += 1;
+      } else {
+        this.currentMonth += 1;
+      }
+    },
+    isToday(day) {
+      const t = this.todayDate;
+      return (
+        day === t.getDate() &&
+        this.currentMonth === t.getMonth() &&
+        this.currentYear === t.getFullYear()
+      );
+    }
+  }
 };
 </script>
 
 <style scoped>
-/* Tambahan jika perlu kustomisasi style lebih lanjut */
+/* Tambahan jika ingin mempercantik kalender atau form */
 </style>

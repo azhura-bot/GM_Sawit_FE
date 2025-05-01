@@ -127,35 +127,45 @@
       <!-- Grid card pengepul -->
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         <div
-          v-for="pengepul in pengepulList"
-          :key="pengepul.id"
-          class="bg-white shadow-md p-4 rounded-2xl relative flex flex-col gap-2 text-center text-green-900"
-        >
-          <div class="w-16 h-16 bg-gray-300 rounded-full mx-auto mb-2"></div>
-          <p class="font-bold">{{ pengepul.name }}</p>
-          <p class="text-sm">{{ formatDate(pengepul.created_at) }}</p>
-          <p class="mt-1 text-sm">
-            <strong>{{ pengepul.email }}</strong><br />
-          </p>
-          <p class="mt-1 text-sm">{{ pengepul.no_phone || 'Nomor Handphone tidak tersedia' }}</p>
+        v-for="pengepul in pengepulList"
+        :key="pengepul.id"
+        class="bg-white shadow-lg p-6 rounded-2xl relative flex flex-col gap-4 text-center text-green-900 transform transition-all hover:scale-105 hover:shadow-2xl">
+        
+        <!-- Nama Pengepul -->
+        <p class="font-bold text-2xl text-green-800">{{ pengepul.name }}</p>
 
-          <div class="absolute top-2 right-2 flex gap-2">
-            <button @click="openEdit(pengepul)" class="text-orange-500 hover:text-orange-600">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 16H9v-2.828z" />
-              </svg>
-            </button>
-            <button @click="openDelete(pengepul)" class="text-red-500 hover:text-red-600">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m2 0H7" />
-              </svg>
-            </button>
-          </div>
+        <!-- Tanggal Perekrutan -->
+        <p class="text-sm text-gray-600">{{ formatDate(pengepul.created_at) }}</p>
+
+        <!-- Email -->
+        <p class="mt-2 text-sm text-gray-700">
+          <strong>Email:</strong> {{ pengepul.email }}
+        </p>
+
+        <!-- Nomor Handphone -->
+        <p class="mt-1 text-sm text-gray-600">
+          <strong>Nomor Handphone:</strong> {{ pengepul.no_phone || 'Nomor Handphone tidak tersedia' }}
+        </p>
+
+        <!-- Tombol Aksi -->
+        <div class="absolute top-2 right-2 flex gap-2">
+          <button @click="openEdit(pengepul)" class="text-orange-500 hover:text-orange-600">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 16H9v-2.828z" />
+            </svg>
+          </button>
+          <button @click="openDelete(pengepul)" class="text-red-500 hover:text-red-600">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m2 0H7" />
+            </svg>
+          </button>
         </div>
+      </div>
+
       </div>
     </div>
   </div>
