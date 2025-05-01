@@ -68,8 +68,18 @@
         <button class="btn close" @click="closeModal">Tutup</button>
       </div>
     </div>
+
+    <!-- Alamat -->
+    <div v-if="isMapOpen" class="modal-overlay">
+      <div class="modal-content" style="height: 80vh; padding: 0;">
+        <div id="map" style="width: 100%; height: 100%; border-radius: 24px;"></div>
+        <button class="btn close" style="position: absolute; top: 16px; right: 16px;" @click="closeMapModal">✖</button>
+      </div>
+    </div>
+
   </div>
 </template>
+
 
 <script>
 export default {
@@ -77,10 +87,18 @@ export default {
   data() {
     return {
       isModalOpen: false,
+      isMapOpen: false,
+      alamat: "",
+      latitude: null,
+      longitude: null,
+      map: null,
+      marker: null,
     };
   },
   methods: {
     handleSubmit() {
+      console.log("Alamat:", this.alamat);
+      console.log("Koordinat:", this.latitude, this.longitude);
       this.isModalOpen = true;
     },
     closeModal() {
@@ -89,9 +107,54 @@ export default {
     cancelForm() {
       this.$router.go(-1);
     },
+    openMapModal() {
+      this.isMapOpen = true;
+      this.$nextTick(() => {
+        this.initMap();
+      });
+    },
+    closeMapModal() {
+      this.isMapOpen = false;
+    },
+    initMap() {
+      const defaultPos = { lat: -6.595, lng: 106.816 }; // Bogor
+
+      this.map = new google.maps.Map(document.getElementById("map"), {
+        center: defaultPos,
+        zoom: 13,
+      });
+
+      this.marker = new google.maps.Marker({
+        position: defaultPos,
+        map: this.map,
+        draggable: true,
+      });
+
+      this.map.addListener("click", (e) => {
+        this.setMarker(e.latLng);
+      });
+
+      this.marker.addListener("dragend", (e) => {
+        this.setMarker(e.latLng);
+      });
+    },
+    setMarker(latLng) {
+      this.marker.setPosition(latLng);
+      this.latitude = latLng.lat();
+      this.longitude = latLng.lng();
+
+      const geocoder = new google.maps.Geocoder();
+      geocoder.geocode({ location: latLng }, (results, status) => {
+        if (status === "OK" && results[0]) {
+          this.alamat = results[0].formatted_address;
+          this.isMapOpen = false;
+        }
+      });
+    },
   },
 };
 </script>
+
 
 <style scoped>
 /* Styling sebelumnya tetap */
@@ -320,4 +383,16 @@ export default {
   color: white;
   width: 100%;
 }
+
+.map-picker {
+  background-color: #f0f0f0;
+  color: #333;
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+.map-picker:hover {
+  background-color: #e0e0e0;
+}
+
 </style>

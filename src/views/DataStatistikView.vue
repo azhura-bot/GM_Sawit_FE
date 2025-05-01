@@ -18,10 +18,18 @@
         </div>
 
         <div class="flex gap-3">
-          <button class="bg-green-700 text-white px-4 py-2 rounded-full font-semibold hover:bg-green-800 hover:shadow-md transition-all">
+          <button 
+            @click="selectCategory('kenaikan')"
+            :class="category === 'kenaikan' ? 'bg-green-700 text-white' : 'bg-gray-200 text-green-900'"
+            class="px-4 py-2 rounded-full font-semibold hover:shadow-md transition-all"
+          >
             Kenaikan
           </button>
-          <button class="bg-gray-200 text-green-900 px-4 py-2 rounded-full font-semibold hover:bg-gray-300 hover:shadow-md transition-all">
+          <button 
+            @click="selectCategory('penurunan')"
+            :class="category === 'penurunan' ? 'bg-green-700 text-white' : 'bg-gray-200 text-green-900'"
+            class="px-4 py-2 rounded-full font-semibold hover:shadow-md transition-all"
+          >
             Penurunan
           </button>
         </div>
@@ -57,8 +65,9 @@
             <div
               v-for="day in daysInMonth"
               :key="day"
+              @click="selectDate(day)"
               class="hover:bg-green-100 cursor-pointer rounded-full py-1"
-              :class="{ 'text-green-800 font-bold': isToday(day) }"
+              :class="{ 'text-green-800 font-bold': isToday(day), 'bg-green-300': day === selectedDate }"
             >
               {{ day }}
             </div>
@@ -80,6 +89,8 @@ export default {
       currentMonth: today.getMonth(),
       currentYear: today.getFullYear(),
       todayDate: today,
+      selectedDate: null,
+      category: 'kenaikan',
       form: {
         harga: '',
         kenaikan: '',
@@ -119,7 +130,7 @@ export default {
   methods: {
     async fetchChartData() {
       try {
-        const response = await axios.get('https://api.example.com/statistik-harga');
+        const response = await axios.get('http://127.0.0.1:8000/daftar_harga');
         const data = response.data;
         this.series = [
           {
@@ -127,19 +138,24 @@ export default {
             data: data.map(item => item.harga)
           }
         ];
-        this.chartOptions.xaxis.categories = data.map(item => item.bulan);
+        this.chartOptions.xaxis.categories = data.map(item => new Date(item.tanggal).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }));
       } catch (error) {
         console.error("Gagal memuat data grafik:", error);
       }
     },
     async submitData() {
+      if (!this.selectedDate) {
+        alert("Silakan pilih tanggal terlebih dahulu.");
+        return;
+      }
+
       try {
         const payload = {
           harga: this.form.harga,
-          kenaikan: this.form.kenaikan,
-          presentase: this.form.presentase,
+          tanggal: new Date(this.currentYear, this.currentMonth, this.selectedDate).toISOString().slice(0, 10),
+          kategori: this.category
         };
-        await axios.post('https://api.example.com/input-harga', payload);
+        await axios.post('http://127.0.0.1:8000/daftar_harga', payload);
         alert("Data berhasil dikirim!");
         this.fetchChartData();
       } catch (error) {
@@ -170,6 +186,12 @@ export default {
         this.currentMonth === t.getMonth() &&
         this.currentYear === t.getFullYear()
       );
+    },
+    selectDate(day) {
+      this.selectedDate = day;
+    },
+    selectCategory(category) {
+      this.category = category;
     }
   }
 };
