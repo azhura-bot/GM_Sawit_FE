@@ -76,7 +76,6 @@
         <button class="btn close" style="position: absolute; top: 16px; right: 16px;" @click="closeMapModal">✖</button>
       </div>
     </div>
-
   </div>
 </template>
 
