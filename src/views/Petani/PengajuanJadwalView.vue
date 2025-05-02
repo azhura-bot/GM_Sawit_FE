@@ -18,9 +18,20 @@
         <form class="form-card" @submit.prevent="handleSubmit">
           <p class="form-description">Masukkan data Anda pada form di bawah ini</p>
 
-          <div class="form-group">
+          <!-- <div class="form-group">
             <label>Nama Petani</label>
-            <input type="text" placeholder="Contoh: Budi Siregar" />
+            <select v-model="form.petani_id" required>
+              <option value="" disabled>Pilih Petani</option>
+              <option v-for="petani in petaniList" :key="petani.id" :value="petani.id">
+                {{ petani.name }}
+              </option>
+            </select>
+            <span v-if="errors.petani_id" class="error">{{ errors.petani_id }}</span>
+          </div> -->
+
+          <div class="form-group">
+            <label>Nama</label>
+            <input type="text" placeholder="Budi Santoso" />
           </div>
 
           <div class="form-group">
@@ -76,6 +87,7 @@
         <button class="btn close" style="position: absolute; top: 16px; right: 16px;" @click="closeMapModal">✖</button>
       </div>
     </div>
+
   </div>
 </template>
 

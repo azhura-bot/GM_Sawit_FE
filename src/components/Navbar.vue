@@ -1,64 +1,39 @@
 <template>
-  <div class="drawer z-50 relative">
-    <input id="my-drawer" type="checkbox" class="drawer-toggle" />
-    <div class="drawer-content">
-      <!-- Dashboard Header Card -->
-      <div class="m-4 mt-6 bg-[#E9FBD0] rounded-3xl p-6 shadow-md z-50 relative">
-        <div class="flex items-center justify-between">
-          <!-- Kiri: Icon & Title -->
-          <div class="flex items-center gap-4">
-            <label
-              for="my-drawer"
-              class="cursor-pointer w-14 h-14 bg-white rounded-full flex items-center justify-center z-50"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </label>
-
-            <div>
-              <h1 class="text-green-900 font-bold text-lg">Manajer</h1>
-              <p class="text-green-900 text-sm">Dashboard</p>
-            </div>
-          </div>
-
-          <!-- Kanan: User Info -->
-          <div class="flex items-center gap-4">
-            <div class="text-right">
-              <h1 class="text-green-900 font-bold">Jackson Miguel Wong</h1>
-              <p class="text-green-900 text-sm">Manajer</p>
-            </div>
-            <router-link to="/profile">
-              <img
-                src="https://randomuser.me/api/portraits/men/32.jpg"
-                alt="Profile"
-                class="w-14 h-14 rounded-full hover:brightness-90 transition"
-              />
-            </router-link>
-          </div>
-        </div>
+  <div class="navbar-container">
+    <!-- Navbar -->
+    <nav class="navbar">
+      <!-- Kiri: Foto Profil dan Nama -->
+      <div class="profile-container">
+        <img
+          src="https://via.placeholder.com/40"
+          alt="Profile"
+          class="profile-img"
+        />
+        <span class="profile-name">Nama Pengguna</span>
       </div>
-    </div>
 
-    <!-- Sidebar Drawer -->
-    <div class="drawer-side z-[100]">
-      <label for="my-drawer" class="drawer-overlay"></label>
-      <div class="menu p-4 w-64 min-h-full bg-white text-base-content text-green-900 shadow-xl">
-        <div class="flex flex-col items-center justify-center mb-4">
-          <img src="../assets/logo.png" alt="Logo" class="w-24 mb-2" />
-          <span class="text-lg font-bold">Palm Track</span>
-        </div>
-        <ul class="w-full">
-          <li><a href="/">Beranda</a></li>
-          <!-- <li><a href="/tugas">Tugas</a></li> -->
-          <li><a href="/data-pengepul">Data Pengepul</a></li>
-          <li><a href="/data-berita">Daftar Artikel</a></li>
-          <li><a href="/data-statistik">Statistik Harga</a></li>
-          <li><a href="/data-jadwal">Permintaan Jadwal</a></li>
-          <li><a href="/data-transaksi">Daftar Transaksi</a></li>
+      <!-- Kanan: Menu dan Tombol Auth -->
+      <div class="menu-container">
+        <!-- Menu Navigasi -->
+        <ul class="nav-links">
+          <li>
+            <router-link to="/" class="nav-link">Beranda</router-link>  <!-- Mengarah ke Dashboard (LandingPage) -->
+          </li>
+          <li>
+            <router-link to="/landingpage2" class="nav-link">Tentang Kami</router-link>  <!-- Mengarah ke LandingPage2 -->
+          </li>
         </ul>
+        <!-- Tombol Sign In / Sign Up -->
+        <div class="auth-buttons">
+          <router-link to="/login">
+            <button class="auth-btn">Sign In</button>  <!-- Tombol Sign In -->
+          </router-link>
+          <router-link to="/register">
+            <button class="auth-btn">Sign Up</button>  <!-- Tombol Sign Up -->
+          </router-link>
+        </div>
       </div>
-    </div>
+    </nav>
   </div>
 </template>
 
@@ -67,9 +42,122 @@
 </script>
 
 <style scoped>
-/* Jika ingin memastikan drawer tidak tertimpa konten lain */
-.drawer {
+/* Animasi fade in */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.navbar-container {
+  width: 100%;
+  animation: fadeInDown 0.6s ease-out;
+}
+
+.navbar {
+  background-color: #134611;
+  color: white;
+  padding: 1rem 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.5s;
+}
+
+.profile-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.profile-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.profile-container:hover .profile-img {
+  transform: scale(1.05);
+}
+
+.profile-name {
+  font-weight: 600;
+  font-size: 1.125rem;
+  transition: color 0.3s;
+}
+
+.profile-container:hover .profile-name {
+  color: #d1fae5;
+}
+
+.menu-container {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 24px;
+}
+
+.nav-link {
+  font-weight: 500;
+  padding-bottom: 2px;
   position: relative;
-  z-index: 50;
+  transition: color 0.3s;
+}
+
+.nav-link::after {
+  content: "";
+  display: block;
+  width: 0;
+  height: 2px;
+  background: white;
+  transition: width 0.3s;
+  margin-top: 2px;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+.nav-link:hover {
+  color: #d1fae5;
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 16px;
+}
+
+.auth-btn {
+  background-color: white;  /* Warna latar belakang putih */
+  color: #134611;  /* Teks hijau */
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border: 2px solid #134611;  /* Border hijau */
+  border-radius: 50px;
+  transition: all 0.2s ease-in-out;  /* Animasi lebih halus */
+  position: relative;
+}
+
+.auth-btn:hover {
+  color: white;  /* Teks putih saat hover */
+  background-color: #134611;  /* Warna latar belakang hijau saat hover */
+  transform: scale(1.05);  /* Sedikit perbesaran */
+}
+
+.auth-btn span {
+  position: relative;
+  z-index: 1;
 }
 </style>

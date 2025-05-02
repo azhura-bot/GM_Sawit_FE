@@ -15,7 +15,7 @@ import PengajuanJadwalView from "../views/Petani/PengajuanJadwalView.vue";
 import HomePengepulView from "../views/pengepul/HomePengepulView.vue";
 import TugasUatamaView from "../views/pengepul/TugasUatamaView.vue";
 import DetailTugasView from "../views/pengepul/DetailTugasView.vue";
-import ArtikelPengepulView from "../views/pengepul/ArtikelPengepulView.vue";
+import ArtikelPengepulView from "../views/Pengepul/ArtikelPengepulView.vue";
 import DetailArtikelPengepulView from "../views/pengepul/DetailArtikelPengepulView.vue";
 import HomePetaniView from "../views/Petani/HomePetaniView.vue";
 import RiwayatPetaniView from "../views/Petani/RiwayatPetaniView.vue";
@@ -23,7 +23,10 @@ import HargaPengepulView from "../views/pengepul/HargaPengepulView.vue";
 import LaporanPengepulView from "../views/pengepul/LaporanPengepulView.vue";
 import ProfilPengepulView from "../views/pengepul/ProfilPengepulView.vue";
 import EditProfilePengepulView from "../views/pengepul/EditProfilePengepulView.vue";
-
+import LandingPage from "../views/LandingPage/LandingPage.vue";
+import Login from "../views/LandingPage/Login.vue";
+import Register from "../views/LandingPage/Register.vue";
+import Landingpage2 from "../views/LandingPage/LandingPage2.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -35,6 +38,26 @@ const router = createRouter({
         // },
         {
             path: "/",
+            name: 'dashboard',
+            component: LandingPage
+        },
+        // {
+        //     path: '/landingpage2',  
+        //     name: 'LandingPage2',  
+        //     component: LandingPage2 
+        // },
+        {
+            path: "/login",
+            name: 'login',
+            component: Login
+        },
+        {
+            path: "/register",
+            name: 'register',
+            component: Register
+        },
+        {
+            path: "/tugas",
             name: 'tugas',
             component: TugasView
         },
