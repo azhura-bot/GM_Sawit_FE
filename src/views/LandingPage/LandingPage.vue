@@ -2,9 +2,8 @@
   <div class="w-full">
     <!-- Hero Section -->
     <div
-  class="w-full h-96 sm:h-[40rem] bg-cover bg-center relative flex items-center"
-  style="background-image: url('/sawit1.png')">
-
+    class="w-full h-96 sm:h-[40rem] bg-cover bg-center relative flex items-center"
+    style="background-image: url('/sawit1.png')">
 
       <div class="relative z-10 pl-8 sm:pl-16 text-white space-y-2">
         <h1 class="text-2xl sm:text-4xl font-bold">Solusi Cerdas untuk</h1>
@@ -25,31 +24,31 @@
       </div>
 
       <!-- Summary Cards -->
-<div class="flex flex-col sm:flex-row justify-center items-center gap-8">
-  <!-- Card 1 -->
-  <div class="relative bg-[#3E8914] p-8 w-72 h-72 rounded-3xl shadow-md text-center">
-    <div class="absolute -top-12 left-1/2 transform -translate-x-1/2 w-24 h-24 bg-white rounded-full shadow-md overflow-hidden">
-      <img src="@/assets/petani1.png" alt="Petani 1" class="object-cover w-full h-full" />
-    </div>
-    <h2 class="text-white font-bold mt-16 mb-6 text-xl">Jual hasil panen dengan harga terbaik dan tanpa perantara yang rumit.</h2>
-  </div>
+      <div class="flex flex-col sm:flex-row justify-center items-center gap-8">
+        <!-- Card 1 -->
+        <div class="relative bg-[#3E8914] p-8 w-72 h-72 rounded-3xl shadow-md text-center">
+          <div class="absolute -top-12 left-1/2 transform -translate-x-1/2 w-24 h-24 bg-white rounded-full shadow-md overflow-hidden">
+            <img src="@/assets/petani1.png" alt="Petani 1" class="object-cover w-full h-full" />
+          </div>
+          <h2 class="text-white font-bold mt-16 mb-6 text-xl">Jual hasil panen dengan harga terbaik dan tanpa perantara yang rumit.</h2>
+        </div>
 
-  <!-- Card 2 -->
-  <div class="relative bg-[#3E8914] p-8 w-72 h-72 rounded-3xl shadow-md text-center">
-    <div class="absolute -top-12 left-1/2 transform -translate-x-1/2 w-24 h-24 bg-white rounded-full shadow-md overflow-hidden">
-      <img src="@/assets/petani2.png" alt="Petani 2" class="object-cover w-full h-full" />
-    </div>
-    <h2 class="text-white font-bold mt-16 mb-6 text-xl">Kelola pembelian dari petani dengan sistem pencatatan yang sangat memudahkan.</h2>
-  </div>
+        <!-- Card 2 -->
+        <div class="relative bg-[#3E8914] p-8 w-72 h-72 rounded-3xl shadow-md text-center">
+          <div class="absolute -top-12 left-1/2 transform -translate-x-1/2 w-24 h-24 bg-white rounded-full shadow-md overflow-hidden">
+            <img src="@/assets/petani2.png" alt="Petani 2" class="object-cover w-full h-full" />
+          </div>
+          <h2 class="text-white font-bold mt-16 mb-6 text-xl">Kelola pembelian dari petani dengan sistem pencatatan yang sangat memudahkan.</h2>
+        </div>
 
-  <!-- Card 3 -->
-  <div class="relative bg-[#3E8914] p-8 w-72 h-72 rounded-3xl shadow-md text-center">
-    <div class="absolute -top-12 left-1/2 transform -translate-x-1/2 w-24 h-24 bg-white rounded-full shadow-md overflow-hidden">
-      <img src="@/assets/petani3.png" alt="Petani 3" class="object-cover w-full h-full" />
-    </div>
-    <h2 class="text-white font-bold mt-16 mb-6 text-xl">Pantau harga transaksi dan harga pasar dalam satu dashboard praktis.</h2>
-  </div>
-</div>
+        <!-- Card 3 -->
+        <div class="relative bg-[#3E8914] p-8 w-72 h-72 rounded-3xl shadow-md text-center">
+          <div class="absolute -top-12 left-1/2 transform -translate-x-1/2 w-24 h-24 bg-white rounded-full shadow-md overflow-hidden">
+            <img src="@/assets/petani3.png" alt="Petani 3" class="object-cover w-full h-full" />
+          </div>
+          <h2 class="text-white font-bold mt-16 mb-6 text-xl">Pantau harga transaksi dan harga pasar dalam satu dashboard praktis.</h2>
+        </div>
+      </div>
 
 
 
@@ -62,7 +61,9 @@
     </div>
 
 <!-- Section Background Sawit2 -->
-<div class="w-full bg-cover bg-center flex items-center justify-center py-20" style="background-image: url('/sawit2.png')">
+<div
+  class="w-full bg-cover bg-center flex items-center justify-center py-20"
+  style="background-image: url('/sawit2.png')">
 
   <div class="flex justify-between w-full max-w-7xl mx-auto px-4 gap-4">
 
