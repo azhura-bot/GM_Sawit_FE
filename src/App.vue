@@ -31,6 +31,7 @@ const navbarRoutes = [
   '/login',
   '/register',
   '/dashboard',
+  '/landingpage2',
 ]
 
 // NavbarManajer
