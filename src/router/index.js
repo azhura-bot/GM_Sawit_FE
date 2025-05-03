@@ -26,7 +26,7 @@ import EditProfilePengepulView from "../views/pengepul/EditProfilePengepulView.v
 import LandingPage from "../views/LandingPage/LandingPage.vue";
 import Login from "../views/LandingPage/Login.vue";
 import Register from "../views/LandingPage/Register.vue";
-import Landingpage2 from "../views/LandingPage/LandingPage2.vue";
+import Landingpage2 from "../views/LandingPage/Landingpage2.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -41,11 +41,11 @@ const router = createRouter({
             name: 'dashboard',
             component: LandingPage
         },
-        // {
-        //     path: '/landingpage2',  
-        //     name: 'LandingPage2',  
-        //     component: LandingPage2 
-        // },
+        {
+            path: '/landingpage2',  
+            name: 'Landingpage2',  
+            component: Landingpage2 
+        },
         {
             path: "/login",
             name: 'login',
