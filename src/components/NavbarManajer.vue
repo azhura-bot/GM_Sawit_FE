@@ -46,7 +46,7 @@
       <div class="menu p-4 w-64 min-h-full bg-white text-base-content text-green-900 shadow-xl">
         <div class="flex flex-col items-center justify-center mb-4">
           <img src="../assets/logo.png" alt="Logo" class="w-24 mb-2" />
-          <span class="text-lg font-bold">Palm Track</span>
+          <span class="text-lg font-bold">EcoPalm</span>
         </div>
         <ul class="w-full">
           <li><a href="/">Beranda</a></li>

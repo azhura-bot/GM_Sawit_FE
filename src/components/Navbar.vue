@@ -5,11 +5,11 @@
       <!-- Kiri: Foto Profil dan Nama -->
       <div class="profile-container">
         <img
-          src="https://via.placeholder.com/40"
+          src="../assets/logo.png"
           alt="Profile"
           class="profile-img"
         />
-        <span class="profile-name">Nama Pengguna</span>
+        <span class="profile-name">EcoPalm</span>
       </div>
 
       <!-- Kanan: Menu dan Tombol Auth -->
