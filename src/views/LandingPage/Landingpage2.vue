@@ -1,13 +1,53 @@
 <template>
   <div class="w-full">
   <!-- Hero Section -->
-    <section class="relative h-screen bg-cover bg-center" style="background-image: url('https://placehold.co/1400x800/green/white')">
-      <div class="absolute inset-0 bg-black bg-opacity-40"></div>
-      <div class="relative flex flex-col items-center justify-center h-full text-white text-center z-10 px-4">
-        <h1 class="text-5xl font-bold mb-2">Sawit</h1>
-        <p class="text-xl">Sistem Analisis dan Informasi Wisata Tani untuk Pengelolaan Kelapa Sawit</p>
+  <section class="hero min-h-screen relative" 
+    :style="{ backgroundImage: `url('${heroBackground}')` }">
+    
+    <!-- Gradient overlay for better text readability -->
+    <div class="absolute inset-0 bg-gradient-to-b from-green-950/70 to-green-900/50"></div>
+    
+    <!-- Hero content -->
+    <div class="hero-content text-center text-neutral-content z-10 py-12">
+      <div class="max-w-md md:max-w-2xl">
+          
+        
+        <!-- Main Title with Animation -->
+        <h1 class="text-10xl md:text-6xl font-bold mb-4 tracking-tight text-white">
+          <span class="inline-block animate-fadeIn">Sawit</span>
+        </h1>
+        
+        <!-- Subtitle with custom styling -->
+        <p class="text-xl md:text-2xl mb-8 text-green-50 font-light">
+          Sistem Analisis dan Informasi Wisata Tani untuk Pengelolaan Kelapa Sawit
+        </p>
+        
+        
+        <!-- Optional Stats Banner -->
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-16 p-4 bg-white/10 backdrop-blur-sm rounded-box">
+          <div class="stat">
+            <div class="stat-title text-green-100">Petani</div>
+            <div class="stat-value text-2xl text-white">5,200+</div>
+          </div>
+          <div class="stat">
+            <div class="stat-title text-green-100">Lahan</div>
+            <div class="stat-value text-2xl text-white">12,500 Ha</div>
+          </div>
+          <div class="stat hidden md:block">
+            <div class="stat-title text-green-100">Produktivitas</div>
+            <div class="stat-value text-2xl text-white">+27%</div>
+          </div>
+        </div>
       </div>
-    </section>
+    </div>
+    
+    <!-- Scroll indicator -->
+    <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+      </svg>
+    </div>
+  </section>
 
     <!-- Welcome Section -->
     <section class="py-20 bg-gradient-to-br from-green-800 to-green-900 relative overflow-hidden">
@@ -205,75 +245,107 @@
       </div>
     </section>
 
-    <section class="py-16 bg-gradient-to-br from-green-800 to-green-900 relative">
-    <!-- Background pattern -->
+    <section class="py-16 bg-gradient-to-br from-green-700 to-green-900 relative overflow-hidden">
+    <!-- Background pattern dengan animasi -->
     <div class="absolute inset-0 opacity-10">
-      <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.2\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); background-size: 60px 60px;"></div>
+      <div class="absolute inset-0 pattern-bg"></div>
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(0,128,0,0.3),transparent_60%)]"></div>
+    </div>
+    
+    <!-- Particle effect -->
+    <div class="absolute inset-0 overflow-hidden">
+      <div v-for="i in 20" :key="i" class="particle"></div>
     </div>
     
     <div class="container mx-auto px-4 relative z-10">
-      <!-- Header with animation -->
+      <!-- Header dengan animasi -->
       <div data-aos="fade-down" class="text-center mb-12">
-        <h2 class="text-4xl font-bold text-white">Tentang Kami</h2>
-        <div class="w-24 h-1 bg-green-400 mx-auto mt-4"></div>
+        <h2 class="text-5xl font-bold text-white mb-2 tracking-tight">Tentang Kami</h2>
+        <p class="text-green-200 text-lg max-w-2xl mx-auto">Menghubungkan seluruh rantai nilai industri kelapa sawit Indonesia</p>
+        <div class="flex justify-center mt-4">
+          <div class="w-24 h-1 bg-green-400 rounded-full"></div>
+        </div>
       </div>
 
-      <!-- Main content cards -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- Visi & Misi Card -->
-        <div data-aos="fade-right" class="card bg-white bg-opacity-100 backdrop-blur-sm shadow-xl overflow-hidden border border-green-700/30">
-          <div class="card-body text-black"> <!-- Teks diubah menjadi hitam untuk kontras -->
-            <!-- Visi Section -->
-            <div class="mb-6">
-              <h3 class="text-2xl font-bold mb-4 flex items-center text-green-600"> <!-- Teks hijau cerah untuk kontras -->
-                <i class="fas fa-shield-alt mr-3"></i>
-                Visi Kami
-              </h3>
-              <p class="leading-relaxed">
-                Menjadi platform terdepan dalam menghubungkan seluruh pemangku kepentingan industri kelapa sawit untuk menciptakan ekosistem yang berkelanjutan, transparan, dan menguntungkan bagi semua pihak.
+
+      <!-- Main content cards dengan layout yang lebih menarik -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Visi & Misi Card - Lebih lebar -->
+        <div data-aos="fade-right" class="lg:col-span-5 card bg-white bg-opacity-95 shadow-2xl overflow-hidden border-t-4 border-green-500 rounded-xl hover:shadow-green-500/20 hover:shadow-2xl transition-all duration-300">
+          <div class="card-body text-black p-8">
+            <!-- Visi Section dengan ikon yang lebih besar -->
+            <div class="mb-8">
+              <div class="flex items-center mb-6">
+                <div class="w-14 h-14 rounded-lg bg-green-100 flex items-center justify-center mr-4">
+                  <i class="fas fa-mountain text-2xl text-green-600"></i>
+                </div>
+                <h3 class="text-3xl font-bold text-green-700">Visi Kami</h3>
+              </div>
+              <p class="leading-relaxed text-gray-700 text-lg">
+                Menjadi platform terdepan dalam menghubungkan seluruh pemangku kepentingan industri kelapa sawit untuk menciptakan ekosistem yang <span class="text-green-600 font-semibold">berkelanjutan</span>, <span class="text-green-600 font-semibold">transparan</span>, dan <span class="text-green-600 font-semibold">menguntungkan</span> bagi semua pihak.
               </p>
             </div>
 
-            <!-- Divider -->
-            <div class="divider my-2 before:bg-green-500/30 after:bg-green-500/30"></div>
+            <!-- Divider with custom design -->
+            <div class="flex items-center my-6">
+              <div class="flex-grow h-0.5 bg-gradient-to-r from-transparent via-green-200 to-transparent"></div>
+              <div class="mx-4 p-1 bg-green-100 rounded-full">
+                <i class="fas fa-leaf text-green-500"></i>
+              </div>
+              <div class="flex-grow h-0.5 bg-gradient-to-r from-transparent via-green-200 to-transparent"></div>
+            </div>
 
-            <!-- Misi Section -->
+            <!-- Misi Section dengan styling yang lebih kaya -->
             <div>
-              <h3 class="text-2xl font-bold mb-4 flex items-center text-green-600">
-                <i class="fas fa-tasks mr-3"></i>
-                Misi Kami
-              </h3>
-              <ul class="space-y-3">
-                <li v-for="(item, index) in missionItems" :key="index" class="flex items-start">
-                  <div class="mt-1 mr-3 text-green-400">
-                    <i class="fas fa-check-circle"></i>
+              <div class="flex items-center mb-6">
+                <div class="w-14 h-14 rounded-lg bg-green-100 flex items-center justify-center mr-4">
+                  <i class="fas fa-tasks text-2xl text-green-600"></i>
+                </div>
+                <h3 class="text-3xl font-bold text-green-700">Misi Kami</h3>
+              </div>
+              
+              <ul class="space-y-4">
+                <li v-for="(mission, index) in missionItems" :key="index" 
+                    class="flex items-start p-3 rounded-lg hover:bg-green-50 transition-colors duration-200">
+                  <div class="mt-1 mr-4 text-green-500">
+                    <i class="fas fa-check-circle text-xl"></i>
                   </div>
-                  <span>{{ item }}</span>
+                  <p class="text-gray-700">{{ mission }}</p>
                 </li>
               </ul>
             </div>
           </div>
         </div>
 
-        <!-- Right Column -->
-        <div class="space-y-8">
+        <!-- Middle separator for desktop - decorative element -->
+        <div class="hidden lg:flex lg:col-span-2 items-center justify-center">
+          <div class="h-full w-0.5 bg-gradient-to-b from-transparent via-green-300 to-transparent opacity-50"></div>
+        </div>
+
+        <!-- Right Column - Sejarah & Tim -->
+        <div class="lg:col-span-5 space-y-8">
           <!-- Sejarah Card -->
-          <div data-aos="fade-left" class="card bg-white bg-opacity-100 backdrop-blur-sm shadow-xl overflow-hidden border border-green-700/30">
-            <div class="card-body text-black">
-              <h3 class="text-2xl font-bold mb-4 flex items-center text-green-600">
-                <i class="fas fa-history mr-3"></i>
-                Sejarah Kami
-              </h3>
+          <div data-aos="fade-left" class="card bg-white bg-opacity-95 shadow-2xl overflow-hidden border-t-4 border-green-500 rounded-xl hover:shadow-green-500/20 hover:shadow-2xl transition-all duration-300">
+            <div class="card-body text-black p-8">
+              <div class="flex items-center mb-6">
+                <div class="w-14 h-14 rounded-lg bg-green-100 flex items-center justify-center mr-4">
+                  <i class="fas fa-history text-2xl text-green-600"></i>
+                </div>
+                <h3 class="text-3xl font-bold text-green-700">Sejarah Kami</h3>
+              </div>
               
-              <div class="space-y-6">
-                <div v-for="(item, index) in historyItems" :key="index" class="flex">
+              <div class="space-y-8">
+                <div v-for="(item, index) in historyItems" :key="index" 
+                     class="flex group">
                   <div class="flex-shrink-0 mr-4">
-                    <div class="flex items-center justify-center w-12 h-12 rounded-full bg-green-500 bg-opacity-20 border-2 border-green-400 text-green-200 font-bold">
+                    <div class="flex items-center justify-center w-16 h-16 rounded-full bg-green-100 border-2 border-green-500 text-green-700 font-bold text-xl group-hover:bg-green-500 group-hover:text-white transition-colors duration-300">
                       {{ item.year }}
                     </div>
                   </div>
-                  <div class="pt-1">
-                    <p class="text-sm leading-relaxed">{{ item.description }}</p>
+                  <div class="pt-2">
+                    <div class="p-4 bg-green-50 rounded-lg border-l-4 border-green-500 group-hover:shadow-md transition-all duration-300">
+                      <p class="leading-relaxed text-gray-700">{{ item.description }}</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -281,22 +353,28 @@
           </div>
           
           <!-- Tim Card -->
-          <div data-aos="fade-up" class="card bg-white bg-opacity-100 backdrop-blur-sm shadow-xl overflow-hidden border border-green-700/30">
-            <div class="card-body text-black">
-              <h3 class="text-2xl font-bold mb-6 flex items-center text-green-600">
-                <i class="fas fa-users mr-3"></i>
-                Tim Kami
-              </h3>
+          <div data-aos="fade-up" class="card bg-white bg-opacity-95 shadow-2xl overflow-hidden border-t-4 border-green-500 rounded-xl hover:shadow-green-500/20 hover:shadow-2xl transition-all duration-300">
+            <div class="card-body text-black p-8">
+              <div class="flex items-center mb-6">
+                <div class="w-14 h-14 rounded-lg bg-green-100 flex items-center justify-center mr-4">
+                  <i class="fas fa-users text-2xl text-green-600"></i>
+                </div>
+                <h3 class="text-3xl font-bold text-green-700">Tim Kami</h3>
+              </div>
               
-              <div class="flex justify-center gap-12">
-                <div v-for="member in teamMembers" :key="member.id" class="text-center">
-                  <div class="avatar mb-4 online">
-                    <div class="w-20 h-20 rounded-full ring ring-green-400 ring-offset-2 ring-offset-green-800 bg-gradient-to-br from-green-200 to-green-400 flex items-center justify-center text-green-800 font-bold text-xl">
+              <div class="flex flex-wrap justify-center gap-8">
+                <div v-for="member in teamMembers" :key="member.id" 
+                     class="text-center group">
+                  <div class="avatar mb-4 online relative">
+                    <div class="w-24 h-24 rounded-full ring ring-green-400 ring-offset-2 ring-offset-white bg-gradient-to-br from-green-200 to-green-400 flex items-center justify-center text-green-800 font-bold text-2xl group-hover:from-green-300 group-hover:to-green-500 transition-all duration-300 relative overflow-hidden">
                       {{ member.initials }}
+                      <div class="absolute inset-0 bg-green-600 opacity-0 group-hover:opacity-80 transition-opacity duration-300 flex items-center justify-center">
+                        <i class="fas fa-plus text-white text-2xl"></i>
+                      </div>
                     </div>
                   </div>
-                  <div class="font-bold text-lg">{{ member.name }}</div>
-                  <div class="text-green-600">{{ member.position }}</div> <!-- Teks hijau untuk tim -->
+                  <div class="font-bold text-lg text-gray-800">{{ member.name }}</div>
+                  <div class="text-green-600 font-medium">{{ member.position }}</div>
                 </div>
               </div>
             </div>
@@ -305,48 +383,50 @@
       </div>
       
       <!-- Hubungi Kami Card -->
-      <div data-aos="fade-up" class="card bg-white bg-opacity-100 backdrop-blur-sm shadow-xl overflow-hidden border border-green-700/30 mt-10">
-        <div class="card-body text-black">
-          <h3 class="text-2xl font-bold mb-6 flex items-center text-green-600">
-            <i class="fas fa-envelope mr-3"></i>
-            Hubungi Kami
-          </h3>
+      <div data-aos="fade-up" class="card bg-white bg-opacity-95 shadow-2xl overflow-hidden border-t-4 border-green-500 rounded-xl hover:shadow-green-500/20 hover:shadow-2xl transition-all duration-300 mt-10">
+        <div class="card-body text-black p-8">
+          <div class="flex items-center mb-6">
+            <div class="w-14 h-14 rounded-lg bg-green-100 flex items-center justify-center mr-4">
+              <i class="fas fa-envelope text-2xl text-green-600"></i>
+            </div>
+            <h3 class="text-3xl font-bold text-green-700">Hubungi Kami</h3>
+          </div>
           
           <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <!-- Address -->
-            <div class="flex">
+            <div class="flex group hover:bg-green-50 p-4 rounded-lg transition-colors duration-300">
               <div class="flex-shrink-0 mr-4">
-                <div class="w-12 h-12 rounded-full bg-green-500 bg-opacity-20 flex items-center justify-center text-green-300">
-                  <i class="fas fa-map-marker-alt text-xl"></i>
+                <div class="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center text-green-600 group-hover:bg-green-500 group-hover:text-white transition-colors duration-300">
+                  <i class="fas fa-map-marker-alt text-2xl"></i>
                 </div>
               </div>
               <div>
-                <h4 class="font-semibold text-green-600 mb-2">Alamat</h4> <!-- Alamat dengan teks hijau -->
-                <p class="text-sm">Jl. Kelapa Sawit No. 123</p>
-                <p class="text-sm">Jakarta Selatan, 12180</p>
-                <p class="text-sm">Indonesia</p>
+                <h4 class="font-semibold text-green-700 mb-2 text-lg">Alamat</h4>
+                <p class="text-gray-700">Jl. Kelapa Sawit No. 123</p>
+                <p class="text-gray-700">Jakarta Selatan, 12180</p>
+                <p class="text-gray-700">Indonesia</p>
               </div>
             </div>
             
             <!-- Contact Info -->
-            <div class="flex">
+            <div class="flex group hover:bg-green-50 p-4 rounded-lg transition-colors duration-300">
               <div class="flex-shrink-0 mr-4">
-                <div class="w-12 h-12 rounded-full bg-green-500 bg-opacity-20 flex items-center justify-center text-green-300">
-                  <i class="fas fa-phone-alt text-xl"></i>
+                <div class="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center text-green-600 group-hover:bg-green-500 group-hover:text-white transition-colors duration-300">
+                  <i class="fas fa-phone-alt text-2xl"></i>
                 </div>
               </div>
               <div>
-                <h4 class="font-semibold text-green-600 mb-2">Kontak</h4> <!-- Kontak dengan teks hijau -->
-                <p class="text-sm">Email: info@sawit.id</p>
-                <p class="text-sm">Telepon: +62 21 5456 7890</p>
-                <div class="flex gap-2 mt-2">
-                  <a href="#" class="btn btn-circle btn-xs btn-ghost text-green-300">
+                <h4 class="font-semibold text-green-700 mb-2 text-lg">Kontak</h4>
+                <p class="text-gray-700">Email: info@sawit.id</p>
+                <p class="text-gray-700">Telepon: +62 21 5456 7890</p>
+                <div class="flex gap-4 mt-4">
+                  <a href="#" class="btn btn-circle btn-sm bg-green-100 hover:bg-green-500 border-none text-green-600 hover:text-white">
                     <i class="fab fa-facebook-f"></i>
                   </a>
-                  <a href="#" class="btn btn-circle btn-xs btn-ghost text-green-300">
+                  <a href="#" class="btn btn-circle btn-sm bg-green-100 hover:bg-green-500 border-none text-green-600 hover:text-white">
                     <i class="fab fa-instagram"></i>
                   </a>
-                  <a href="#" class="btn btn-circle btn-xs btn-ghost text-green-300">
+                  <a href="#" class="btn btn-circle btn-sm bg-green-100 hover:bg-green-500 border-none text-green-600 hover:text-white">
                     <i class="fab fa-twitter"></i>
                   </a>
                 </div>
@@ -355,7 +435,7 @@
             
             <!-- Consultation Button -->
             <div class="flex items-center justify-center md:justify-end">
-              <button class="btn btn-primary bg-green-500 hover:bg-green-600 border-green-600 text-white gap-2">
+              <button class="btn btn-lg bg-green-600 hover:bg-green-700 border-none text-white gap-2 shadow-lg hover:shadow-green-500/30 transition-all duration-300">
                 <i class="fas fa-calendar-check"></i>
                 Jadwalkan Konsultasi
               </button>
