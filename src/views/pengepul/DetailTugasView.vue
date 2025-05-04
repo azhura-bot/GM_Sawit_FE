@@ -1,101 +1,117 @@
 <template>
-    <div class="main-container">
-      <!-- Header -->
-      <header class="header">
+  <div class="main-container">
+    <!-- Header -->
+    <header class="header">
       <router-link to="/profile-pengepul" class="circle"></router-link>
       <span class="username">Lorem Ipsum</span>
-      </header>
-  
-      <!-- Content -->
-      <main class="content">
-        <!-- Judul -->
-        <section class="title-with-icon">
-          <img src="@/assets/icon-tugas-trans.png" alt="Icon Tugas" class="icon" />
-          <h2> Tugas </h2>
-        </section>
-  
-        <!-- Tugas Baru -->
-        <section class="task-category">
-          <div class="category-title">Tugas yang baru saja masuk</div>
-  
-          <!-- Detail Card -->
-          <div class="task-card">
-            <div class="task-info">
-              <div>
-                <div class="label">Nama Petani</div>
-                <div class="value">Agus Setiawan</div>
-              </div>
+    </header>
+
+    <!-- Content -->
+    <main class="content">
+      <!-- Judul -->
+      <section class="title-with-icon">
+        <img src="@/assets/icon-tugas-trans.png" alt="Icon Tugas" class="icon" />
+        <h2> Tugas </h2>
+      </section>
+
+      <!-- Tugas Baru -->
+      <section class="task-category">
+        <div class="category-title">Tugas yang baru saja masuk</div>
+
+        <!-- Detail Card -->
+        <div class="task-card">
+          <div class="task-info">
+            <div>
+              <div class="label">Nama Petani</div>
+              <div class="value">Agus Setiawan</div>
             </div>
-  
-            <div class="task-info">
-              <div>
-                <div class="label">Lokasi</div>
-                <div class="value">
-                  JL. Swad Jaya No 8, RT 01 / RW 05, Kel. Tanjung Gusta, Kec. Medan Helvetia, Kota Medan, Sumatera Utara 20125
-                </div>
-              </div>
-            </div>
-  
-            <div class="task-info">
-              <div>
-                <div class="label">Nomor Tlp</div>
-                <div class="value">0877-9999-2345</div>
-              </div>
-            </div>
-  
-            <div class="task-info">
-              <div>
-                <div class="label">Jumlah</div>
-                <div class="value">200 Kg</div>
+          </div>
+
+          <div class="task-info">
+            <div>
+              <div class="label">Lokasi</div>
+              <div class="value">
+                JL. Swad Jaya No 8, RT 01 / RW 05, Kel. Tanjung Gusta, Kec. Medan Helvetia, Kota Medan, Sumatera Utara 20125
               </div>
             </div>
           </div>
-  
-          <!-- Tombol -->
-          <div class="button-group">
-            <button class="button-decline" @click="showModal = true">Tolak?</button>
-            <button class="button-accept">Simpan</button>
-            <button class="button-back" @click="goBack">Kembali</button>
+
+          <div class="task-info">
+            <div>
+              <div class="label">Nomor Tlp</div>
+              <div class="value">0877-9999-2345</div>
+            </div>
           </div>
-        </section>
-      </main>
-  
-      <!-- Modal -->
-      <div v-if="showModal" class="modal-overlay">
-        <div class="modal-content">
-          <div class="warning-img-wrapper">
-            <img src="/warning-image.png" alt="Warning" class="warning-img" />
+
+          <div class="task-info">
+            <div>
+              <div class="label">Jumlah</div>
+              <div class="value">200 Kg</div>
+            </div>
           </div>
-          <p class="modal-text">Apakah anda yakin untuk menolak tugas ini?</p>
-          <div class="modal-buttons">
-            <button class="modal-cancel" @click="showModal = false">Batalkan</button>
-            <button class="modal-confirm" @click="confirmDecline">Ya, tolak</button>
-          </div>
+        </div>
+
+        <!-- Tombol -->
+        <div class="button-group">
+          <button class="button-decline" @click="showModal = true">Tolak?</button>
+          <button class="button-accept">Terima</button>
+          <button class="button-back" @click="goBack">Kembali</button>
+        </div>
+      </section>
+    </main>
+
+    <!-- Modal -->
+    <div v-if="showModal" class="modal-overlay">
+      <div class="modal-content">
+        <div class="warning-img-wrapper">
+          <img src="/warning-image.png" alt="Warning" class="warning-img" />
+        </div>
+        <p class="modal-text">Apakah Anda yakin ingin menolak tugas ini?</p>
+
+        <!-- Form Alasan -->
+        <textarea
+          v-model="alasan"
+          placeholder="Tuliskan alasan penolakan..."
+          class="alasan-input"
+        ></textarea>
+
+        <div class="modal-buttons">
+          <button class="modal-cancel" @click="showModal = false">Batalkan</button>
+          <button class="modal-confirm" @click="confirmDecline">Ya, Tolak</button>
         </div>
       </div>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    name: "DetailTugasView",
-    data() {
-      return {
-        showModal: false, // ⬅️ Penting supaya modal bisa muncul
-      };
+  </div>
+</template>
+
+<script>
+export default {
+  name: "DetailTugasView",
+  data() {
+    return {
+      showModal: false,
+      alasan: "", // untuk alasan penolakan
+    };
+  },
+  methods: {
+    goBack() {
+      this.$router.push("/tugas-utama-pengepul");
     },
-    methods: {
-      goBack() {
-        this.$router.push('/tugas-utama-pengepul'); // ganti sesuai route halaman utama tugasmu
-      },
-      confirmDecline() {
-        this.showModal = false;
-        alert('Tugas telah ditolak!');
-        this.$router.push('/tugas-utama');
+    confirmDecline() {
+      if (!this.alasan.trim()) {
+        alert("Mohon isi alasan terlebih dahulu sebelum menolak tugas.");
+        return;
       }
-    }
-  };
-  </script>
+
+      // Lanjutkan aksi penolakan
+      this.showModal = false;
+      alert("Tugas telah ditolak dengan alasan: " + this.alasan);
+      this.alasan = ""; // reset form
+      this.$router.push("/tugas-utama");
+    },
+  },
+};
+</script>
   
   <style scoped>
   .main-container {
@@ -295,5 +311,16 @@
     border-radius: 20px;
     font-weight: bold;
   }
+
+  .alasan-input {
+  width: 100%;
+  height: 80px;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 8px;
+  font-size: 14px;
+  resize: none;
+  margin-bottom: 16px;
+}
   </style>
   

@@ -41,6 +41,7 @@ const router = createRouter({
             name: 'dashboard',
             component: LandingPage
         },
+        
         {
             path: '/landingpage2',  
             name: 'Landingpage2',  
@@ -57,7 +58,7 @@ const router = createRouter({
             component: Register
         },
         {
-            path: "/tugas",
+            path: "/dashboard",
             name: 'tugas',
             component: TugasView
         },

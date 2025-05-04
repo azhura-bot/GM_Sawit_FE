@@ -30,12 +30,14 @@ const navbarRoutes = [
   '/',
   '/login',
   '/register',
-  '/dashboard',
+  // '/dashboard',
   '/landingpage2',
 ]
 
 // NavbarManajer
 const navbarManajerRoutes = [
+
+  '/dashboard',
   '/data-berita',
   '/data-jadwal',
   '/data-pengepul',
@@ -54,7 +56,6 @@ const showFooterRoutes = [
   '/',
   '/login',
   '/register',
-  '/dashboard',
 ]
 
 const showNavbar = computed(() => navbarRoutes.includes(route.path))
