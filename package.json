@@ -18,10 +18,15 @@
     "vue": "^3.5.13",
     "vue-router": "^4.5.0",
     "vue-sawit": "file:",
-    "vue3-apexcharts": "^1.8.0"
+    "vue3-apexcharts": "^1.8.0",
+    "vuetify": "^3.8.3"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.2",
-    "vite": "^6.3.0"
+    "deepmerge": "^4.3.1",
+    "sass": "^1.87.0",
+    "sass-loader": "^16.0.5",
+    "vite": "^6.3.0",
+    "vue-loader": "^17.0.0"
   }
 }

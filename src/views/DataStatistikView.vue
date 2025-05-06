@@ -2,10 +2,17 @@
   <div class="min-h-screen bg-gray-50 p-6 space-y-8">
     <!-- Statistik Grafik -->
     <div class="bg-white p-6 rounded-2xl shadow-md">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-2xl font-bold text-green-900">Statistik hingga saat ini</h2>
+      <div class="flex flex-col mb-4">
+        <h2 class="text-2xl font-bold text-green-900">Harga Hari Ini</h2>
+        <h3 class="text-lg text-gray-600">Statistik hingga saat ini</h3>
       </div>
-      <apexchart type="line" height="350" :options="chartOptions" :series="series" />
+      <apexchart
+        type="area"
+        height="300"
+        :options="chartOptions"
+        :series="series"
+        class="chart-image"
+      />
     </div>
 
     <!-- Form Manajemen Harga -->
@@ -17,186 +24,130 @@
           <h3 class="text-2xl font-bold text-green-900">Manajemen Data Harga Kelapa Sawit</h3>
         </div>
 
-        <div class="flex gap-3">
-          <button 
-            @click="selectCategory('kenaikan')"
-            :class="category === 'kenaikan' ? 'bg-green-700 text-white' : 'bg-gray-200 text-green-900'"
-            class="px-4 py-2 rounded-full font-semibold hover:shadow-md transition-all"
-          >
-            Kenaikan
-          </button>
-          <button 
-            @click="selectCategory('penurunan')"
-            :class="category === 'penurunan' ? 'bg-green-700 text-white' : 'bg-gray-200 text-green-900'"
-            class="px-4 py-2 rounded-full font-semibold hover:shadow-md transition-all"
-          >
-            Penurunan
-          </button>
-        </div>
-
         <div class="space-y-4">
-          <input v-model="form.harga" type="text" placeholder="Harga per Kg" class="w-full p-3 rounded-full bg-gray-200 focus:outline-none" />
-          <input v-model="form.kenaikan" type="text" placeholder="Harga kenaikan" class="w-full p-3 rounded-full bg-gray-200 focus:outline-none" />
-          <input v-model="form.presentase" type="text" placeholder="Presentase Kenaikan" class="w-full p-3 rounded-full bg-gray-200 focus:outline-none" />
+          <input
+            v-model="form.harga"
+            type="text"
+            placeholder="Perubahan Harga"
+            class="w-full p-3 rounded-full bg-gray-200 focus:outline-none"
+          />
         </div>
 
-        <button @click="submitData" class="bg-green-700 text-white px-6 py-3 rounded-full font-bold">Masukan Data</button>
-      </div>
-
-      <!-- Kalender Dinamis -->
-      <div>
-        <h3 class="text-2xl font-bold text-green-900 mb-2">Tanggal Input Harga</h3>
-        <div class="bg-white border rounded-xl shadow-md p-4">
-          <div class="flex justify-between items-center mb-4">
-            <button @click="prevMonth" class="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300">&laquo;</button>
-            <div class="font-bold text-lg">{{ monthYearLabel }}</div>
-            <button @click="nextMonth" class="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300">&raquo;</button>
-          </div>
-          <div class="grid grid-cols-7 text-center text-sm gap-y-1">
-            <div class="text-gray-400">Mon</div>
-            <div class="text-gray-400">Tue</div>
-            <div class="text-gray-400">Wed</div>
-            <div class="text-gray-400">Thu</div>
-            <div class="text-gray-400">Fri</div>
-            <div class="text-gray-400">Sat</div>
-            <div class="text-gray-400">Sun</div>
-
-            <div v-for="blank in startDay" :key="'b'+blank" class="text-gray-200">-</div>
-            <div
-              v-for="day in daysInMonth"
-              :key="day"
-              @click="selectDate(day)"
-              class="hover:bg-green-100 cursor-pointer rounded-full py-1"
-              :class="{ 'text-green-800 font-bold': isToday(day), 'bg-green-300': day === selectedDate }"
-            >
-              {{ day }}
-            </div>
-          </div>
-        </div>
+        <button
+          @click="submitData"
+          class="bg-green-700 text-white px-6 py-3 rounded-full font-bold"
+        >
+          Masukan Data
+        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import axios from 'axios';
+import axios from 'axios'
+import ApexCharts from 'vue3-apexcharts'
 
 export default {
-  name: "StatistikHarga",
+  name: 'DataStatistikView',
+  components: { apexchart: ApexCharts },
   data() {
-    const today = new Date();
     return {
-      currentMonth: today.getMonth(),
-      currentYear: today.getFullYear(),
-      todayDate: today,
-      selectedDate: null,
-      category: 'kenaikan',
-      form: {
-        harga: '',
-        kenaikan: '',
-        presentase: ''
-      },
-      series: [],
+      apiUrl: import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000',
+      form: { harga: '' },
+      series: [
+        { name: 'Harga Sawit', data: [800, 820, 790, 850, 870, 860, 890] }
+      ],
       chartOptions: {
-        chart: { id: "harga-chart" },
-        xaxis: { categories: [] },
-        stroke: { curve: 'smooth' },
-        title: {
-          text: "Harga Kelapa Sawit per Bulan",
-          align: 'left'
+        chart: { id: 'harga-sawit-chart' },
+        xaxis: {
+          categories: []
+        },
+        fill: {
+          type: 'gradient',
+          gradient: {
+            shade: 'light',
+            type: 'vertical',
+            gradientToColors: ['#81C784'],
+            stops: [0, 100]
+          }
         }
       }
-    };
-  },
-  computed: {
-    daysInMonth() {
-      return new Date(this.currentYear, this.currentMonth + 1, 0).getDate();
-    },
-    startDay() {
-      const day = new Date(this.currentYear, this.currentMonth, 1).getDay();
-      return (day + 6) % 7; // Monday = 0
-    },
-    monthYearLabel() {
-      const months = [
-        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-        "Juli", "Agustus", "September", "Oktober", "November", "Desember",
-      ];
-      return `${months[this.currentMonth]} ${this.currentYear}`;
     }
   },
   mounted() {
-    this.fetchChartData();
+    this.fetchChartData()
   },
   methods: {
     async fetchChartData() {
+      const token = localStorage.getItem('token')
+      if (!token) {
+        this.$router.push('/login')
+        return
+      }
       try {
-        const response = await axios.get('http://127.0.0.1:8000/daftar_harga');
-        const data = response.data;
-        this.series = [
-          {
-            name: "Harga Sawit",
-            data: data.map(item => item.harga)
-          }
-        ];
-        this.chartOptions.xaxis.categories = data.map(item => new Date(item.tanggal).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }));
-      } catch (error) {
-        console.error("Gagal memuat data grafik:", error);
-      }
-    },
-    async submitData() {
-      if (!this.selectedDate) {
-        alert("Silakan pilih tanggal terlebih dahulu.");
-        return;
-      }
+        const { data: res } = await axios.get(`${this.apiUrl}/api/harga`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        const data = res.data || []
 
+        console.log('Data API:', data) // Debug: cek isi data dari API
+
+        // update series data
+        this.series = [
+          { name: 'Harga Sawit', data: data.map(item => parseFloat(item.harga)) }
+        ]
+
+        // format tanggal untuk x-axis dan trigger reaktivitas
+        const formattedDates = data.map(item => {
+          const d = new Date(item.created_at)
+          const day = String(d.getDate()).padStart(2, '0')
+          const month = String(d.getMonth() + 1).padStart(2, '0')
+          const year = d.getFullYear()
+          return `${day}/${month}/${year}`
+        })
+
+        // ganti seluruh objek chartOptions agar reactive
+        this.chartOptions = {
+          ...this.chartOptions,
+          xaxis: {
+            ...this.chartOptions.xaxis,
+            categories: formattedDates
+          }
+        }
+      } catch (err) {
+        console.error('Gagal memuat data grafik:', err)
+        if (err.response?.status === 401) {
+          localStorage.removeItem('token')
+          this.$router.push('/login')
+        }
+      }
+    },
+
+    async submitData() {
+      const token = localStorage.getItem('token')
+      if (!token) { this.$router.push('/login'); return }
+      if (!this.form.harga) { alert('Harga tidak boleh kosong.'); return }
       try {
-        const payload = {
-          harga: this.form.harga,
-          tanggal: new Date(this.currentYear, this.currentMonth, this.selectedDate).toISOString().slice(0, 10),
-          kategori: this.category
-        };
-        await axios.post('http://127.0.0.1:8000/daftar_harga', payload);
-        alert("Data berhasil dikirim!");
-        this.fetchChartData();
-      } catch (error) {
-        console.error("Gagal mengirim data:", error);
-        alert("Terjadi kesalahan saat mengirim data.");
+        await axios.post(
+          `${this.apiUrl}/api/harga`,
+          { harga: this.form.harga },
+          { headers: { Authorization: `Bearer ${token}` } }
+        )
+        this.form.harga = ''
+        this.fetchChartData()
+      } catch (err) {
+        console.error('Gagal mengirim data:', err)
+        if (err.response?.status === 401) {
+          localStorage.removeItem('token')
+          this.$router.push('/login')
+        }
       }
-    },
-    prevMonth() {
-      if (this.currentMonth === 0) {
-        this.currentMonth = 11;
-        this.currentYear -= 1;
-      } else {
-        this.currentMonth -= 1;
-      }
-    },
-    nextMonth() {
-      if (this.currentMonth === 11) {
-        this.currentMonth = 0;
-        this.currentYear += 1;
-      } else {
-        this.currentMonth += 1;
-      }
-    },
-    isToday(day) {
-      const t = this.todayDate;
-      return (
-        day === t.getDate() &&
-        this.currentMonth === t.getMonth() &&
-        this.currentYear === t.getFullYear()
-      );
-    },
-    selectDate(day) {
-      this.selectedDate = day;
-    },
-    selectCategory(category) {
-      this.category = category;
     }
   }
-};
+}
 </script>
 
 <style scoped>
-/* Tambahan jika ingin mempercantik kalender atau form */
+/* styling asli dipertahankan */
 </style>

@@ -25,7 +25,7 @@
           <!-- Kanan: User Info -->
           <div class="flex items-center gap-4">
             <div class="text-right">
-              <h1 class="text-green-900 font-bold">Jackson Miguel Wong</h1>
+              <h1 class="text-green-900 font-bold">{{ user?.name || '-' }}</h1>
               <p class="text-green-900 text-sm">Manajer</p>
             </div>
             <router-link to="/profile">
@@ -63,8 +63,44 @@
 </template>
 
 <script setup>
-// No script needed
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
+import { useRouter } from 'vue-router'
+
+const user = ref(null)
+const router = useRouter()
+const apiUrl = 'http://127.0.0.1:8000' // atau sesuaikan base API kamu
+
+const fetchUser = async () => {
+  const token = localStorage.getItem('token')
+  if (!token) {
+    console.warn('Token tidak ditemukan, user belum login.')
+    return
+  }
+
+  try {
+    const response = await axios.get(`${apiUrl}/api/profile`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    user.value = response.data.data || response.data
+  } catch (error) {
+    console.error('Gagal mendapatkan data user:', error)
+    if (error.response && error.response.status === 401) {
+      alert('Sesi login sudah habis, silakan login ulang.')
+      localStorage.removeItem('token')
+      router.push('/login')
+    }
+  }
+}
+
+onMounted(() => {
+  fetchUser()
+})
 </script>
+
+
 
 <style scoped>
 /* Jika ingin memastikan drawer tidak tertimpa konten lain */

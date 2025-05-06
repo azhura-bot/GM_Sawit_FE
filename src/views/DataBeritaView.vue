@@ -4,43 +4,78 @@ import axios from 'axios'
 import HapusBeritaAlert from '@/components/HapusBeritaAlert.vue'
 
 // API base URL
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const API_URL = import.meta.env.VITE_API_URL
 
-// State
+// State untuk menyimpan artikel dan status modal
 const articles = ref([])
 const showAlert = ref(false)
 const deleteId = ref(null)
 
-// Fetch articles dari API Laravel
+// Fetch artikel dari API Laravel
 const fetchArticles = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/artikel`)
+    const token = localStorage.getItem('token') // Ambil token dari localStorage
+    if (!token) {
+      console.warn('Token tidak ditemukan, silakan login terlebih dahulu.')
+      return
+    }
+
+    const response = await axios.get(`${API_URL}/api/artikel`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
     articles.value = response.data.data
   } catch (error) {
     console.error('Error fetching articles:', error)
   }
 }
 
-// Lifecycle hook
+// Lifecycle hook untuk memanggil fetchArticles ketika komponen dimuat
 onMounted(() => {
   fetchArticles()
 })
 
-// Modal handlers
+// Fungsi untuk membuka modal
 const openModal = (id) => {
   deleteId.value = id
   showAlert.value = true
 }
 
+// Fungsi untuk menutup modal
 const closeModal = () => {
   deleteId.value = null
   showAlert.value = false
 }
 
-// Setelah berhasil hapus
+// Fungsi untuk menghapus artikel
+const deleteArticle = async () => {
+  if (!deleteId.value) return;
+
+  const token = localStorage.getItem('token')
+  if (!token) {
+    console.warn('Token tidak ditemukan, silakan login terlebih dahulu.')
+    return
+  }
+
+  try {
+    const response = await axios.delete(`${API_URL}/api/artikel/${deleteId.value}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    console.log('Artikel berhasil dihapus:', response.data)
+    handleDeleted() // Segera refresh artikel setelah dihapus
+  } catch (error) {
+    console.error('Error menghapus artikel:', error)
+    // TODO: tampilkan notifikasi error ke user
+  }
+}
+
+// Setelah berhasil menghapus artikel
 const handleDeleted = () => {
-  closeModal()
-  fetchArticles() // Refresh artikel
+  closeModal()  // Menutup modal setelah artikel dihapus
+  fetchArticles() // Mengambil data artikel terbaru setelah penghapusan
 }
 </script>
 

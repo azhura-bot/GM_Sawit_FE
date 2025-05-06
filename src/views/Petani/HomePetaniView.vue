@@ -3,7 +3,7 @@
     <!-- Header -->
     <header class="header">
       <div class="circle"></div>
-      <span class="username">nama User</span>
+      <span class="username">{{ user?.name || 'nama User' }}</span>
     </header>
 
     <!-- Content -->
@@ -32,8 +32,6 @@
             <p>Artikel</p>
           </router-link>
 
-
-
           <div class="main-image">
             <img src="@/assets/icon-harga.png" alt="Data Harga" />
             <p>Data Harga</p>
@@ -45,10 +43,7 @@
       <section class="trending-section">
         <h2>Trending Saat ini</h2>
         <div class="trending-cards">
-          <div
-            v-if="latestArticles.length === 0"
-            class="no-articles"
-          >
+          <div v-if="latestArticles.length === 0" class="no-articles">
             <p>Tidak ada artikel untuk ditampilkan.</p>
           </div>
           <div
@@ -100,13 +95,13 @@ export default {
   data() {
     return {
       apiUrl: import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000',
-      series: [
-        { name: 'Harga Sawit', data: [800, 820, 790, 850, 870, 860, 890] }
-      ],
+      user: null,
+      articles: [],
+      series: [], // akan diisi dari API
       chartOptions: {
         chart: { id: 'harga-sawit-chart' },
         xaxis: {
-          categories: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu']
+          categories: [] // akan diisi dari API
         },
         fill: {
           type: 'gradient',
@@ -117,8 +112,7 @@ export default {
             stops: [0, 100]
           }
         }
-      },
-      articles: []
+      }
     }
   },
   computed: {
@@ -127,32 +121,113 @@ export default {
     }
   },
   mounted() {
+    this.fetchUser()
     this.fetchArticles()
+    this.fetchHargaSawit()
   },
   methods: {
+    async fetchUser() {
+      const token = localStorage.getItem('token')
+      if (!token) {
+        console.warn('Token tidak ditemukan, user belum login.')
+        return
+      }
+
+      try {
+        const response = await axios.get(`${this.apiUrl}/api/profile`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        this.user = response.data.data || response.data
+      } catch (error) {
+        console.error('Gagal mendapatkan data user:', error)
+        if (error.response && error.response.status === 401) {
+          alert('Sesi login sudah habis, silakan login ulang.')
+          localStorage.removeItem('token')
+          this.$router.push('/login')
+        }
+      }
+    },
+
+    formatTanggal(tanggal) {
+      const date = new Date(tanggal)
+      if (isNaN(date.getTime())) return 'Invalid Date'
+
+      const dd = String(date.getDate()).padStart(2, '0')
+      const mm = String(date.getMonth() + 1).padStart(2, '0')
+      const yyyy = date.getFullYear()
+      return `${dd}/${mm}/${yyyy}`
+    },
+
+    async fetchHargaSawit() {
+      try {
+        const token = localStorage.getItem('token')
+        const response = await axios.get(`${this.apiUrl}/api/harga`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+
+        const hargaData = response.data.data || []
+
+        // Format tanggal dan harga
+        const tanggalFormatted = hargaData.map(item =>
+          this.formatTanggal(item.created_at)
+        )
+        const hargaValues = hargaData.map(item => item.harga)
+
+        // Update chart
+        this.series = [
+          {
+            name: 'Harga Sawit',
+            data: hargaValues
+          }
+        ]
+
+        this.chartOptions = {
+          ...this.chartOptions,
+          xaxis: {
+            ...this.chartOptions.xaxis,
+            categories: tanggalFormatted
+          }
+        }
+
+      } catch (error) {
+        console.error('Gagal memuat data harga sawit:', error)
+      }
+    },
+
     async fetchArticles() {
       try {
-        const response = await axios.get(`${this.apiUrl}/api/artikel`)
+        const token = localStorage.getItem('token')
+        const response = await axios.get(`${this.apiUrl}/api/artikel`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
         const data = response.data
-        // Jika struktur memakai Resource Collection
         this.articles = data.data || data.artikels || data
-        console.log('Articles fetched:', this.articles)
       } catch (error) {
         console.error('Error fetching articles:', error)
       }
     },
+
     goToDetail(id) {
-      this.$router.push({ name: 'DetailArtikel', params: { id } })
+      if (id) {
+        this.$router.push(`/detail-artikel/${id}`)
+      } else {
+        console.log('Invalid article ID')
+      }
     },
-    /**
-     * Dapatkan URL gambar artikel dengan fallback
-     */
+
     getImageUrl(artikel) {
-      const img = artikel.imageUrl || artikel.image || artikel.thumbnail
+      const img = artikel.imageUrl || artikel.image || artikel.image_path || artikel.thumbnail
       if (!img) return require('@/assets/fotosawit.jpg')
       if (/^(https?:)?\/\//.test(img)) return img
       return `${this.apiUrl}/storage/${img}`
     },
+
     truncate(text, maxLength) {
       if (!text) return ''
       return text.length > maxLength ? text.substring(0, maxLength) + '...' : text
@@ -160,6 +235,8 @@ export default {
   }
 }
 </script>
+
+
 
 <style scoped>
 .main-container { background-color: #e6f7cf; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
@@ -173,7 +250,11 @@ export default {
 .main-image p { font-size: 14px; margin: 0; }
 .menu-section h2, .trending-section h2, .harga-section h2 { margin: 16px 0 8px; color: #134611; font-size: 20px; font-weight: bold; }
 .menu-grid { display: flex; justify-content: space-between; margin-top: 12px; gap: 20px; }
-.trending-cards { display: flex; gap: 12px; margin-top: 12px; }
+.trending-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 kolom */
+  gap: 1rem;
+}
 .card { background: #f2f2f2; flex: 1; border-radius: 12px; overflow: hidden; cursor: pointer; }
 .card-image img { width: 100%; height: 100px; object-fit: cover; }
 .card-content { padding: 8px; }

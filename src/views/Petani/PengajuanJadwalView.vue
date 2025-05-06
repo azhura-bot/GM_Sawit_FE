@@ -1,14 +1,11 @@
 <template>
   <div class="main-container">
-    <!-- Header -->
     <header class="header">
       <div class="circle"></div>
-      <span class="username">Lorem Ipsum</span>
+      <span class="username">{{ nama }}</span>
     </header>
 
-    <!-- Content -->
     <main class="content">
-      <!-- Form Section -->
       <section class="form-section">
         <div class="form-icon-wrapper">
           <img src="@/assets/pengajuan-jadwal.png" alt="Pengajuan Icon" class="form-icon" />
@@ -18,35 +15,24 @@
         <form class="form-card" @submit.prevent="handleSubmit">
           <p class="form-description">Masukkan data Anda pada form di bawah ini</p>
 
-          <!-- <div class="form-group">
-            <label>Nama Petani</label>
-            <select v-model="form.petani_id" required>
-              <option value="" disabled>Pilih Petani</option>
-              <option v-for="petani in petaniList" :key="petani.id" :value="petani.id">
-                {{ petani.name }}
-              </option>
-            </select>
-            <span v-if="errors.petani_id" class="error">{{ errors.petani_id }}</span>
-          </div> -->
-
           <div class="form-group">
             <label>Nama</label>
-            <input type="text" placeholder="Budi Santoso" />
+            <input type="text" v-model="nama" readonly />
           </div>
 
           <div class="form-group">
             <label>Nomor Telephone</label>
-            <input type="text" placeholder="0812xxxxxxxx" />
+            <input type="text" v-model="no_phone" readonly />
           </div>
 
           <div class="form-group">
             <label>Email</label>
-            <input type="email" placeholder="nama@email.com" />
+            <input type="email" v-model="email" readonly />
           </div>
 
           <div class="form-group">
             <label>Tanggal Pengambilan</label>
-            <input type="date" />
+            <input type="date" v-model="tanggal" required />
           </div>
 
           <div class="form-group">
@@ -55,10 +41,9 @@
             <button type="button" class="btn map-picker" @click="openMapModal">📍 Pilih di Peta</button>
           </div>
 
-
           <div class="form-group">
             <label>Jumlah</label>
-            <input type="number" placeholder="Contoh: 20 kg" />
+            <input type="number" v-model="jumlah" placeholder="Contoh: 20 kg" required />
           </div>
 
           <div class="button-group">
@@ -67,10 +52,9 @@
           </div>
         </form>
       </section>
-
     </main>
 
-    <!-- Modal -->
+    <!-- Modal Sukses -->
     <div v-if="isModalOpen" class="modal-overlay">
       <div class="modal-content">
         <img src="@/assets/success-icon.png" alt="Success Icon" class="success-icon" />
@@ -80,17 +64,15 @@
       </div>
     </div>
 
-    <!-- Alamat -->
+    <!-- Map Modal -->
     <div v-if="isMapOpen" class="modal-overlay">
       <div class="modal-content" style="height: 80vh; padding: 0;">
         <div id="map" style="width: 100%; height: 100%; border-radius: 24px;"></div>
         <button class="btn close" style="position: absolute; top: 16px; right: 16px;" @click="closeMapModal">✖</button>
       </div>
     </div>
-
   </div>
 </template>
-
 
 <script>
 export default {
@@ -99,6 +81,11 @@ export default {
     return {
       isModalOpen: false,
       isMapOpen: false,
+      nama: "",
+      email: "",
+      no_phone: "",
+      tanggal: "",
+      jumlah: "",
       alamat: "",
       latitude: null,
       longitude: null,
@@ -106,64 +93,71 @@ export default {
       marker: null,
     };
   },
+  created() {
+    const user = JSON.parse(localStorage.getItem("user"))
+    if (user) {
+      this.nama = user.name || ""
+      this.email = user.email || ""
+      this.no_phone = user.no_phone || ""  // Pastikan backend mengirim `no_phone` pada data user
+    }
+  },
   methods: {
     handleSubmit() {
-      console.log("Alamat:", this.alamat);
-      console.log("Koordinat:", this.latitude, this.longitude);
-      this.isModalOpen = true;
+      console.log("Data terkirim:", {
+        nama: this.nama,
+        email: this.email,
+        no_phone: this.no_phone,
+        tanggal: this.tanggal,
+        jumlah: this.jumlah,
+        alamat: this.alamat,
+        latitude: this.latitude,
+        longitude: this.longitude,
+      })
+      this.isModalOpen = true
     },
     closeModal() {
-      this.isModalOpen = false;
+      this.isModalOpen = false
     },
     cancelForm() {
-      this.$router.go(-1);
+      this.$router.go(-1)
     },
     openMapModal() {
-      this.isMapOpen = true;
+      this.isMapOpen = true
       this.$nextTick(() => {
-        this.initMap();
-      });
+        this.initMap()
+      })
     },
     closeMapModal() {
-      this.isMapOpen = false;
+      this.isMapOpen = false
     },
     initMap() {
-      const defaultPos = { lat: -6.595, lng: 106.816 }; // Bogor
-
+      const defaultPos = { lat: -6.595, lng: 106.816 }
       this.map = new google.maps.Map(document.getElementById("map"), {
         center: defaultPos,
         zoom: 13,
-      });
-
+      })
       this.marker = new google.maps.Marker({
         position: defaultPos,
         map: this.map,
         draggable: true,
-      });
-
-      this.map.addListener("click", (e) => {
-        this.setMarker(e.latLng);
-      });
-
-      this.marker.addListener("dragend", (e) => {
-        this.setMarker(e.latLng);
-      });
+      })
+      this.map.addListener("click", (e) => this.setMarker(e.latLng))
+      this.marker.addListener("dragend", (e) => this.setMarker(e.latLng))
     },
     setMarker(latLng) {
-      this.marker.setPosition(latLng);
-      this.latitude = latLng.lat();
-      this.longitude = latLng.lng();
-
-      const geocoder = new google.maps.Geocoder();
+      this.marker.setPosition(latLng)
+      this.latitude = latLng.lat()
+      this.longitude = latLng.lng()
+      const geocoder = new google.maps.Geocoder()
       geocoder.geocode({ location: latLng }, (results, status) => {
         if (status === "OK" && results[0]) {
-          this.alamat = results[0].formatted_address;
-          this.isMapOpen = false;
+          this.alamat = results[0].formatted_address
+          this.isMapOpen = false
         }
-      });
+      })
     },
   },
-};
+}
 </script>
 
 

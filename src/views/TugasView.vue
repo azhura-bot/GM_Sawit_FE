@@ -83,7 +83,6 @@
             class="w-full h-full"
             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d31693.119965891137!2d106.79309672895196!3d-6.598568091240697!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69c5bc2e1e1fbf%3A0x301576d14feb9b0!2sBogor%2C%20Kota%20Bogor%2C%20Jawa%20Barat!5e0!3m2!1sen!2sid!4v1682003457000!5m2!1sen!2sid"
             style="border:0;"
-            allowfullscreen=""
             loading="lazy"
             referrerpolicy="no-referrer-when-downgrade"
           ></iframe>

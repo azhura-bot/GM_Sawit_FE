@@ -16,7 +16,7 @@
 import { ref } from 'vue'
 import axios from 'axios'
 
-// Props untuk menerima id artikel yang mau dihapus
+// Props untuk menerima id artikel yang akan dihapus
 const props = defineProps({
   artikelId: {
     type: Number,
@@ -24,20 +24,30 @@ const props = defineProps({
   }
 })
 
-// Emit untuk kasih tahu parent
+// Emit untuk memberi tahu parent
 const emit = defineEmits(['close', 'deleted'])
 
-const API_URL = import.meta.env.VITE_API_URL 
+const API_URL = import.meta.env.VITE_API_URL
 
+// Fungsi untuk menghapus artikel
 const deleteArtikel = async () => {
   try {
-    await axios.delete(`${API_URL}/api/artikel/${props.artikelId}`)
-    emit('deleted') 
-    emit('close')  
+    const token = localStorage.getItem('token')
+    if (!token) {
+      console.warn('Token tidak ditemukan, silakan login terlebih dahulu.')
+      return
+    }
+
+    const response = await axios.delete(`${API_URL}/api/artikel/${props.artikelId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    emit('deleted')  // Emit event ke parent setelah berhasil dihapus
+    emit('close')    // Tutup modal
   } catch (error) {
     console.error('Gagal menghapus artikel:', error)
     alert('Gagal menghapus artikel!')
   }
 }
 </script>
-

@@ -1,11 +1,5 @@
 <template>
   <div class="main-container">
-    <!-- Header -->
-    <header class="header">
-      <router-link to="/profile-pengepul" class="circle"></router-link>
-      <span class="username">Nama Pengguna</span>
-    </header>
-
     <!-- Content -->
     <main class="content">
       <!-- Judul dan Icon -->

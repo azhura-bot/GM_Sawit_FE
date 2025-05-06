@@ -74,6 +74,17 @@ const thumbnail = ref(null)
 const fileInput = ref(null)
 const router = useRouter()
 
+// Fungsi untuk mengambil token dari localStorage
+const getAuthToken = () => {
+  return localStorage.getItem('token') // Ganti dengan nama token sesuai dengan aplikasi kamu
+}
+
+// Fungsi untuk menambahkan Authorization header
+const getAuthHeaders = () => {
+  const token = getAuthToken()
+  return token ? { 'Authorization': `Bearer ${token}` } : {}
+}
+
 const triggerFile = () => {
   fileInput.value.click()
 }
@@ -92,7 +103,10 @@ const submitForm = async () => {
 
   try {
     const { data } = await axios.post('http://127.0.0.1:8000/api/artikel', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        ...getAuthHeaders() // Menambahkan Authorization header
+      }
     })
     console.log('Artikel berhasil ditambahkan:', data)
     router.push('/daftar-berita')
@@ -100,7 +114,7 @@ const submitForm = async () => {
     console.error('Error menambahkan artikel:', error)
     // TODO: tampilkan notifikasi error ke user
   }
-  
+
   router.push('/data-berita')
 }
 </script>

@@ -106,10 +106,23 @@ const handleFileUpload = (e) => {
   thumbnail.value = e.target.files[0]
 }
 
+// Ambil token dari localStorage
+const getAuthToken = () => {
+  return localStorage.getItem('token') // Ganti dengan nama yang sesuai jika diperlukan
+}
+
+// Tambahkan token pada header
+const getAuthHeaders = () => {
+  const token = getAuthToken()
+  return token ? { 'Authorization': `Bearer ${token}` } : {}
+}
+
 // Fetch existing article data
 const fetchArticle = async () => {
   try {
-    const { data } = await axios.get(`${API_URL}/api/artikel/${id}`)
+    const { data } = await axios.get(`${API_URL}/api/artikel/${id}`, {
+      headers: getAuthHeaders() // Kirim header dengan token
+    })
     judul.value = data.data.title
     isiArtikel.value = data.data.content
     currentImage.value = data.data.image
@@ -129,7 +142,12 @@ const submitForm = async () => {
     await axios.post(
       `${API_URL}/api/artikel/${id}?_method=PUT`,
       formData,
-      { headers: { 'Content-Type': 'multipart/form-data' } }
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          ...getAuthHeaders() // Kirim header dengan token
+        }
+      }
     )
     router.push('/daftar-berita')
   } catch (error) {

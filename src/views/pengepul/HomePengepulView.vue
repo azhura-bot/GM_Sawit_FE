@@ -3,7 +3,7 @@
     <!-- Header -->
     <header class="header">
       <router-link to="/profile-pengepul" class="circle" />
-      <span class="username">nama User</span>
+      <span class="username">{{ user?.name || 'nama User' }}</span>
     </header>
 
     <!-- Content -->
@@ -91,14 +91,13 @@ export default {
   data() {
     return {
       apiUrl: import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000',
+      user: null,
       articles: [],
-      series: [
-        { name: 'Harga Sawit', data: [800, 820, 790, 850, 870, 860, 890] }
-      ],
+      series: [], // akan diisi dari API
       chartOptions: {
         chart: { id: 'harga-sawit-chart' },
         xaxis: {
-          categories: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu']
+          categories: [] // akan diisi dari API
         },
         fill: {
           type: 'gradient',
@@ -118,26 +117,113 @@ export default {
     }
   },
   mounted() {
+    this.fetchUser()
     this.fetchArticles()
+    this.fetchHargaSawit()
   },
   methods: {
+    async fetchUser() {
+      const token = localStorage.getItem('token')
+      if (!token) {
+        console.warn('Token tidak ditemukan, user belum login.')
+        return
+      }
+
+      try {
+        const response = await axios.get(`${this.apiUrl}/api/profile`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        this.user = response.data.data || response.data
+      } catch (error) {
+        console.error('Gagal mendapatkan data user:', error)
+        if (error.response && error.response.status === 401) {
+          alert('Sesi login sudah habis, silakan login ulang.')
+          localStorage.removeItem('token')
+          this.$router.push('/login')
+        }
+      }
+    },
+
+    formatTanggal(tanggal) {
+      const date = new Date(tanggal)
+      if (isNaN(date.getTime())) return 'Invalid Date'
+
+      const dd = String(date.getDate()).padStart(2, '0')
+      const mm = String(date.getMonth() + 1).padStart(2, '0')
+      const yyyy = date.getFullYear()
+      return `${dd}/${mm}/${yyyy}`
+    },
+
+    async fetchHargaSawit() {
+      try {
+        const token = localStorage.getItem('token')
+        const response = await axios.get(`${this.apiUrl}/api/harga`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+
+        const hargaData = response.data.data || []
+
+        // Format tanggal dan harga
+        const tanggalFormatted = hargaData.map(item =>
+          this.formatTanggal(item.created_at)
+        )
+        const hargaValues = hargaData.map(item => item.harga)
+
+        // Update chart
+        this.series = [
+          {
+            name: 'Harga Sawit',
+            data: hargaValues
+          }
+        ]
+
+        this.chartOptions = {
+          ...this.chartOptions,
+          xaxis: {
+            ...this.chartOptions.xaxis,
+            categories: tanggalFormatted
+          }
+        }
+
+      } catch (error) {
+        console.error('Gagal memuat data harga sawit:', error)
+      }
+    },
+
     async fetchArticles() {
       try {
-        const response = await axios.get(`${this.apiUrl}/api/artikel`)
-        this.articles = response.data.data ?? response.data
+        const token = localStorage.getItem('token')
+        const response = await axios.get(`${this.apiUrl}/api/artikel`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        const data = response.data
+        this.articles = data.data || data.artikels || data
       } catch (error) {
         console.error('Error fetching articles:', error)
       }
     },
+
     goToDetail(id) {
-      this.$router.push({ name: 'DetailArtikel', params: { id } })
+      if (id) {
+        this.$router.push(`/detail-artikel/${id}`)
+      } else {
+        console.log('Invalid article ID')
+      }
     },
-    resolveImage(artikel) {
-      const path = artikel.imageUrl || artikel.image || artikel.thumbnail
-      if (!path) return require('@/assets/fotosawit.jpg')
-      if (/^(https?:)?\/\//.test(path)) return path
-      return `${this.apiUrl}/storage/${path}`
+
+    getImageUrl(artikel) {
+      const img = artikel.imageUrl || artikel.image || artikel.image_path || artikel.thumbnail
+      if (!img) return require('@/assets/fotosawit.jpg')
+      if (/^(https?:)?\/\//.test(img)) return img
+      return `${this.apiUrl}/storage/${img}`
     },
+
     truncate(text, maxLength) {
       if (!text) return ''
       return text.length > maxLength ? text.substring(0, maxLength) + '...' : text
@@ -145,6 +231,7 @@ export default {
   }
 }
 </script>
+
 
 <style scoped>
 .main-container {

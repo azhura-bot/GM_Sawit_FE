@@ -1,43 +1,77 @@
 <template>
-    <div class="main-container">
-      <header class="header">
+  <div class="main-container">
+    <!-- Header -->
+    <header class="header">
       <router-link to="/profile-pengepul" class="circle"></router-link>
-      <span class="username">Lorem Ipsum</span>
-      </header>
-      <main class="content">
-        <!-- Tombol Back dan Image -->
-        <div class="top-section">
-          <button class="back-button" @click="goBack">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <img src="@/assets/fotosawit.jpg" alt="Foto Sawit" class="detail-image" />
-        </div>
-  
-        <div class="detail-content">
-          <h2>Lorem Ipsum</h2>
-          <p>
-            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.
-          </p>
-          <p>
-            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.
-          </p>
-        </div>
-      </main>
-    </div>
-  </template>
-  
-  <script>
-  export default {
-    name: "DetailArtikelPengepulView",
-    methods: {
-      goBack() {
-        this.$router.go(-1);
-      },
+      <span class="username">{{ 'Pengepul' }}</span>
+    </header>
+
+    <!-- Main Content -->
+    <main class="content">
+      <!-- Tombol Back dan Gambar -->
+      <div class="top-section">
+        <button class="back-button" @click="goBack">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+            viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <img :src="getImageUrl()" alt="Foto Artikel" class="detail-image" />
+      </div>
+
+      <!-- Detail Artikel -->
+      <div class="detail-content">
+        <h2>{{ artikel?.title || 'Judul Artikel' }}</h2>
+        <p v-html="artikel?.content || artikel?.description || 'Konten tidak tersedia.'"></p>
+      </div>
+    </main>
+  </div>
+</template>
+
+<script>
+import axios from 'axios'
+import fallbackImage from '@/assets/fotosawit.jpg'
+
+export default {
+  name: 'DetailArtikelPengepulView',
+  data() {
+    return {
+      apiUrl: import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000',
+      artikel: null
+    }
+  },
+  mounted() {
+    const id = this.$route.params.id
+    if (id) this.fetchArtikel(id)
+  },
+  methods: {
+    async fetchArtikel(id) {
+      const token = localStorage.getItem('token')
+      try {
+        const response = await axios.get(`${this.apiUrl}/api/artikel/${id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        this.artikel = response.data.data || response.data
+      } catch (error) {
+        console.error('Gagal memuat artikel:', error)
+      }
     },
-  };
-  </script>
+    goBack() {
+      this.$router.go(-1)
+    },
+    getImageUrl() {
+      const img = this.artikel?.image
+              || this.artikel?.image_path
+              || this.artikel?.thumbnail
+
+      if (!img) return fallbackImage
+      if (/^(https?:)?\/\//.test(img)) return img
+      return `${this.apiUrl}/storage/${img}`
+    }
+  }
+}
+</script>
   
   <style scoped>
   .main-container {
