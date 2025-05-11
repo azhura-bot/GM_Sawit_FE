@@ -49,7 +49,7 @@
           <span class="text-lg font-bold">EcoPalm</span>
         </div>
         <ul class="w-full">
-          <li><a href="/">Beranda</a></li>
+          <li><a href="/dashboard">Beranda</a></li>
           <!-- <li><a href="/tugas">Tugas</a></li> -->
           <li><a href="/data-pengepul">Data Pengepul</a></li>
           <li><a href="/data-berita">Daftar Artikel</a></li>
