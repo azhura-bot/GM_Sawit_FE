@@ -73,6 +73,8 @@ const no_phone = ref('')
 const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
+const role = ref('manager') // bisa default 'petani' atau sesuai kebutuhan
+
 
 const submitForm = async () => {
   try {
@@ -82,6 +84,7 @@ const submitForm = async () => {
       email: email.value,
       password: password.value,
       password_confirmation: password.value,
+      role: role.value,
     }, {
       headers: {
         'Content-Type': 'application/json',  // pastikan konten yang dikirim sesuai
