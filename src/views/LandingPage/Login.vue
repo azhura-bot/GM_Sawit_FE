@@ -6,11 +6,21 @@
       <form @submit.prevent="submitLogin" class="space-y-4">
         <div>
           <label class="block text-sm font-semibold mb-1 text-[#134611]">Email</label>
-          <input type="email" v-model="email" class="w-full p-3 bg-[#D9D9D9] rounded-3xl outline-none" required />
+          <input
+            type="email"
+            v-model="email"
+            class="w-full p-3 bg-[#D9D9D9] rounded-3xl outline-none text-black"
+            required
+          />
         </div>
         <div>
           <label class="block text-sm font-semibold mb-1 text-[#134611]">Password</label>
-          <input type="password" v-model="password" class="w-full p-3 bg-[#D9D9D9] rounded-3xl outline-none" required />
+          <input
+            type="password"
+            v-model="password"
+            class="w-full p-3 bg-[#D9D9D9] rounded-3xl outline-none text-black"
+            required
+          />
           <div class="text-center mt-1">
             <a href="#" class="text-blue-600 text-sm hover:underline">Forgot Password?</a>
           </div>

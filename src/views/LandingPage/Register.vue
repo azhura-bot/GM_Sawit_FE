@@ -14,7 +14,7 @@
           <input
             type="text"
             v-model="name"
-            class="w-full p-3 bg-[#D9D9D9] rounded-3xl outline-none"
+            class="w-full p-3 bg-[#D9D9D9] rounded-3xl outline-none text-black"
             required
           />
         </div>
@@ -24,7 +24,7 @@
           <input
             type="tel"
             v-model="no_phone"
-            class="w-full p-3 bg-[#D9D9D9] rounded-3xl outline-none"
+            class="w-full p-3 bg-[#D9D9D9] rounded-3xl outline-none text-black"
             required
           />
         </div>
@@ -34,7 +34,7 @@
           <input
             type="email"
             v-model="email"
-            class="w-full p-3 bg-[#D9D9D9] rounded-3xl outline-none"
+            class="w-full p-3 bg-[#D9D9D9] rounded-3xl outline-none text-black"
             required
           />
         </div>
@@ -44,10 +44,11 @@
           <input
             type="password"
             v-model="password"
-            class="w-full p-3 bg-[#D9D9D9] rounded-3xl outline-none"
+            class="w-full p-3 bg-[#D9D9D9] rounded-3xl outline-none text-black"
             required
           />
         </div>
+
 
         <button
           type="submit"
