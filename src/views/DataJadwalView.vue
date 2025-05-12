@@ -23,11 +23,11 @@
               :key="index"
               class="hover:bg-lime-50"
             >
-              <td class="px-6 py-4 whitespace-nowrap">{{ jadwal.tanggal }}</td>
-              <td class="px-6 py-4 whitespace-nowrap">{{ jadwal.jam }}</td>
-              <td class="px-6 py-4 whitespace-nowrap">{{ jadwal.nama }}</td>
-              <td class="px-6 py-4 whitespace-nowrap">{{ jadwal.lokasi }}</td>
-              <td class="px-6 py-4 whitespace-nowrap">{{ jadwal.telepon }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-black">{{ jadwal.tanggal }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-black">{{ jadwal.jam }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-black">{{ jadwal.nama }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-black">{{ jadwal.lokasi }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-black">{{ jadwal.telepon }}</td>
               <td class="px-6 py-4">
                 <span
                   class="inline-block px-2 py-1 rounded-full text-xs font-medium"
@@ -127,7 +127,13 @@ export default {
   th,
   td {
     padding: 0.75rem 0.5rem;
+    color: black;
   }
+
+  td {
+    color: black;
+  }
+
 
   button {
     padding: 0.25rem 0.75rem;

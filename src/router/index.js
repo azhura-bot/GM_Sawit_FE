@@ -14,6 +14,7 @@ import TambahBeritaView from '@/views/TambahBeritaView.vue'
 import EditBeritaView from '@/views/EditBeritaView.vue'
 import DataStatistikView from '@/views/DataStatistikView.vue'
 import DataJadwalView from '@/views/DataJadwalView.vue'
+import DataTransaksiView from '@/views/DataTransaksiView.vue'
 
 // Pengepul
 import HomePengepulView from '@/views/pengepul/HomePengepulView.vue'
@@ -53,6 +54,7 @@ const routes = [
   { path: '/edit-berita/:id', name: 'EditBerita', component: EditBeritaView, props: true, meta: { requiresAuth: true, role: 'manager' }},
   { path: '/data-statistik', name: 'DataStatistik', component: DataStatistikView, meta: { requiresAuth: true, role: 'manager' }},
   { path: '/data-jadwal', name: 'DataJadwal', component: DataJadwalView, meta: { requiresAuth: true, role: 'manager' }},
+  { path: '/data-transaksi', name: 'DataTransaksi', component: DataTransaksiView, meta: { requiresAuth: true, role: 'manager' }},
 
   // Pengepul
   { path: '/home-pengepul', name: 'HomePengepul', component: HomePengepulView, meta: { requiresAuth: true, role: 'pengepul' }},
