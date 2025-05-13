@@ -49,6 +49,19 @@
           />
         </div>
 
+        <div>
+          <label class="block text-sm font-semibold mb-1 text-[#134611]">Role</label>
+          <select
+            v-model="role"
+            class="w-full p-3 bg-[#D9D9D9] rounded-3xl outline-none text-black"
+            required
+          >
+            <option value="" disabled selected>Pilih Role</option>
+            <option value="pengepul">Pengepul</option>
+            <option value="petani">Petani</option>
+          </select>
+        </div>
+
 
         <button
           type="submit"
@@ -73,8 +86,7 @@ const no_phone = ref('')
 const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
-const role = ref('pengepul') // bisa default 'petani' atau sesuai kebutuhan
-
+const role = ref('') 
 
 const submitForm = async () => {
   try {
