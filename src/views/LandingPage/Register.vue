@@ -73,7 +73,7 @@ const no_phone = ref('')
 const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
-const role = ref('petani') // bisa default 'petani' atau sesuai kebutuhan
+const role = ref('pengepul') // bisa default 'petani' atau sesuai kebutuhan
 
 
 const submitForm = async () => {

@@ -239,28 +239,137 @@ export default {
 
 
 <style scoped>
-.main-container { background-color: #e6f7cf; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
-.header { background-color: #164b1b; width: 100%; padding: 12px; display: flex; align-items: center; justify-content: center; color: white; position: sticky; top: 0; z-index: 10; }
-.circle { width: 24px; height: 24px; background-color: white; border-radius: 50%; margin-right: 8px; }
-.username { font-weight: bold; }
-.content { background: white; margin-top: 12px; width: 100%; max-width: 430px; border-radius: 16px 16px 0 0; padding: 16px; }
-.image-section { border-radius: 16px; overflow: hidden; margin-bottom: 16px; }
-.main-image { display: flex; flex-direction: column; align-items: center; text-align: center; text-decoration: none; color: inherit; }
-.main-image img { width: 80px; height: 80px; margin-bottom: 8px; }
-.main-image p { font-size: 14px; margin: 0; }
-.menu-section h2, .trending-section h2, .harga-section h2 { margin: 16px 0 8px; color: #134611; font-size: 20px; font-weight: bold; }
-.menu-grid { display: flex; justify-content: space-between; margin-top: 12px; gap: 20px; }
+.main-container {
+  background-color: #e6f7cf;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.header {
+  background-color: #164b1b;
+  width: 100%;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.circle {
+  width: 24px;
+  height: 24px;
+  background-color: white;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.username {
+  font-weight: bold;
+}
+
+.content {
+  background: white;
+  margin-top: 12px;
+  width: 100%;
+  max-width: 430px;
+  border-radius: 16px 16px 0 0;
+  padding: 16px;
+}
+
+.image-section {
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.main-image {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  text-decoration: none;
+  color: inherit;
+}
+
+.main-image img {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 8px;
+}
+
+.main-image p {
+  font-size: 14px;
+  margin: 0;
+  color: #000000;
+}
+
+.menu-section h2,
+.trending-section h2,
+.harga-section h2 {
+  margin: 16px 0 8px;
+  color: #134611;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
 .trending-cards {
   display: grid;
   grid-template-columns: repeat(2, 1fr); /* 2 kolom */
   gap: 1rem;
 }
-.card { background: #f2f2f2; flex: 1; border-radius: 12px; overflow: hidden; cursor: pointer; }
-.card-image img { width: 100%; height: 100px; object-fit: cover; }
-.card-content { padding: 8px; }
-.card-content h3 { font-size: 14px; margin: 4px 0; }
-.card-content p { font-size: 12px; color: #666; }
-.no-articles { text-align: center; color: #666; font-style: italic; }
-.harga-section { margin-top: 24px; }
-.chart-image { width: 100%; margin-top: 8px; border-radius: 12px; }
+
+.card {
+  background: #f2f2f2;
+  flex: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.card-image img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+}
+
+.card-content {
+  padding: 8px;
+}
+
+.card-content h3 {
+  font-size: 14px;
+  margin: 4px 0;
+}
+
+.card-content p {
+  font-size: 12px;
+  color: #666;
+}
+
+.no-articles {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+}
+
+.harga-section {
+  margin-top: 24px;
+}
+
+.chart-image {
+  width: 100%;
+  margin-top: 8px;
+  border-radius: 12px;
+}
 </style>
