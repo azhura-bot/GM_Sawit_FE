@@ -50,7 +50,7 @@
                 </button>
                 <button
                   class="px-3 py-1 bg-rose-200 text-rose-700 hover:bg-rose-300 rounded text-xs font-semibold"
-                  @click="tolak(index)"
+                  @click="bukaModalTolak(index)"
                   :disabled="jadwal.status !== 'Request'"
                 >
                   Tolak
@@ -59,6 +59,23 @@
             </tr>
           </tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- Modal Tolak -->
+    <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+      <div class="bg-white rounded-xl p-6 w-96 shadow-lg relative">
+        <h3 class="text-lg font-semibold mb-2 text-gray-800">Konfirmasi Penolakan</h3>
+        <p class="text-sm text-gray-600 mb-3">Apakah Anda yakin ingin menolak pengajuan ini?</p>
+        <textarea
+          v-model="alasan"
+          placeholder="Tuliskan alasan penolakan..."
+          class="w-full border border-gray-300 rounded p-2 mb-3 text-sm"
+        ></textarea>
+        <div class="flex justify-end gap-2">
+          <button @click="tutupModal" class="px-4 py-1 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 text-sm">Batalkan</button>
+          <button @click="konfirmasiTolak" class="px-4 py-1 bg-rose-500 text-white rounded hover:bg-rose-600 text-sm">Ya, Tolak</button>
+        </div>
       </div>
     </div>
   </div>
@@ -94,7 +111,10 @@ export default {
           telepon: '0822-2222-2222',
           status: 'Request'
         }
-      ]
+      ],
+      showModal: false,
+      alasan: '',
+      selectedIndex: null
     };
   },
   methods: {
@@ -105,14 +125,23 @@ export default {
         alert("Pengajuan telah diterima.");
       }
     },
-    tolak(index) {
-      const konfirmasi = window.confirm(
-        "Apakah Anda yakin ingin menolak pengajuan ini?\n\nRequest ditolak akan diberitahukan ke petani."
-      );
-      if (konfirmasi) {
-        this.jadwals[index].status = "Ditolak";
-        alert("Pengajuan ditolak dan akan diberitahukan ke petani.");
+    bukaModalTolak(index) {
+      this.selectedIndex = index;
+      this.showModal = true;
+    },
+    tutupModal() {
+      this.showModal = false;
+      this.alasan = '';
+      this.selectedIndex = null;
+    },
+    konfirmasiTolak() {
+      if (!this.alasan.trim()) {
+        alert("Mohon isi alasan terlebih dahulu sebelum menolak.");
+        return;
       }
+      this.jadwals[this.selectedIndex].status = "Ditolak";
+      alert("Pengajuan ditolak dengan alasan: " + this.alasan);
+      this.tutupModal();
     }
   }
 };
@@ -129,11 +158,6 @@ export default {
     padding: 0.75rem 0.5rem;
     color: black;
   }
-
-  td {
-    color: black;
-  }
-
 
   button {
     padding: 0.25rem 0.75rem;
