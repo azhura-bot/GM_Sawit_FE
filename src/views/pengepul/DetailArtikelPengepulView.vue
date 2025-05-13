@@ -3,7 +3,7 @@
     <!-- Header -->
     <header class="header">
       <router-link to="/profile-pengepul" class="circle"></router-link>
-      <span class="username">{{ 'Pengepul' }}</span>
+      <span class="username">{{ user?.name || 'nama User' }}</span>
     </header>
 
     <!-- Main Content -->
@@ -38,13 +38,17 @@ export default {
   data() {
     return {
       apiUrl: import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000',
-      artikel: null
+      artikel: null,
+      user: null,
     }
   },
+
   mounted() {
+    this.fetchUser()
     const id = this.$route.params.id
     if (id) this.fetchArtikel(id)
   },
+
   methods: {
     async fetchArtikel(id) {
       const token = localStorage.getItem('token')
@@ -57,9 +61,11 @@ export default {
         console.error('Gagal memuat artikel:', error)
       }
     },
+
     goBack() {
       this.$router.go(-1)
     },
+
     getImageUrl() {
       const img = this.artikel?.image
               || this.artikel?.image_path
@@ -68,12 +74,36 @@ export default {
       if (!img) return fallbackImage
       if (/^(https?:)?\/\//.test(img)) return img
       return `${this.apiUrl}/storage/${img}`
+    },
+    
+    async fetchUser() {
+      const token = localStorage.getItem('token')
+      if (!token) {
+        console.warn('Token tidak ditemukan, user belum login.')
+        return
+      }
+
+      try {
+        const response = await axios.get(`${this.apiUrl}/api/profile`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        this.user = response.data.data || response.data
+      } catch (error) {
+        console.error('Gagal mendapatkan data user:', error)
+        if (error.response && error.response.status === 401) {
+          alert('Sesi login sudah habis, silakan login ulang.')
+          localStorage.removeItem('token')
+          this.$router.push('/login')
+        }
+      }
     }
   }
 }
 </script>
   
-  <style scoped>
+<style scoped>
   .main-container {
     background-color: #e6f7cf;
     min-height: 100vh;
@@ -158,5 +188,5 @@ export default {
     font-size: 14px;
     margin-bottom: 12px;
   }
-  </style>
+</style>
   

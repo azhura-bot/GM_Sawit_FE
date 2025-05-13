@@ -17,33 +17,33 @@
 
           <div class="form-group">
             <label>Nama</label>
-            <input type="text" v-model="nama" readonly />
+            <input type="text" v-model="nama" readonly class="text-[#134611]" />
           </div>
 
           <div class="form-group">
-            <label>Nomor Telephone</label>
-            <input type="text" v-model="no_phone" readonly />
-          </div>
-
-          <div class="form-group">
-            <label>Email</label>
-            <input type="email" v-model="email" readonly />
+            <label>Nomor Telepon</label>
+            <input type="text" v-model="no_phone" class="text-[#134611]" />
           </div>
 
           <div class="form-group">
             <label>Tanggal Pengambilan</label>
-            <input type="date" v-model="tanggal" required />
+            <Datepicker
+              v-model="tanggal"
+              format="yyyy-MM-dd"
+              placeholder="Pilih Tanggal"
+              class="w-full px-4 py-3 border border-[#cfcfcf] rounded-[12px] bg-[#f9f9f9] text-sm transition-all focus:outline-none focus:border-[#4b830d] focus:bg-white text-[#134611]"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Jam Pengambilan</label>
+            <input type="time" v-model="jam" class="text-[#134611]" />
           </div>
 
           <div class="form-group">
             <label>Alamat</label>
-            <input type="text" v-model="alamat" placeholder="Jl. Mawar No. 1, Bogor" readonly />
+            <input type="text" v-model="alamat" readonly class="text-[#134611]" />
             <button type="button" class="btn map-picker" @click="openMapModal">📍 Pilih di Peta</button>
-          </div>
-
-          <div class="form-group">
-            <label>Jumlah</label>
-            <input type="number" v-model="jumlah" placeholder="Contoh: 20 kg" required />
           </div>
 
           <div class="button-group">
@@ -64,7 +64,7 @@
       </div>
     </div>
 
-    <!-- Map Modal -->
+    <!-- Modal Peta -->
     <div v-if="isMapOpen" class="modal-overlay">
       <div class="modal-content" style="height: 80vh; padding: 0;">
         <div id="map" style="width: 100%; height: 100%; border-radius: 24px;"></div>
@@ -75,91 +75,127 @@
 </template>
 
 <script>
+import L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
+import Datepicker from 'vue3-datepicker'
+
 export default {
   name: "PengajuanJadwalView",
+  components: { Datepicker },
   data() {
     return {
       isModalOpen: false,
       isMapOpen: false,
       nama: "",
-      email: "",
       no_phone: "",
-      tanggal: "",
-      jumlah: "",
+      tanggal: null, // Date object or string
+      jam: "",     // string 'HH:mm'
       alamat: "",
       latitude: null,
       longitude: null,
       map: null,
       marker: null,
-    };
-  },
-  created() {
-    const user = JSON.parse(localStorage.getItem("user"))
-    if (user) {
-      this.nama = user.name || ""
-      this.email = user.email || ""
-      this.no_phone = user.no_phone || ""  // Pastikan backend mengirim `no_phone` pada data user
     }
   },
+  created() {
+    const user = JSON.parse(localStorage.getItem("user")) || {}
+    this.nama = user.name || ""
+    this.no_phone = user.no_phone || ""
+  },
   methods: {
-    handleSubmit() {
-      console.log("Data terkirim:", {
-        nama: this.nama,
-        email: this.email,
-        no_phone: this.no_phone,
-        tanggal: this.tanggal,
-        jumlah: this.jumlah,
-        alamat: this.alamat,
-        latitude: this.latitude,
-        longitude: this.longitude,
-      })
-      this.isModalOpen = true
-    },
-    closeModal() {
-      this.isModalOpen = false
-    },
-    cancelForm() {
-      this.$router.go(-1)
-    },
     openMapModal() {
       this.isMapOpen = true
-      this.$nextTick(() => {
-        this.initMap()
-      })
+      this.$nextTick(this.initMap)
     },
     closeMapModal() {
       this.isMapOpen = false
     },
     initMap() {
-      const defaultPos = { lat: -6.595, lng: 106.816 }
-      this.map = new google.maps.Map(document.getElementById("map"), {
-        center: defaultPos,
-        zoom: 13,
-      })
-      this.marker = new google.maps.Marker({
-        position: defaultPos,
-        map: this.map,
-        draggable: true,
-      })
-      this.map.addListener("click", (e) => this.setMarker(e.latLng))
-      this.marker.addListener("dragend", (e) => this.setMarker(e.latLng))
+      const defaultPos = [-6.595, 106.816]
+      if (this.map) this.map.remove()
+      this.map = L.map("map").setView(defaultPos, 13)
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: '&copy; OpenStreetMap contributors' }).addTo(this.map)
+      this.marker = L.marker(defaultPos, { draggable: true }).addTo(this.map)
+      this.map.on("click", e => this.setMarker(e.latlng))
+      this.marker.on("dragend", e => this.setMarker(e.target.getLatLng()))
     },
-    setMarker(latLng) {
-      this.marker.setPosition(latLng)
-      this.latitude = latLng.lat()
-      this.longitude = latLng.lng()
-      const geocoder = new google.maps.Geocoder()
-      geocoder.geocode({ location: latLng }, (results, status) => {
-        if (status === "OK" && results[0]) {
-          this.alamat = results[0].formatted_address
+    setMarker(latlng) {
+      this.marker.setLatLng(latlng)
+      this.latitude = latlng.lat
+      this.longitude = latlng.lng
+      fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latlng.lat}&lon=${latlng.lng}&format=json`)
+        .then(res => res.json())
+        .then(data => {
+          this.alamat = data.display_name
           this.isMapOpen = false
+        })
+        .catch(() => alert("Gagal mendapatkan alamat"))
+    },
+    handleSubmit() {
+      const token = localStorage.getItem("token")
+      if (!token) return alert("Anda belum login atau token tidak ditemukan")
+      if (!this.tanggal || !this.jam || !this.alamat || !this.no_phone) {
+        return alert("Harap lengkapi semua data terlebih dahulu.")
+      }
+
+      // Format tanggalWaktu: "YYYY-MM-DD HH:mm:00"
+      let year, month, day
+      if (this.tanggal instanceof Date) {
+        year = this.tanggal.getFullYear()
+        month = String(this.tanggal.getMonth() + 1).padStart(2, '0')
+        day = String(this.tanggal.getDate()).padStart(2, '0')
+      } else {
+        [year, month, day] = this.tanggal.split('-')
+      }
+      const [hour, minute] = this.jam.split(':')
+      const tanggalWaktu = `${year}-${month}-${day} ${hour.padStart(2,'0')}:${minute.padStart(2,'0')}:00`
+
+      const payload = {
+        nama_petani: this.nama,
+        no_hp: this.no_phone,
+        alamat: this.alamat,
+        tanggal: tanggalWaktu,
+        jam: this.jam,
+        latitude: this.latitude,
+        longitude: this.longitude,
+      }
+
+      fetch("http://127.0.0.1:8000/api/janji-temu", {
+        method: "POST",
+        mode: "cors",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      })
+      .then(async res => {
+        const data = await res.json()
+        if (!res.ok) {
+          const msg = Object.values(data.errors || {}).flat()[0] || data.message || 'Gagal mengirim data'
+          return alert(msg)
         }
+        this.isModalOpen = true
+      })
+      .catch(err => {
+        console.error(err)
+        alert("Terjadi kesalahan saat mengirim data")
       })
     },
-  },
+    closeModal() {
+      this.isModalOpen = false
+      // bersihkan form setelah menutup modal
+      this.tanggal = null
+      this.jam = ""
+      this.alamat = ""
+      this.latitude = null
+      this.longitude = null
+    },
+    cancelForm() { this.$router.go(-1) }
+  }
 }
 </script>
-
 
 <style scoped>
 /* Styling sebelumnya tetap */
@@ -280,7 +316,8 @@ export default {
   font-size: 14px;
 }
 
-.form-group input {
+.form-group input,
+.form-group input[type="date"]  {
   padding: 12px 16px;
   border: 1px solid #cfcfcf;
   border-radius: 12px;
@@ -289,7 +326,8 @@ export default {
   transition: border 0.3s ease;
 }
 
-.form-group input:focus {
+.form-group input:focus,
+.form-group input[type="date"]  {
   outline: none;
   border-color: #4b830d;
   background-color: #fff;

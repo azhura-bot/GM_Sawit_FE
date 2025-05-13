@@ -52,13 +52,13 @@
           >
             <div class="card-image">
               <img
-                :src="resolveImage(artikel)"
+                :src="getImageUrl(artikel)"
                 alt="gambar artikel"
                 class="object-cover w-full h-full"
               />
             </div>
             <div class="card-content">
-              <h3>{{ artikel.title }}</h3>
+              <h3 class="text-[#134611] font-bold">{{ artikel.title }}</h3>
               <p>{{ truncate(artikel.content || artikel.description, 100) }}</p>
             </div>
           </div>

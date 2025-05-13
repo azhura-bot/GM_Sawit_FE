@@ -10,7 +10,7 @@
       <main class="content">
         <section class="section-header">
           <img src="@/assets/pengajuan-jadwal.png" alt="Icon Pengajuan" class="section-icon" />
-          <h1>Riwayat Pengajuan Jadwal</h1>
+          <h1 class="text-[#134611]">Riwayat Pengajuan Jadwal</h1>
         </section>
   
         <section class="accepted-section">
@@ -18,14 +18,14 @@
           
           <div v-for="(item, index) in acceptedSchedules" :key="index" class="schedule-card">
             <div class="schedule-row">
-              <span class="label">Nama Petani</span>
-              <span class="value">{{ item.nama }}</span>
-              <span class="label jam">Jam</span>
-              <span class="value jam">{{ item.jam }}</span>
+              <span class="label">Nama Petani: </span>
+              <span class="value text-[#134611]">{{ item.nama }}</span>
+              <span class="label jam text-[#134611]">Jam: </span>
+              <span class="value jam text-[#134611]">{{ item.jam }}</span>
             </div>
             <div class="schedule-row">
-              <span class="label">Lokasi</span>
-              <span class="value">{{ item.lokasi }}</span>
+              <span class="label">Lokasi: </span>
+              <span class="value text-[#134611]">{{ item.lokasi }}</span>
             </div>
           </div>
         </section>

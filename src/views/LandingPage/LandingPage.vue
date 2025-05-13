@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full">
+  <div class="w-full bg-white">
     <!-- Hero Section -->
     <div
     class="w-full h-96 sm:h-[40rem] bg-cover bg-center relative flex items-center"

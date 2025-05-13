@@ -46,7 +46,7 @@ const navbarManajerRoutes = [
   '/edit-berita',
   '/tugas',
   '/main',
-  '/profile',
+  // '/profile',
   '/tambah-berita',
   '/tambah-pengepul',
 ]

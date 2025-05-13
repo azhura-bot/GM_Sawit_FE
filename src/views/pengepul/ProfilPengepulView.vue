@@ -1,71 +1,165 @@
 <template>
-    <div class="main-container">
-      <!-- Header -->
-      <header class="header">
+  <div class="main-container">
+    <header class="header">
       <router-link to="/profile-pengepul" class="circle"></router-link>
-      <span class="username">Lorem Ipsum</span>
-      </header>
-  
-      <!-- Content -->
-      <main class="content">
-        <!-- Profile Section -->
-        <div class="profile-section">
-          <img src="@/assets/jay.jpg" alt="Profile" class="profile-picture" />
-          <h1 class="profile-name">Udin Suyonto</h1>
+      <span class="username">{{ profile.name || 'Lorem Ipsum' }}</span>
+    </header>
+
+    <main class="content">
+      <div class="profile-section">
+        <img :src="imagePreview || profile.photo || defaultPhoto" alt="Profile" class="profile-picture" />
+      </div>
+
+      <section class="info-section">
+        <p class="info-instruction">Informasi Profil</p>
+
+        <div class="info-group">
+          <label>Nama</label>
+          <input v-if="isEditing" v-model="profile.name" class="info-value" />
+          <div v-else class="info-value">{{ profile.name }}</div>
         </div>
-  
-        <!-- Info Section -->
-        <section class="info-section">
-          <p class="info-instruction">Informasi Profil</p>
-  
-          <div class="info-group">
-            <label>Nomor Telephone</label>
-            <div class="info-value">{{ profile.nomorTelepon }}</div>
-          </div>
-  
-          <div class="info-group">
-            <label>Email</label>
-            <div class="info-value">{{ profile.email }}</div>
-          </div>
-  
-          <div class="info-group">
-            <label>Alamat</label>
-            <div class="info-value">{{ profile.alamat }}</div>
-          </div>
-  
-          <!-- Edit Button -->
-          <div class="button-group">
-            <button class="edit-button" @click="goToEditProfile">Edit Profil</button>
-          </div>
-        </section>
-      </main>
-    </div>
-  </template>
-  
-  <script>
-  export default {
-    name: 'ProfilePengepulView',
-    data() {
-      return {
-        profile: {
-          nomorTelepon: '081234567890',
-          email: 'udin@example.com',
-          alamat: 'Jl. Contoh No. 123, Jakarta',
+
+        <div class="info-group">
+          <label>Nomor Telepon</label>
+          <input v-if="isEditing" v-model="profile.no_phone" class="info-value" type="number"/>
+          <div v-else class="info-value">{{ profile.no_phone || 'Tidak ada Nomor Telepon'}}</div>
+        </div>
+
+        <div class="info-group">
+          <label>Email</label>
+          <input v-if="isEditing" v-model="profile.email" class="info-value" />
+          <div v-else class="info-value">{{ profile.email }}</div>
+        </div>
+
+        <div v-if="isEditing" class="info-group">
+          <label>Photo</label>
+          <input type="file" @change="handleFileUpload" class="info-value" />
+        </div>
+
+
+        <div class="button-group">
+          <button class="edit-button" @click="isEditing ? saveProfile() : toggleEdit()">
+            {{ isEditing ? 'Simpan' : 'Edit Profil' }}
+          </button>
+        </div>
+      </section>
+    </main>
+  </div>
+</template>
+
+<script>
+import axios from 'axios'
+import defaultPhoto from '@/assets/jay.jpg'
+
+export default {
+  name: 'ProfilePengepulView',
+  data() {
+    return {
+      isEditing: false,
+      profile: {
+        name: '',
+        no_phone: '',
+        email: '',
+        photo: '',
+        photoFile: null
+      },
+      imagePreview: null,
+      defaultPhoto,
+      apiUrl: import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
+    }
+  },
+  mounted() {
+    this.fetchProfile()
+  },
+  methods: {
+    async fetchProfile() {
+      const token = localStorage.getItem('token')
+      if (!token) {
+        console.warn('Token tidak tersedia.')
+        return
+      }
+
+      try {
+        const response = await axios.get(`${this.apiUrl}/api/profile`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        const data = response.data.data || response.data
+
+        this.profile = {
+          ...this.profile,
+          name: data.name || '',
+          no_phone: data.no_phone || '',
+          email: data.email || '',
+          photo: data.photo ? `${this.apiUrl}/storage/${data.photo}` : defaultPhoto
+        }
+
+        // Simpan juga ke localStorage agar konsisten dengan komponen lain
+        localStorage.setItem('user', JSON.stringify(data))
+      } catch (error) {
+        console.error('Gagal mengambil data profil:', error)
+        if (error.response?.status === 401) {
+          alert('Sesi login berakhir. Silakan login kembali.')
+          localStorage.removeItem('token')
+          this.$router.push('/login')
         }
       }
     },
-    methods: {
-      goToProfile() {
-        // Kalau circle diklik, bisa buat fitur lain. Sekarang stay dulu.
-      },
-      goToEditProfile() {
-        this.$router.push('/edit-profile-pengepul');
+
+    toggleEdit() {
+      this.isEditing = true
+    },
+
+    handleFileUpload(event) {
+      const file = event.target.files[0]
+      if (file) {
+        this.profile.photoFile = file
+        this.imagePreview = URL.createObjectURL(file)
+      }
+    },
+
+    async saveProfile() {
+      const token = localStorage.getItem('token')
+      const formData = new FormData()
+      formData.append('_method', 'PUT')
+      formData.append('name', this.profile.name)
+      formData.append('no_phone', this.profile.no_phone)
+      formData.append('email', this.profile.email)
+
+      if (this.profile.photoFile) {
+        formData.append('photo', this.profile.photoFile)
+      }
+
+      try {
+        const response = await axios.post(`${this.apiUrl}/api/profile`, formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+
+        const updatedData = response.data.data
+        this.isEditing = false
+        this.imagePreview = null
+
+        // Perbarui tampilan dan simpan ke localStorage
+        this.fetchProfile()
+        localStorage.setItem('user', JSON.stringify(updatedData))
+      } catch (error) {
+        const msg = error.response?.data?.message || 'Terjadi kesalahan saat menyimpan.'
+        console.error(msg)
+        alert('Gagal menyimpan profil: ' + msg)
       }
     }
   }
-  </script>
-  
-  <style scoped>
+}
+</script>
+
+
+
+
+<style scoped>
   .main-container {
     background-color: #e6f7cf;
     min-height: 100vh;
@@ -183,5 +277,4 @@
     font-weight: bold;
     cursor: pointer;
   }
-  </style>
-  
+</style>
