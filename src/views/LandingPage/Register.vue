@@ -14,7 +14,7 @@
           <input
             type="text"
             v-model="name"
-            class="w-full p-3 bg-[#D9D9D9] rounded-3xl outline-none"
+            class="w-full p-3 bg-[#D9D9D9] rounded-3xl outline-none text-black"
             required
           />
         </div>
@@ -24,7 +24,7 @@
           <input
             type="tel"
             v-model="no_phone"
-            class="w-full p-3 bg-[#D9D9D9] rounded-3xl outline-none"
+            class="w-full p-3 bg-[#D9D9D9] rounded-3xl outline-none text-black"
             required
           />
         </div>
@@ -34,7 +34,7 @@
           <input
             type="email"
             v-model="email"
-            class="w-full p-3 bg-[#D9D9D9] rounded-3xl outline-none"
+            class="w-full p-3 bg-[#D9D9D9] rounded-3xl outline-none text-black"
             required
           />
         </div>
@@ -44,10 +44,24 @@
           <input
             type="password"
             v-model="password"
-            class="w-full p-3 bg-[#D9D9D9] rounded-3xl outline-none"
+            class="w-full p-3 bg-[#D9D9D9] rounded-3xl outline-none text-black"
             required
           />
         </div>
+
+        <div>
+          <label class="block text-sm font-semibold mb-1 text-[#134611]">Role</label>
+          <select
+            v-model="role"
+            class="w-full p-3 bg-[#D9D9D9] rounded-3xl outline-none text-black"
+            required
+          >
+            <option value="" disabled selected>Pilih Role</option>
+            <option value="pengepul">Pengepul</option>
+            <option value="petani">Petani</option>
+          </select>
+        </div>
+
 
         <button
           type="submit"
@@ -72,6 +86,7 @@ const no_phone = ref('')
 const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
+const role = ref('') 
 
 const submitForm = async () => {
   try {
@@ -81,6 +96,7 @@ const submitForm = async () => {
       email: email.value,
       password: password.value,
       password_confirmation: password.value,
+      role: role.value,
     }, {
       headers: {
         'Content-Type': 'application/json',  // pastikan konten yang dikirim sesuai

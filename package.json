@@ -15,6 +15,7 @@
     "cally": "^0.8.0",
     "daisyui": "^5.0.22",
     "leaflet": "^1.9.4",
+    "express": "^5.1.0",
     "tailwindcss": "^4.1.4",
     "v-calendar": "^3.1.2",
     "vue": "^3.5.13",
