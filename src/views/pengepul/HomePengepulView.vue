@@ -25,10 +25,6 @@
             <img src="@/assets/icon-artikel.png" alt="Artikel" />
             <p>Artikel</p>
           </router-link>
-          <router-link to="/harga-pengepul" class="menu-item">
-            <img src="@/assets/icon-harga.png" alt="Data Harga" />
-            <p>Data Harga</p>
-          </router-link>
           <router-link to="/laporan-pengepul" class="menu-item">
             <img src="@/assets/icon-laporan.png" alt="Laporan" />
             <p>Laporan</p>
@@ -95,20 +91,32 @@ export default {
       articles: [],
       series: [], // akan diisi dari API
       chartOptions: {
-        chart: { id: 'harga-sawit-chart' },
-        xaxis: {
-          categories: [] // akan diisi dari API
+      chart: { id: 'harga-sawit-chart' },
+      xaxis: { categories: [] },
+      fill: {
+        type: 'gradient',
+        gradient: {
+          shade: 'light',
+          type: 'vertical',
+          gradientToColors: ['#81C784'],
+          stops: [0, 100]
+        }
+      },
+      tooltip: {
+        x: { format: 'dd/MM/yyyy HH:mm' },
+        y: {
+          formatter: val => 'Rp ' + val.toLocaleString('id-ID'),
+          title: { formatter: s => `${s}:` }
         },
-        fill: {
-          type: 'gradient',
-          gradient: {
-            shade: 'light',
-            type: 'vertical',
-            gradientToColors: ['#81C784'],
-            stops: [0, 100]
-          }
+        marker: { show: true, fillColors: ['#0096FF'] },
+        theme: 'light',
+        style: {
+          textcolor: '#000000',   
+          fontSize: '14px',
+          fontFamily: 'Arial, sans-serif'
         }
       }
+    }
     }
   },
   computed: {
@@ -368,5 +376,23 @@ export default {
   width: 100%;
   margin-top: 8px;
   border-radius: 12px;
+}
+
+/* Override background menjadi putih (untuk theme light) */
+:deep(.apexcharts-theme-light .apexcharts-tooltip) {
+  background: #fff !important;
+  color: #000 !important;           /* teks utama menjadi hitam */
+}
+
+/* Override label (series name) */
+:deep(.apexcharts-theme-light .apexcharts-tooltip .apexcharts-tooltip-text-y-label) {
+  fill: #000 !important;            /* untuk elemen SVG <tspan> yang pakai fill */
+  color: #000 !important;
+}
+
+/* Override value */
+:deep(.apexcharts-theme-light .apexcharts-tooltip .apexcharts-tooltip-text-value) {
+  fill: #000 !important;
+  color: #000 !important;
 }
 </style>

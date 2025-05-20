@@ -52,10 +52,11 @@
           <li><a href="/dashboard">Beranda</a></li>
           <!-- <li><a href="/tugas">Tugas</a></li> -->
           <li><a href="/data-pengepul">Data Pengepul</a></li>
-          <li><a href="/data-berita">Daftar Artikel</a></li>
-          <li><a href="/data-statistik">Statistik Harga</a></li>
-          <li><a href="/data-jadwal">Permintaan Jadwal</a></li>
-          <li><a href="/data-transaksi">Daftar Transaksi</a></li>
+          <li><a href="/data-berita">Data Artikel</a></li>
+          <li><a href="/data-statistik"> Data Statistik Harga</a></li>
+          <li><a href="/data-jadwal">Data Permintaan Jadwal</a></li>
+          <li><a href="/data-transaksi">Data Transaksi</a></li>
+          <li><a href="/data-tugas">Data Tugas</a></li>
         </ul>
       </div>
     </div>

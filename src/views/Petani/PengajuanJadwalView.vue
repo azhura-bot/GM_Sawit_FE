@@ -21,6 +21,11 @@
           </div>
 
           <div class="form-group">
+            <label>Email</label>
+            <input type="text" v-model="email" readonly class="text-[#134611]" />
+          </div>
+
+          <div class="form-group">
             <label>Nomor Telepon</label>
             <input type="text" v-model="no_phone" class="text-[#134611]" />
           </div>
@@ -87,6 +92,7 @@ export default {
       isModalOpen: false,
       isMapOpen: false,
       nama: "",
+      email: "",
       no_phone: "",
       tanggal: null, // Date object or string
       jam: "",     // string 'HH:mm'
@@ -100,6 +106,7 @@ export default {
   created() {
     const user = JSON.parse(localStorage.getItem("user")) || {}
     this.nama = user.name || ""
+    this.email = user.email || ""
     this.no_phone = user.no_phone || ""
   },
   methods: {
@@ -152,6 +159,7 @@ export default {
 
       const payload = {
         nama_petani: this.nama,
+        email: this.email,
         no_hp: this.no_phone,
         alamat: this.alamat,
         tanggal: tanggalWaktu,
@@ -185,7 +193,6 @@ export default {
     },
     closeModal() {
       this.isModalOpen = false
-      // bersihkan form setelah menutup modal
       this.tanggal = null
       this.jam = ""
       this.alamat = ""

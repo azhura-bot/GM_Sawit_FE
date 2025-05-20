@@ -15,10 +15,11 @@ import EditBeritaView from '@/views/EditBeritaView.vue'
 import DataStatistikView from '@/views/DataStatistikView.vue'
 import DataJadwalView from '@/views/DataJadwalView.vue'
 import DataTransaksiView from '@/views/DataTransaksiView.vue'
+import DataTugas from '@/views/DataTugas.vue'
 
 // Pengepul
 import HomePengepulView from '@/views/pengepul/HomePengepulView.vue'
-import TugasUatamaView from '@/views/pengepul/TugasUatamaView.vue'
+import TugasUatamaView from '@/views/pengepul/TugasUtamaView.vue'
 import DetailTugasView from '@/views/pengepul/DetailTugasView.vue'
 import ArtikelPengepulView from '@/views/pengepul/ArtikelPengepulView.vue'
 import DetailArtikelPengepulView from '@/views/pengepul/DetailArtikelPengepulView.vue'
@@ -27,6 +28,7 @@ import LaporanPengepulView from '@/views/pengepul/LaporanPengepulView.vue'
 import ProfilPengepulView from '@/views/pengepul/ProfilPengepulView.vue'
 import EditProfilePengepulView from '@/views/pengepul/EditProfilePengepulView.vue'
 import LandingPage2 from '@/views/LandingPage/LandingPage2.vue'
+import DaftarHarga from '@/views/pengepul/HargaPengepulView.vue'
 
 // Petani
 import HomePetaniView from '@/views/petani/HomePetaniView.vue'
@@ -55,17 +57,19 @@ const routes = [
   { path: '/data-statistik', name: 'DataStatistik', component: DataStatistikView, meta: { requiresAuth: true, role: 'manager' }},
   { path: '/data-jadwal', name: 'DataJadwal', component: DataJadwalView, meta: { requiresAuth: true, role: 'manager' }},
   { path: '/data-transaksi', name: 'DataTransaksi', component: DataTransaksiView, meta: { requiresAuth: true, role: 'manager' }},
+  { path: '/data-tugas', name: 'DataTugas', component: DataTugas, meta: { requiresAuth: true, role: 'manager' }},
 
   // Pengepul
   { path: '/home-pengepul', name: 'HomePengepul', component: HomePengepulView, meta: { requiresAuth: true, role: 'pengepul' }},
   { path: '/tugas-utama-pengepul', name: 'TugasUtamaPengepul', component: TugasUatamaView, meta: { requiresAuth: true, role: 'pengepul' }},
-  { path: '/detail-tugas-pengepul', name: 'DetailTugasPengepul', component: DetailTugasView, meta: { requiresAuth: true, role: 'pengepul' }},
+  { path: '/detail-tugas-pengepul/:id', name: 'DetailTugasPengepul', component: DetailTugasView, meta: { requiresAuth: true, role: 'pengepul' }},
   { path: '/artikel', name: 'ArtikelPengepul', component: ArtikelPengepulView, meta: { requiresAuth: true, role: ['pengepul', 'petani'] }},
   { path: '/detail-artikel/:id', name: 'DetailArtikel', component: DetailArtikelPengepulView, props: true, meta: { requiresAuth: true, role: ['pengepul', 'petani'] }},
   { path: '/harga-pengepul', name: 'HargaPengepul', component: HargaPengepulView, meta: { requiresAuth: true, role: 'pengepul' }},
   { path: '/laporan-pengepul', name: 'LaporanPengepul', component: LaporanPengepulView, meta: { requiresAuth: true, role: 'pengepul' }},
   { path: '/profile-pengepul', name: 'ProfilePengepul', component: ProfilPengepulView, meta: { requiresAuth: true, role: 'pengepul' }},
   { path: '/edit-profile-pengepul', name: 'EditProfilePengepul', component: EditProfilePengepulView, meta: { requiresAuth: true, role: 'pengepul' }},
+  { path: '/harga', name: 'DaftarHarga', component: DaftarHarga, meta: { requiresAuth: true, role: ['pengepul', 'petani'] }},
 
   // Petani
   { path: '/home-petani', name: 'HomePetani', component: HomePetaniView, meta: { requiresAuth: true, role: 'petani' }},

@@ -4,6 +4,21 @@
       <div class="bg-lime-600 text-white text-lg md:text-xl font-semibold px-6 py-4">
         Pengajuan Jadwal
       </div>
+      <!-- Filter & Pagination Controls -->
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between px-6 py-4">
+        <div class="mb-2 md:mb-0">
+          <label for="statusFilter" class="font-medium text-lime-800 mr-2">Filter Status:</label>
+          <select id="statusFilter" v-model="filterStatus" @change="currentPage=1" class="border border-gray-300 rounded p-2 text-black">
+            <option value="all">Semua</option>
+            <option value="pending">Request</option>
+            <option value="approved">Diterima</option>
+            <option value="rejected">Ditolak</option>
+          </select>
+        </div>
+        <div>
+          <span class="text-sm text-gray-600">Halaman {{ currentPage }} dari {{ totalPages }}</span>
+        </div>
+      </div>
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200 text-sm">
           <thead class="bg-lime-100 text-lime-900 uppercase tracking-wide">
@@ -19,62 +34,88 @@
           </thead>
           <tbody class="divide-y divide-gray-100 bg-white">
             <tr
-              v-for="(jadwal, index) in jadwals"
-              :key="index"
+              v-for="(jadwal, index) in paginatedJadwals"
+              :key="jadwal.id"
               class="hover:bg-lime-50"
             >
-              <td class="px-6 py-4 whitespace-nowrap text-black">{{ jadwal.tanggal }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-black">{{ jadwal.jam }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-black">{{ jadwal.nama }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-black">{{ jadwal.lokasi }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-black">{{ jadwal.telepon }}</td>
+              <td class="px-6 py-4 text-black whitespace-nowrap">{{ formatDate(jadwal.tanggal) }}</td>
+              <td class="px-6 py-4 text-black whitespace-nowrap">{{ formatTime(jadwal.tanggal) }}</td>
+              <td class="px-6 py-4 text-black whitespace-nowrap">{{ jadwal.nama_petani }}</td>
+              <td class="px-6 py-4 text-black" style="white-space: normal; word-break: break-word; max-width: 200px;">
+                {{ jadwal.alamat }}
+              </td>
+              <td class="px-6 py-4 text-black whitespace-nowrap">{{ jadwal.no_hp }}</td>
               <td class="px-6 py-4">
                 <span
                   class="inline-block px-2 py-1 rounded-full text-xs font-medium"
                   :class="{
-                    'bg-yellow-100 text-yellow-800': jadwal.status === 'Request',
-                    'bg-green-100 text-green-800': jadwal.status === 'Diterima',
-                    'bg-red-100 text-red-800': jadwal.status === 'Ditolak'
+                    'bg-yellow-100 text-yellow-800': jadwal.status === 'pending',
+                    'bg-green-100 text-green-800': jadwal.status === 'approved',
+                    'bg-red-100 text-red-800': jadwal.status === 'rejected'
                   }"
                 >
-                  {{ jadwal.status }}
+                  {{ statusMap[jadwal.status] || jadwal.status }}
                 </span>
               </td>
               <td class="px-6 py-4 flex gap-2">
                 <button
                   class="px-3 py-1 bg-lime-200 text-lime-800 hover:bg-lime-300 rounded text-xs font-semibold"
-                  @click="konfirmasiTerima(index)"
-                  :disabled="jadwal.status !== 'Request'"
+                  @click="bukaModalTerima(index)"
+                  :disabled="jadwal.status !== 'pending' || loading"
                 >
                   Terima
                 </button>
                 <button
                   class="px-3 py-1 bg-rose-200 text-rose-700 hover:bg-rose-300 rounded text-xs font-semibold"
                   @click="bukaModalTolak(index)"
-                  :disabled="jadwal.status !== 'Request'"
+                  :disabled="jadwal.status !== 'pending' || loading"
                 >
                   Tolak
                 </button>
               </td>
             </tr>
+            <tr v-if="!paginatedJadwals.length">
+              <td colspan="7" class="text-center text-gray-500 py-4">Tidak ada data jadwal.</td>
+            </tr>
           </tbody>
         </table>
       </div>
+      <!-- Pagination Buttons -->
+      <div class="flex justify-center items-center gap-2 p-4">
+        <button
+          @click="prevPage"
+          :disabled="currentPage === 1"
+          class="px-3 py-1 bg-[#134611] border rounded text-white"
+        >Prev</button>
+        <button
+          @click="nextPage"
+          :disabled="currentPage === totalPages"
+          class="px-3 py-1 bg-[#134611] border rounded text-white"
+        >Next</button>
+      </div>
     </div>
-
     <!-- Modal Tolak -->
-    <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
-      <div class="bg-white rounded-xl p-6 w-96 shadow-lg relative">
+    <div v-if="showModal" class="fixed inset-0 flex justify-center items-center z-50" style="background-color: rgba(0,0,0,0.5)">
+      <div class="bg-white rounded-xl p-6 w-96 shadow-lg">
         <h3 class="text-lg font-semibold mb-2 text-gray-800">Konfirmasi Penolakan</h3>
-        <p class="text-sm text-gray-600 mb-3">Apakah Anda yakin ingin menolak pengajuan ini?</p>
-        <textarea
-          v-model="alasan"
-          placeholder="Tuliskan alasan penolakan..."
-          class="w-full border border-gray-300 rounded p-2 mb-3 text-sm"
-        ></textarea>
+        <textarea v-model="alasan" placeholder="Alasan penolakan..." class="w-full border border-gray-300 rounded p-2 mb-4 text-black"></textarea>
         <div class="flex justify-end gap-2">
-          <button @click="tutupModal" class="px-4 py-1 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 text-sm">Batalkan</button>
-          <button @click="konfirmasiTolak" class="px-4 py-1 bg-rose-500 text-white rounded hover:bg-rose-600 text-sm">Ya, Tolak</button>
+          <button @click="tutupModal" class="px-4 py-2 bg-gray-200 rounded text-black" :disabled="loading">Batal</button>
+          <button @click="konfirmasiTolak" class="px-4 py-2 bg-rose-500 text-white rounded" :disabled="loading || !alasan.trim()">Tolak</button>
+        </div>
+      </div>
+    </div>
+    <!-- Modal Terima -->
+    <div v-if="showModalTerima" class="fixed inset-0 flex justify-center items-center z-50" style="background-color: rgba(0,0,0,0.5)">
+      <div class="bg-white rounded-xl p-6 w-96 shadow-lg">
+        <h3 class="text-lg font-semibold mb-2 text-gray-800">Pilih Pengepul</h3>
+        <select v-model="selectedPengepul" class="w-full border border-gray-300 rounded p-2 mb-4 text-black">
+          <option disabled value="">-- Pilih pengepul --</option>
+          <option v-for="p in pengepuls" :key="p.id" :value="p.id">{{ p.name }}</option>
+        </select>
+        <div class="flex justify-end gap-2">
+          <button @click="tutupModalTerima" class="px-4 py-2 bg-gray-200 rounded text-black" :disabled="loading">Batal</button>
+          <button @click="konfirmasiTerima" class="px-4 py-2 bg-green-500 text-white rounded" :disabled="loading || !selectedPengepul">Terima</button>
         </div>
       </div>
     </div>
@@ -83,67 +124,86 @@
 
 <script>
 export default {
-  name: "PengajuanJadwalPage",
+  name: 'PengajuanJadwalPage',
   data() {
     return {
-      jadwals: [
-        {
-          tanggal: '20/02/2025',
-          jam: '10:00 WIB',
-          nama: 'Rizky Pratama',
-          lokasi: 'Jl. Gatot Subroto, Medan',
-          telepon: '0822-2222-2222',
-          status: 'Request'
-        },
-        {
-          tanggal: '20/02/2025',
-          jam: '10:00 WIB',
-          nama: 'Andi Saputra',
-          lokasi: 'Jl. Setia Budi, Medan Selayang',
-          telepon: '0822-2222-2222',
-          status: 'Request'
-        },
-        {
-          tanggal: '20/02/2025',
-          jam: '10:00 WIB',
-          nama: 'Fajar Hidayat',
-          lokasi: 'Jl. Iskandar Muda, Medan Petisah',
-          telepon: '0822-2222-2222',
-          status: 'Request'
-        }
-      ],
-      showModal: false,
-      alasan: '',
-      selectedIndex: null
+      jadwals: [], pengepuls: [], selectedPengepul: null,
+      showModal: false, showModalTerima: false, alasan: '', loading: false,
+      statusMap: { pending: 'Request', approved: 'Diterima', rejected: 'Ditolak' },
+      filterStatus: 'all', currentPage: 1, pageSize: 5, selectedIndex: null
     };
   },
-  methods: {
-    konfirmasiTerima(index) {
-      const konfirmasi = window.confirm("Apakah Anda yakin ingin menerima pengajuan ini?");
-      if (konfirmasi) {
-        this.jadwals[index].status = "Diterima";
-        alert("Pengajuan telah diterima.");
-      }
+  computed: {
+    filteredJadwals() {
+      let list = this.jadwals;
+      if (this.filterStatus !== 'all') list = list.filter(j => j.status === this.filterStatus);
+      return list.sort((a, b) => (a.status===b.status?0:(a.status==='pending'? -1:(b.status==='pending'?1:0))));
     },
-    bukaModalTolak(index) {
-      this.selectedIndex = index;
-      this.showModal = true;
+    totalPages() {
+      return Math.max(1, Math.ceil(this.filteredJadwals.length / this.pageSize));
     },
-    tutupModal() {
-      this.showModal = false;
-      this.alasan = '';
-      this.selectedIndex = null;
-    },
-    konfirmasiTolak() {
-      if (!this.alasan.trim()) {
-        alert("Mohon isi alasan terlebih dahulu sebelum menolak.");
-        return;
-      }
-      this.jadwals[this.selectedIndex].status = "Ditolak";
-      alert("Pengajuan ditolak dengan alasan: " + this.alasan);
-      this.tutupModal();
+    paginatedJadwals() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      return this.filteredJadwals.slice(start, start + this.pageSize);
     }
-  }
+  },
+  methods: {
+    formatDate(datetime) {
+      if (!datetime) return '';
+      return new Date(datetime).toLocaleDateString('id-ID', { year:'numeric', month:'2-digit', day:'2-digit' });
+    },
+    formatTime(datetime) {
+      if (!datetime) return '';
+      const t = datetime.split('T')[1] || '';
+      const [h,m] = t.split(':') || [];
+      return h && m ? `${h.padStart(2,'0')}:${m.padStart(2,'0')}` : '';
+    },
+    prevPage() { if (this.currentPage>1) this.currentPage--; },
+    nextPage() { if (this.currentPage<this.totalPages) this.currentPage++; },
+    async fetchJadwal() {
+      this.loading=true;
+      try {
+        const token=localStorage.getItem('token');
+        const res=await fetch('/api/janji-temu',{ headers:{ 'Authorization':`Bearer ${token}`, 'Accept':'application/json' } });
+        if(!res.ok) throw new Error(res.status);
+        const { data }=await res.json();
+        this.jadwals=data;
+      } catch(e) { console.error(e); alert('Gagal memuat data jadwal.'); }
+      finally { this.loading=false; }
+    },
+    bukaModalTolak(idx) { this.selectedIndex=idx; this.alasan=''; this.showModal=true; },
+    tutupModal() { this.showModal=false; this.selectedIndex=null; this.alasan=''; },
+    async bukaModalTerima(idx) {
+      this.selectedIndex=idx; this.showModalTerima=true; this.selectedPengepul=null;
+      try { const token=localStorage.getItem('token'); const res=await fetch('/api/pengepul',{ headers:{ 'Authorization':`Bearer ${token}`, 'Accept':'application/json' } }); if(!res.ok) throw new Error(res.status); this.pengepuls=(await res.json()).data; } catch(e){ console.error(e); alert('Gagal memuat pengepul.'); }
+    },
+    tutupModalTerima() { this.showModalTerima=false; this.selectedIndex=null; },
+    async konfirmasiTolak() {
+      if(!this.alasan.trim()) return;
+      this.loading=true;
+      try {
+        const jadwal=this.paginatedJadwals[this.selectedIndex];
+        const token=localStorage.getItem('token');
+        const res=await fetch(`/api/janji-temu/${jadwal.id}/reject`,{ method:'POST', headers:{ 'Authorization':`Bearer ${token}`,'Content-Type':'application/json' }, body: JSON.stringify({ alasan_reject:this.alasan }) });
+        if(!res.ok) throw new Error(res.status);
+        jadwal.status='rejected'; this.tutupModal();
+      } catch(e){ console.error(e); alert('Gagal menolak jadwal.'); }
+      finally{ this.loading=false; }
+    },
+    async konfirmasiTerima() {
+      if(!this.selectedPengepul) return;
+      this.loading=true;
+      try {
+        const jadwal=this.paginatedJadwals[this.selectedIndex];
+        const token=localStorage.getItem('token');
+        const res=await fetch('/api/task',{ method:'POST', headers:{ 'Authorization':`Bearer ${token}`,'Content-Type':'application/json' }, body:JSON.stringify({ janji_temu_id:jadwal.id, pengepul_id:this.selectedPengepul }) });
+        if(!res.ok) throw new Error(res.status);
+        jadwal.status='approved'; this.tutupModalTerima();
+      } catch(e){ console.error(e); alert('Gagal konfirmasi jadwal.'); }
+      finally{ this.loading=false; }
+    }
+  },
+  created() { this.fetchJadwal(); }
 };
 </script>
 

@@ -3,7 +3,7 @@
     <!-- Header -->
     <header class="header">
       <div class="circle"></div>
-      <span class="username">Nama User</span>
+      <span class="username">{{ userName }}</span>
     </header>
 
     <!-- Content -->
@@ -13,271 +13,258 @@
         <h1>Riwayat Pengajuan Jadwal</h1>
       </section>
 
-      <!-- Diterima -->
+      <!-- Pending -->
       <section class="table-section">
-        <h2 class="section-title accepted">Pengajuan Diterima</h2>
+        <h2 class="section-title pending">Menunggu</h2>
         <div class="table-container">
-          <table class="jadwal-table">
-            <thead>
-              <tr>
-                <th>Nama Petani</th>
-                <th>Jam</th>
-                <th>Lokasi</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(item, index) in acceptedSchedules" :key="'acc-' + index">
-                <td>{{ item.nama }}</td>
-                <td>{{ item.jam }}</td>
-                <td>{{ item.lokasi }}</td>
-              </tr>
-            </tbody>
-          </table>
+          <!-- Card Header -->
+          <div class="jadwal-card header-card">
+            <span class="jadwal-tanggal label text-[#333]">Tanggal</span>
+            <span class="jadwal-jam label text-[#333]">Jam</span>
+            <span class="jadwal-lokasi label">Lokasi</span>
+          </div>
+          <!-- Card Items -->
+          <div v-for="(item, idx) in filteredMyJadwals.filter(j => j.status === 'pending')" :key="item.id" class="jadwal-card">
+            <span class="jadwal-tanggal text-[#333]">{{ formatDate(item.tanggal) }}</span>
+            <span class="jadwal-jam text-[#333]">{{ formatTime(item.tanggal) }}</span>
+            <span class="jadwal-lokasi">{{ item.alamat }}</span>
+          </div>
+          <div v-if="!filteredMyJadwals.some(j => j.status === 'pending')" class="empty-message">
+            Tidak ada pengajuan menunggu.
+          </div>
         </div>
       </section>
 
-      <!-- Ditolak -->
+      <!-- Accepted -->
       <section class="table-section">
-        <h2 class="section-title rejected">Pengajuan Ditolak</h2>
+        <h2 class="section-title accepted">Disetujui</h2>
         <div class="table-container">
-          <table class="jadwal-table">
-            <thead>
-              <tr>
-                <th>Nama Petani</th>
-                <th>Jam</th>
-                <th>Lokasi</th>
-                <th>Alasan</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(item, index) in rejectedSchedules" :key="'rej-' + index">
-                <td>{{ item.nama }}</td>
-                <td>{{ item.jam }}</td>
-                <td>{{ item.lokasi }}</td>
-                <td>
-                  <button class="info-btn">Info</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="jadwal-card header-card">
+            <span class="jadwal-tanggal label text-[#333]">Tanggal</span>
+            <span class="jadwal-jam label text-[#333]">Jam</span>
+            <span class="jadwal-lokasi label">Lokasi</span>
+          </div>
+          <div v-for="(item, idx) in filteredMyJadwals.filter(j => j.status === 'approved')" :key="item.id" class="jadwal-card">
+            <span class="jadwal-tanggal text-[#333]">{{ formatDate(item.tanggal) }}</span>
+            <span class="jadwal-jam text-[#333]">{{ formatTime(item.tanggal) }}</span>
+            <span class="jadwal-lokasi">{{ item.alamat }}</span>
+          </div>
+          <div v-if="!filteredMyJadwals.some(j => j.status === 'approved')" class="empty-message">
+            Tidak ada pengajuan disetujui.
+          </div>
         </div>
       </section>
+
+      <!-- Rejected -->
+      <section class="table-section">
+        <h2 class="section-title rejected">Ditolak</h2>
+        <div class="table-container">
+          <div class="jadwal-card header-card">
+            <span class="jadwal-tanggal label text-[#333]">Tanggal</span>
+            <span class="jadwal-jam labelv text-[#333]">Jam</span>
+            <span class="jadwal-lokasi label">Lokasi</span>
+            <span class="info-btn label">Alasan</span>
+          </div>
+          <div v-for="(item, idx) in filteredMyJadwals.filter(j => j.status === 'rejected')" :key="item.id" class="jadwal-card rejected-card">
+            <span class="jadwal-tanggal text-[#333]">{{ formatDate(item.tanggal) }}</span>
+            <span class="jadwal-jam text-[#333]">{{ formatTime(item.tanggal) }}</span>
+            <span class="jadwal-lokasi">{{ item.alamat }}</span>
+            <button class="info-btn" @click="openRejectInfo(item.alasan_reject)">Info</button>
+          </div>
+          <div v-if="!filteredMyJadwals.some(j => j.status === 'rejected')" class="empty-message">
+            Tidak ada pengajuan ditolak.
+          </div>
+        </div>
+      </section>
+
+      <!-- Modal Alasan Reject -->
+      <div
+        v-if="showRejectModal"
+        class="fixed inset-0 flex justify-center items-center z-50" style="background-color: rgba(0,0,0,0.5)"
+      >
+        <div class="bg-white rounded-xl p-6 w-80">
+          <h3 class="text-lg font-semibold mb-4 text-[#134611]">Alasan Penolakan</h3>
+          <p class="text-gray-800 mb-6 whitespace-pre-line">{{ rejectReason }}</p>
+          <div class="text-right">
+            <button
+              @click="showRejectModal = false"
+              class="close-btn px-4 py-2 bg-[#ff4d4d] text-white rounded"
+            >Tutup</button>
+          </div>
+        </div>
+      </div>
     </main>
   </div>
 </template>
 
 <script>
 export default {
+  name: 'RiwayatJanjiTemu',
   data() {
     return {
-      acceptedSchedules: [
-        { nama: "Agus Setiawan", lokasi: "Tanjung Gusta, Medan Helvetia", jam: "10:00 WIB" },
-        { nama: "Agus Setiawan", lokasi: "Tanjung Gusta, Medan Helvetia", jam: "11:00 WIB" },
-      ],
-      rejectedSchedules: [
-        { nama: "Agus Setiawan", lokasi: "Tanjung Gusta, Medan Helvetia", jam: "12:00 WIB" },
-        { nama: "Agus Setiawan", lokasi: "Tanjung Gusta, Medan Helvetia", jam: "13:00 WIB" },
-      ],
+      jadwals: [],
+      showRejectModal: false,
+      rejectReason: ''
     };
   },
+  computed: {
+    user() {
+      return JSON.parse(localStorage.getItem('user') || '{}');
+    },
+    userName() {
+      return this.user.name || 'User';
+    },
+    filteredMyJadwals() {
+      return this.jadwals
+        .filter(j => j.email === this.user.email)
+        .sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+    }
+  },
+  methods: {
+    async fetchJadwals() {
+      const token = localStorage.getItem('token');
+      const res = await fetch('/api/janji-temu', {
+        headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' }
+      });
+      const { data } = await res.json();
+      this.jadwals = data;
+    },
+    formatDate(dt) {
+      return new Date(dt).toLocaleDateString('id-ID', { year:'numeric', month:'2-digit', day:'2-digit' });
+    },
+    formatTime(dt) {
+      const t = dt.split('T')[1] || '';
+      const [h, m] = t.split(':');
+      return h && m ? `${h}:${m}` : '';
+    },
+    openRejectInfo(reason) {
+      this.rejectReason = reason;
+      this.showRejectModal = true;
+    }
+  },
+  created() {
+    this.fetchJadwals();
+  }
 };
 </script>
 
-    <div class="main-container">
-      <!-- Header -->
-      <header class="header">
-        <div class="circle"></div>
-        <span class="username">Nama User</span>
-      </header>
-  
-      <!-- Content -->
-      <main class="content">
-        <section class="section-header">
-          <img src="@/assets/pengajuan-jadwal.png" alt="Icon Pengajuan" class="section-icon" />
-          <h1 class="text-[#134611]">Riwayat Pengajuan Jadwal</h1>
-        </section>
-  
-        <section class="accepted-section">
-          <div class="section-label accepted">Pengajuan jadwal yang diterima</div>
-          
-          <div v-for="(item, index) in acceptedSchedules" :key="index" class="schedule-card">
-            <div class="schedule-row">
-              <span class="label">Nama Petani: </span>
-              <span class="value text-[#134611]">{{ item.nama }}</span>
-              <span class="label jam text-[#134611]">Jam: </span>
-              <span class="value jam text-[#134611]">{{ item.jam }}</span>
-            </div>
-            <div class="schedule-row">
-              <span class="label">Lokasi: </span>
-              <span class="value text-[#134611]">{{ item.lokasi }}</span>
-            </div>
-          </div>
-        </section>
-  
-        <section class="rejected-section">
-          <div class="section-label rejected">Pengajuan jadwal yang ditolak</div>
-          
-          <div v-for="(item, index) in rejectedSchedules" :key="index" class="schedule-card">
-            <div class="schedule-row">
-              <span class="label">Nama Petani</span>
-              <span class="value">{{ item.nama }}</span>
-              <span class="label jam">Jam</span>
-              <span class="value jam">{{ item.jam }}</span>
-            </div>
-            <div class="schedule-row">
-              <span class="label">Lokasi</span>
-              <span class="value">{{ item.lokasi }}</span>
-            </div>
-            <button class="info-btn">Info</button>
-          </div>
-        </section>
-      </main>
-    </div>
-  </template>
-  
-  <script>
-  export default {
-    data() {
-      return {
-        acceptedSchedules: [
-          { nama: "Agus Setiawan", lokasi: "Jl. Swad Jaya No 8, RT 01 / RW 05, Kel. Tanjung Gusta, Kec. Medan Helvetia", jam: "10:00 WIB" },
-          { nama: "Agus Setiawan", lokasi: "Jl. Swad Jaya No 8, RT 01 / RW 05, Kel. Tanjung Gusta, Kec. Medan Helvetia", jam: "10:00 WIB" },
-          { nama: "Agus Setiawan", lokasi: "Jl. Swad Jaya No 8, RT 01 / RW 05, Kel. Tanjung Gusta, Kec. Medan Helvetia", jam: "10:00 WIB" },
-        ],
-        rejectedSchedules: [
-          { nama: "Agus Setiawan", lokasi: "Jl. Swad Jaya No 8, RT 01 / RW 05, Kel. Tanjung Gusta, Kec. Medan Helvetia", jam: "10:00 WIB" },
-          { nama: "Agus Setiawan", lokasi: "Jl. Swad Jaya No 8, RT 01 / RW 05, Kel. Tanjung Gusta, Kec. Medan Helvetia", jam: "10:00 WIB" },
-          { nama: "Agus Setiawan", lokasi: "Jl. Swad Jaya No 8, RT 01 / RW 05, Kel. Tanjung Gusta, Kec. Medan Helvetia", jam: "10:00 WIB" },
-        ],
-      };
-    },
-  };
-  </script>
-  
-  <style scoped>
-    .main-container {
-    background-color: #e6f7cf;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
+<style scoped>
+.main-container {
+  background-color: #e6f7cf;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.header {
+  background-color: #164b1b;
+  width: 100%;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.circle {
+  width: 24px;
+  height: 24px;
+  background-color: white;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+.username {
+  font-weight: bold;
+}
+.content {
+  background: white;
+  margin-top: 12px;
+  width: 100%;
+  max-width: 430px;
+  border-radius: 16px 16px 0 0;
+  padding: 16px;
+}
+.section-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.section-icon {
+  width: 50px;
+  height: 50px;
+}
+.section-header h1 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-top: 0.5rem;
+  color: #134611;
+}
+.section-title {
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+}
+.pending { background-color: #A9A9A9; color: white; }
+.accepted { background-color: #d9fdd3; color: #134611; }
+.rejected { background-color: #ffe2e2; color: #cc0000; }
+.table-section { margin-bottom: 2rem; }
+.table-container { display: flex; flex-direction: column; }
 
-  .header {
-    background-color: #164b1b;
-    width: 100%;
-    padding: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-  }
+/* Use CSS Grid for alignment */
+.jadwal-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr auto;
+  gap: 1rem;
+  background: #f9f9f9;
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  align-items: center;
+}
 
-  .circle {
-    width: 24px;
-    height: 24px;
-    background-color: white;
-    border-radius: 50%;
-    margin-right: 8px;
-  }
+/* Header version without background and shadow */
+.header-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr auto;
+  gap: 1rem;
+  padding: 0 12px;
+  font-weight: bold;
+  color: #666;
+  background: transparent;
+  box-shadow: none;
+}
 
-  .username {
-    font-weight: bold;
-  }
+/* Adjust rejected card for Info button label */
+.header-card .info-btn.label {
+  justify-self: start;
+}
+.rejected-card .info-btn {
+  justify-self: end;
+  margin-left: 0;
+}
 
-  .content {
-    background: white;
-    margin-top: 12px;
-    width: 100%;
-    max-width: 430px;
-    border-radius: 16px 16px 0 0;
-    padding: 16px;
-  }
+.jadwal-lokasi { font-size: 14px; color: #333; }
+.info-btn {
+  background: #ff4d4d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-weight: bold;
+  font-size: 12px;
+  cursor: pointer;
+  justify-self: end;
+}
+.info-btn:hover { background: #e60000; }
+.empty-message { text-align: center; color: #666; padding: 12px; }
 
-  .section-header {
-    text-align: center;
-    margin-bottom: 2rem;
-  }
-
-  .section-icon {
-    width: 50px;
-    height: 50px;
-  }
-
-  .section-header h1 {
-    font-size: 24px;
-    font-weight: bold;
-    margin-top: 0.5rem;
-    color: #134611;
-  }
-
-  .section-title {
-    font-weight: bold;
-    font-size: 18px;
-    margin-bottom: 1rem;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-  }
-
-  .accepted {
-    background-color: #d9fdd3;
-    color: #134611;
-  }
-
-  .rejected {
-    background-color: #ffe2e2;
-    color: #cc0000;
-  }
-
-  .table-container {
-    overflow-x: auto;
-    margin-bottom: 2rem;
-  }
-
-  .jadwal-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-    background-color: white;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  }
-
-  .jadwal-table th,
-  .jadwal-table td {
-    padding: 12px 16px;
-    border-bottom: 1px solid #ddd;
-    text-align: left;
-    color: #000;
-  }
-
-  .jadwal-table th {
-    background-color: #f3f4f6;
-    color: #333;
-    font-weight: 600;
-  }
-
-  .jadwal-table tbody tr:hover {
-    background-color: #f9f9f9;
-  }
-
-  .info-btn {
-    background: #ff4d4d;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 6px 12px;
-    font-weight: bold;
-    font-size: 12px;
-    cursor: pointer;
-  }
-
-  .info-btn:hover {
-    background: #e60000;
-  }
-
-
-  </style>
-  
+.close-btn {
+  transition: background-color 0.2s;
+}
+.close-btn:hover {
+  background-color: #e60000;
+}
+</style>

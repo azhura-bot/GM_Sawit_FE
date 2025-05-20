@@ -10,6 +10,16 @@
         <div class="bg-white rounded-2xl shadow-xl w-[700px] p-8 flex flex-col gap-6 animate-fade-in-scale">
           <h3 class="text-green-900 font-bold text-xl">Edit Data Pengepul</h3>
 
+          <img 
+            v-if="form.photoPreview || form.currentPhoto" 
+            :src="form.photoPreview || form.currentPhoto" 
+            alt="Foto Pengepul" 
+            class="w-24 h-24 rounded-full mx-auto object-cover"
+          />
+          <div v-else class="w-24 h-24 rounded-full mx-auto bg-gray-200 flex items-center justify-center text-gray-500">
+            No Image
+          </div>
+
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label class="text-sm text-gray-600">Nama Pengepul</label>
@@ -41,6 +51,17 @@
                 type="text"
                 v-model="form.nomor"
                 class="w-full border rounded-xl px-4 py-2 mt-1 outline-none focus:ring-2 focus:ring-green-300 text-black"
+                placeholder="081234567890"
+              />
+            </div>
+            <div>
+              <label class="text-sm text-gray-600">Upload Foto (opsional)</label>
+              <input
+                type="file"
+                @change="onPhotoChange"
+                accept="image/*"
+                class="w-full border rounded-xl px-4 py-2 mt-1 outline-none focus:ring-2 focus:ring-green-300 text-black"
+              />
               />
             </div>
           </div>
@@ -88,13 +109,15 @@
         </div>
       </div>
 
-      <!-- Header dan Search -->
+      <!-- Header dan Search + Import -->
       <div class="flex flex-col md:flex-row justify-between items-center mb-6">
-        <div class="w-full md:w-1/2 bg-[#DDF7B1] rounded-full flex items-center px-4 py-2 text-green-900">
+        <div class="w-full md:w-1/3 bg-[#DDF7B1] rounded-full flex items-center px-4 py-2 text-green-900 mb-4 md:mb-0">
           <input
             type="text"
             placeholder="Search..."
             class="bg-transparent outline-none w-full"
+            v-model="search"
+            @input="filterList"
           />
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-900" fill="none"
             viewBox="0 0 24 24" stroke="currentColor">
@@ -103,21 +126,23 @@
           </svg>
         </div>
 
-        <div class="flex gap-3 mt-4 md:mt-0">
-          <button class="bg-gray-200 text-green-900 px-4 py-2 rounded-full text-sm">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none"
-              viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2H3V4zM3 8h18v10a1 1 0 01-1 1H4a1 1 0 01-1-1V8z" />
+        <div class="flex gap-3">
+          <a href="/files/Contoh_Excel.xlsx" download class="bg-gray-200 text-green-900 px-4 py-2 rounded-full text-sm inline-flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 12v8m4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
-            Filter
-          </button>
+            Download Contoh Excel
+          </a>
           <router-link
             to="/tambah-pengepul"
             class="bg-[#DDF7B1] text-green-900 px-4 py-2 rounded-full text-sm"
           >
             + Tambah Pengepul
           </router-link>
+          <label class="bg-[#F0E68C] text-green-900 px-4 py-2 rounded-full text-sm cursor-pointer">
+            Import Excel
+            <input type="file" class="hidden" @change="importExcel" accept=".xlsx, .xls" />
+          </label>
         </div>
       </div>
 
@@ -127,45 +152,49 @@
       <!-- Grid card pengepul -->
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         <div
-        v-for="pengepul in pengepulList"
-        :key="pengepul.id"
-        class="bg-white shadow-lg p-6 rounded-2xl relative flex flex-col gap-4 text-center text-green-900 transform transition-all hover:scale-105 hover:shadow-2xl">
-        
-        <!-- Nama Pengepul -->
-        <p class="font-bold text-2xl text-green-800">{{ pengepul.name }}</p>
+          v-for="item in filteredList"
+          :key="item.id"
+          class="bg-white shadow-lg p-6 rounded-2xl flex flex-col items-center gap-4 text-green-900 transform transition-all hover:scale-105 hover:shadow-2xl">
 
-        <!-- Tanggal Perekrutan -->
-        <p class="text-sm text-gray-600">{{ formatDate(pengepul.created_at) }}</p>
+          <div v-if="item.photo_url" class="w-24 h-24 rounded-full overflow-hidden">
+            <img :src="item.photo_url" alt="Foto Pengepul" class="w-full h-full object-cover" />
+          </div>
+          <div v-else class="w-24 h-24 rounded-full overflow-hidden">
+            <img src="/profile.png" alt="Default Profile" class="w-full h-full object-cover" />
+          </div>
 
-        <!-- Email -->
-        <p class="mt-2 text-sm text-gray-700">
-          <strong>Email:</strong> {{ pengepul.email }}
-        </p>
+          <!-- Nama Pengepul -->
+          <p class="font-bold text-2xl text-green-800">{{ item.name }}</p>
 
-        <!-- Nomor Handphone -->
-        <p class="mt-1 text-sm text-gray-600">
-          <strong>Nomor Handphone:</strong> {{ pengepul.no_phone || 'Nomor Handphone tidak tersedia' }}
-        </p>
+          <!-- Tanggal Perekrutan -->
+          <p class="text-sm text-gray-600">{{ formatDate(item.created_at) }}</p>
 
-        <!-- Tombol Aksi -->
-        <div class="absolute top-2 right-2 flex gap-2">
-          <button @click="openEdit(pengepul)" class="text-orange-500 hover:text-orange-600">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-              viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 16H9v-2.828z" />
-            </svg>
-          </button>
-          <button @click="openDelete(pengepul)" class="text-red-500 hover:text-red-600">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-              viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m2 0H7" />
-            </svg>
-          </button>
+          <!-- Email -->
+          <p class="mt-2 text-sm text-gray-700 w-full text-left">
+            <strong>Email:</strong> {{ item.email }}
+          </p>
+
+          <!-- Nomor Handphone -->
+          <p class="mt-1 text-sm text-gray-600 w-full text-left">
+            <strong>Nomor HP:</strong> {{ item.no_phone || 'Tidak tersedia' }}
+          </p>
+
+          <!-- Tombol Aksi -->
+          <div class="flex gap-4 mt-4">
+            <button
+              @click="openEdit(item)"
+              class="bg-[#00A5E0] text-white px-4 py-2 rounded-full text-sm"
+            >
+              Edit
+            </button>
+            <button
+              @click="openDelete(item)"
+              class="bg-[#F56565] text-white px-4 py-2 rounded-full text-sm"
+            >
+              Delete
+            </button>
+          </div>
         </div>
-      </div>
-
       </div>
     </div>
   </div>
@@ -175,89 +204,121 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 
+const token = localStorage.getItem('token')
+const api = axios.create({
+  baseURL: 'http://127.0.0.1:8000/api',
+  headers: { Authorization: `Bearer ${token}` }
+})
+
+const pengepulList = ref([])
+const filteredList = ref([])
+const search = ref('')
 const showModal = ref(false)
 const showDeleteModal = ref(false)
+const pengepulIdToDelete = ref(null)
+
 const form = ref({
-  id: null,    // <- tambah ID untuk tracking siapa yang di-edit
+  id: null,
   name: '',
   tanggal: '',
   email: '',
   nomor: '',
+  currentPhoto: null,
+  photo: null,
+  photoPreview: null
 })
 
-const pengepulList = ref([])
-const pengepulIdToDelete = ref(null) // <- id yang mau dihapus
-
-// Ambil data pengepul saat komponen dimuat
 onMounted(fetchPengepul)
 
-// Fungsi ambil semua pengepul
 async function fetchPengepul() {
-  try {
-    const response = await axios.get('http://127.0.0.1:8000/api/pengepul')
-    pengepulList.value = response.data.data
-  } catch (error) {
-    console.error('Gagal mengambil data pengepul:', error)
-  }
+  const res = await api.get('/pengepul')
+  pengepulList.value = res.data.data
+  filteredList.value = pengepulList.value
 }
 
-// Buka modal edit
-const openEdit = (pengepul) => {
+function filterList() {
+  const q = search.value.toLowerCase()
+  filteredList.value = pengepulList.value.filter(i => i.name.toLowerCase().includes(q))
+}
+
+function openEdit(item) {
   form.value = {
-    id: pengepul.id,
-    name: pengepul.name,
-    tanggal: pengepul.created_at.split('T')[0],
-    email: pengepul.email,
-    nomor: pengepul.no_phone || '',
+    id: item.id,
+    name: item.name,
+    tanggal: item.created_at.split('T')[0],
+    email: item.email,
+    nomor: item.no_phone || '',
+    currentPhoto: item.photo_url,
+    photo: null,
+    photoPreview: null
   }
   showModal.value = true
 }
 
-// Simpan perubahan pengepul (UPDATE)
-const simpanPerubahan = async () => {
-  try {
-    const payload = {
-      name: form.value.name,
-      email: form.value.email,
-      no_phone: form.value.nomor,
-      tanggal: form.value.tanggal,
-    }
-
-    await axios.put(`http://127.0.0.1:8000/api/pengepul/${form.value.id}`, payload)
-
-    showModal.value = false
-    await fetchPengepul() // refresh data
-  } catch (error) {
-    console.error('Gagal update pengepul:', error)
-  }
+function onPhotoChange(e) {
+  const file = e.target.files[0]
+  if (!file) return
+  form.value.photo = file
+  form.value.photoPreview = URL.createObjectURL(file)
 }
 
-// Buka modal hapus
-const openDelete = (pengepul) => {
-  pengepulIdToDelete.value = pengepul.id
+async function simpanPerubahan() {
+  const data = new FormData()
+  data.append('name', form.value.name)
+  data.append('email', form.value.email)
+  data.append('no_phone', form.value.nomor)
+  data.append('tanggal', form.value.tanggal)
+  if (form.value.photo) data.append('photo', form.value.photo)
+  // Method override for Laravel PUT
+  data.append('_method', 'PUT')
+
+  await api.post(`/pengepul/${form.value.id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } })
+  showModal.value = false
+  await fetchPengepul()
+}
+
+async function openDelete(item) {
+  pengepulIdToDelete.value = item.id
   showDeleteModal.value = true
 }
 
-// Hapus pengepul (DELETE)
-const hapusPengepul = async () => {
-  try {
-    await axios.delete(`http://127.0.0.1:8000/api/pengepul/${pengepulIdToDelete.value}`)
+async function hapusPengepul() {
+  await api.delete(`/pengepul/${pengepulIdToDelete.value}`)
+  showDeleteModal.value = false
+  await fetchPengepul()
+}
 
-    showDeleteModal.value = false
-    await fetchPengepul() // refresh data
-  } catch (error) {
-    console.error('Gagal hapus pengepul:', error)
+async function importExcel(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    const res = await api.post('/pengepul/import', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    console.log('Import response:', res.data);
+
+    if (res.data.success) {
+      // berhasil
+      await fetchPengepul();
+      alert(res.data.message || 'Import sukses!');
+    } else {
+      // kalau API mengembalikan success: false
+      alert(res.data.message || 'Import gagal tanpa error.');
+    }
+  } catch (err) {
+    console.error('Error saat import:', err.response || err);
+    alert('Gagal import: ' + (err.response?.data?.message || err.message));
   }
 }
 
-// Format tanggal
-const formatDate = (dateString) => {
-  if (!dateString) return ''
-  const date = new Date(dateString)
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
+
+function formatDate(dt) {
+  if (!dt) return ''
+  const d = new Date(dt)
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
 }
 </script>
-

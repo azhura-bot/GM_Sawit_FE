@@ -1,119 +1,222 @@
 <template>
   <div class="main-container">
-    <!-- Header -->
     <header class="header">
       <router-link to="/profile-pengepul" class="circle"></router-link>
-      <span class="username">Lorem Ipsum</span>
+      <span class="username">{{ pengepulName }}</span>
     </header>
 
-    <!-- Content -->
     <main class="content">
-      <!-- Judul -->
       <section class="title-with-icon">
         <img src="@/assets/icon-tugas-trans.png" alt="Icon Tugas" class="icon" />
         <h2> Tugas </h2>
       </section>
 
-      <!-- Tugas Baru -->
-      <section class="task-category">
+      <!-- Loading -->
+      <div v-if="loading">Memuat detail tugas...</div>
+
+      <!-- Data tugas -->
+      <section v-else class="task-category">
         <div class="category-title">Tugas yang baru saja masuk</div>
 
-        <!-- Detail Card -->
-        <div class="task-card">
+        <div class="task-card" v-if="task">
           <div class="task-info">
-            <div>
-              <div class="label">Nama Petani</div>
-              <div class="value">Agus Setiawan</div>
-            </div>
+            <div class="label">Nama Tugas</div>
+            <div class="value">{{ task.nama_task }}</div>
           </div>
 
           <div class="task-info">
-            <div>
-              <div class="label">Lokasi</div>
-              <div class="value">
-                JL. Swad Jaya No 8, RT 01 / RW 05, Kel. Tanjung Gusta, Kec. Medan Helvetia, Kota Medan, Sumatera Utara 20125
-              </div>
-            </div>
+            <div class="label">Nama Petani</div>
+            <div class="value">{{ task.janji_temu.nama_petani }}</div>
           </div>
 
           <div class="task-info">
-            <div>
-              <div class="label">Nomor Tlp</div>
-              <div class="value">0877-9999-2345</div>
-            </div>
+            <div class="label">Lokasi</div>
+            <div class="value">{{ task.janji_temu.alamat }}</div>
           </div>
 
           <div class="task-info">
-            <div>
-              <div class="label">Jumlah</div>
-              <div class="value">200 Kg</div>
-            </div>
+            <div class="label">Nomor Tlp</div>
+            <div class="value">{{ task.janji_temu.no_hp }}</div>
           </div>
         </div>
 
-        <!-- Tombol -->
         <div class="button-group">
-          <button class="button-decline" @click="showModal = true">Tolak?</button>
-          <button class="button-accept">Terima</button>
+          <button class="button-accept" @click="handleAccept">Terima</button>
           <button class="button-back" @click="goBack">Kembali</button>
         </div>
       </section>
     </main>
-
-    <!-- Modal -->
-    <div v-if="showModal" class="modal-overlay">
-      <div class="modal-content">
-        <div class="warning-img-wrapper">
-          <img src="/warning-image.png" alt="Warning" class="warning-img" />
-        </div>
-        <p class="modal-text">Apakah Anda yakin ingin menolak tugas ini?</p>
-
-        <!-- Form Alasan -->
-        <textarea
-          v-model="alasan"
-          placeholder="Tuliskan alasan penolakan..."
-          class="alasan-input"
-        ></textarea>
-
-        <div class="modal-buttons">
-          <button class="modal-cancel" @click="showModal = false">Batalkan</button>
-          <button class="modal-confirm" @click="confirmDecline">Ya, Tolak</button>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "DetailTugasView",
   data() {
     return {
-      showModal: false,
-      alasan: "", // untuk alasan penolakan
+      taskId: null,
+      task: null,
+      pengepulName: "",
+      trackingInterval: null,
+      loading: true,
+      locationEnabled: false,
     };
   },
   methods: {
     goBack() {
       this.$router.push("/tugas-utama-pengepul");
     },
-    confirmDecline() {
-      if (!this.alasan.trim()) {
-        alert("Mohon isi alasan terlebih dahulu sebelum menolak tugas.");
+
+    getToken() {
+      return localStorage.getItem("token");
+    },
+
+    getUser() {
+      const user = localStorage.getItem("user");
+      return user ? JSON.parse(user) : null;
+    },
+
+    async fetchTaskDetail() {
+      try {
+        const response = await axios.get(`http://127.0.0.1:8000/api/task/${this.taskId}`, {
+          headers: {
+            Authorization: `Bearer ${this.getToken()}`,
+          },
+        });
+        this.task = response.data.data;
+        this.loading = false;
+      } catch (error) {
+        console.error("Gagal memuat detail tugas:", error);
+        alert("Gagal memuat data tugas.");
+      }
+    },
+
+    async handleAccept() {
+      if (!this.locationEnabled) {
+        this.requestLocationPermission(true);
+        return; // Jangan lanjut dulu sebelum izin diaktifkan
+      }
+
+      if (!navigator.geolocation) {
+        alert("Geolocation tidak didukung oleh browser ini.");
         return;
       }
 
-      // Lanjutkan aksi penolakan
-      this.showModal = false;
-      alert("Tugas telah ditolak dengan alasan: " + this.alasan);
-      this.alasan = ""; // reset form
-      this.$router.push("/tugas-utama");
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            await axios.post(
+              `http://127.0.0.1:8000/api/task/${this.taskId}/accepted`,
+              {
+                pul_latitude: position.coords.latitude,
+                pul_longitude: position.coords.longitude,
+              },
+              {
+                headers: {
+                  Authorization: `Bearer ${this.getToken()}`,
+                },
+              }
+            );
+
+            this.startLocationTracking();
+            alert("Tugas berhasil diterima. Tracking lokasi dimulai.");
+          } catch (error) {
+            console.error("Gagal menerima tugas:", error.response?.data || error);
+            alert("Gagal menerima tugas.");
+          }
+        },
+        (error) => {
+          alert("Mohon aktifkan lokasi untuk melanjutkan. Silakan izinkan akses lokasi di browser Anda.");
+          console.error("Error mendapatkan lokasi:", error);
+        }
+      );
     },
+
+    requestLocationPermission(showAlert = false) {
+      if (!navigator.geolocation) {
+        alert("Geolocation tidak didukung oleh browser ini.");
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        () => {
+          this.locationEnabled = true;
+        },
+        () => {
+          this.locationEnabled = false;
+          if (showAlert) {
+            alert("Mohon aktifkan lokasi untuk melanjutkan. Silakan izinkan akses lokasi di browser Anda.");
+          }
+        }
+      );
+    },
+
+    startLocationTracking() {
+      if (!navigator.geolocation) {
+        console.error("Geolocation tidak didukung browser");
+        return;
+      }
+
+      this.trackingInterval = setInterval(() => {
+        navigator.permissions.query({ name: 'geolocation' }).then((result) => {
+          if (result.state === 'granted') {
+            navigator.geolocation.getCurrentPosition(
+              async (position) => {
+                try {
+                  await axios.put(
+                    `http://127.0.0.1:8000/api/task/${this.taskId}/location`,
+                    {
+                      pul_latitude: position.coords.latitude,
+                      pul_longitude: position.coords.longitude,
+                    },
+                    {
+                      headers: {
+                        Authorization: `Bearer ${this.getToken()}`,
+                      },
+                    }
+                  );
+                } catch (err) {
+                  console.error("Gagal mengirim lokasi:", err);
+                }
+              },
+              (error) => {
+                console.error("Gagal mengambil lokasi:", error.message);
+              }
+            );
+          } else if (result.state === 'denied') {
+            console.warn("Izin lokasi ditolak, hentikan tracking");
+            this.stopLocationTracking();
+            alert("Izin lokasi ditolak, tracking lokasi dihentikan.");
+          }
+          // Kalau state 'prompt' bisa juga minta izin, tapi biasanya terjadi di awal saja
+        });
+      }, 5000);
+    },
+
+    stopLocationTracking() {
+      if (this.trackingInterval) {
+        clearInterval(this.trackingInterval);
+        this.trackingInterval = null;
+      }
+    },
+  },
+  mounted() {
+    this.taskId = this.$route.params.id;
+    const user = this.getUser();
+    this.pengepulName = user ? user.nama : "Pengepul";
+
+    this.fetchTaskDetail();
+    this.requestLocationPermission();
+  },
+  beforeDestroy() {
+    this.stopLocationTracking();
   },
 };
 </script>
-  
-  <style scoped>
+
+<style scoped>
   .main-container {
     background-color: #e6f7cf;
     min-height: 100vh;
@@ -322,5 +425,4 @@ export default {
   resize: none;
   margin-bottom: 16px;
 }
-  </style>
-  
+</style>

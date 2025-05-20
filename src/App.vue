@@ -44,9 +44,8 @@ const navbarManajerRoutes = [
   '/data-statistik',
   '/data-transaksi',
   '/edit-berita',
-  '/tugas',
   '/main',
-  // '/profile',
+  '/data-tugas',
   '/tambah-berita',
   '/tambah-pengepul',
 ]

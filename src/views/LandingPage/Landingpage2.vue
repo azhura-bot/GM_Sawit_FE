@@ -113,7 +113,7 @@
               
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div v-for="(feature, index) in features" :key="index" 
-                     class="bg-white/10 hover:bg-white/15 p-4 rounded-lg flex items-center gap-4 transition-all duration-300 border border-white/5 hover:-translate-y-1 hover:shadow-lg">
+                    class="bg-white/10 hover:bg-white/15 p-4 rounded-lg flex items-center gap-4 transition-all duration-300 border border-white/5 hover:-translate-y-1 hover:shadow-lg">
                   <div class="bg-gradient-to-br from-green-400 to-green-600 rounded-lg p-3 text-white">
                     <i :class="feature.icon"></i>
                   </div>

@@ -17,25 +17,20 @@
       <section class="menu-section">
         <h2>Menu</h2>
         <div class="menu-grid">
-          <router-link to="/pengajuan-jadwal" class="main-image">
+          <router-link to="/pengajuan-jadwal" class="menu-item">
             <img src="@/assets/pengajuan-jadwal.png" alt="Pengajuan Jadwal" />
-            <p>Pengajuan Jadwal</p>
+            <p class="text-[#164b1b]">Pengajuan Jadwal</p>
           </router-link>
 
-          <router-link to="/riwayat-petani" class="main-image">
+          <router-link to="/riwayat-petani" class="menu-item">
             <img src="@/assets/riwayat-pengajuan.png" alt="Riwayat Pengajuan" />
-            <p>Riwayat Pengajuan</p>
+            <p class="text-[#164b1b]">Riwayat Pengajuan</p>
           </router-link>
 
-          <router-link to="/artikel" class="main-image">
+          <router-link to="/artikel" class="menu-item">
             <img src="@/assets/icon-artikel.png" alt="Artikel" />
-            <p>Artikel</p>
+            <p class="text-[#164b1b]">Artikel</p>
           </router-link>
-
-          <div class="main-image">
-            <img src="@/assets/icon-harga.png" alt="Data Harga" />
-            <p>Data Harga</p>
-          </div>
         </div>
       </section>
 
@@ -61,7 +56,7 @@
               />
             </div>
             <div class="card-content">
-              <h3 class="text-[#134611] font-bold" >{{ artikel.title }}</h3>
+              <h3 class="text-[#134611] font-bold">{{ artikel.title }}</h3>
               <p>{{ truncate(artikel.content || artikel.description, 100) }}</p>
             </div>
           </div>
@@ -79,7 +74,8 @@
           :options="chartOptions"
           :series="series"
           class="chart-image"
-        />
+        ></apexchart>
+
       </section>
     </main>
   </div>
@@ -97,22 +93,34 @@ export default {
       apiUrl: import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000',
       user: null,
       articles: [],
-      series: [], // akan diisi dari API
+      series: [],
       chartOptions: {
-        chart: { id: 'harga-sawit-chart' },
-        xaxis: {
-          categories: [] // akan diisi dari API
+      chart: { id: 'harga-sawit-chart' },
+      xaxis: { categories: [] },
+      fill: {
+        type: 'gradient',
+        gradient: {
+          shade: 'light',
+          type: 'vertical',
+          gradientToColors: ['#81C784'],
+          stops: [0, 100]
+        }
+      },
+      tooltip: {
+        x: { format: 'dd/MM/yyyy HH:mm' },
+        y: {
+          formatter: val => 'Rp ' + val.toLocaleString('id-ID'),
+          title: { formatter: s => `${s}:` }
         },
-        fill: {
-          type: 'gradient',
-          gradient: {
-            shade: 'light',
-            type: 'vertical',
-            gradientToColors: ['#81C784'],
-            stops: [0, 100]
-          }
+        marker: { show: true, fillColors: ['#0096FF'] },
+        theme: 'light',
+        style: {
+          textcolor: '#000000',   
+          fontSize: '14px',
+          fontFamily: 'Arial, sans-serif'
         }
       }
+    }
     }
   },
   computed: {
@@ -128,73 +136,14 @@ export default {
   methods: {
     async fetchUser() {
       const token = localStorage.getItem('token')
-      if (!token) {
-        console.warn('Token tidak ditemukan, user belum login.')
-        return
-      }
-
+      if (!token) return
       try {
         const response = await axios.get(`${this.apiUrl}/api/profile`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+          headers: { Authorization: `Bearer ${token}` }
         })
         this.user = response.data.data || response.data
       } catch (error) {
         console.error('Gagal mendapatkan data user:', error)
-        if (error.response && error.response.status === 401) {
-          alert('Sesi login sudah habis, silakan login ulang.')
-          localStorage.removeItem('token')
-          this.$router.push('/login')
-        }
-      }
-    },
-
-    formatTanggal(tanggal) {
-      const date = new Date(tanggal)
-      if (isNaN(date.getTime())) return 'Invalid Date'
-
-      const dd = String(date.getDate()).padStart(2, '0')
-      const mm = String(date.getMonth() + 1).padStart(2, '0')
-      const yyyy = date.getFullYear()
-      return `${dd}/${mm}/${yyyy}`
-    },
-
-    async fetchHargaSawit() {
-      try {
-        const token = localStorage.getItem('token')
-        const response = await axios.get(`${this.apiUrl}/api/harga`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        })
-
-        const hargaData = response.data.data || []
-
-        // Format tanggal dan harga
-        const tanggalFormatted = hargaData.map(item =>
-          this.formatTanggal(item.created_at)
-        )
-        const hargaValues = hargaData.map(item => item.harga)
-
-        // Update chart
-        this.series = [
-          {
-            name: 'Harga Sawit',
-            data: hargaValues
-          }
-        ]
-
-        this.chartOptions = {
-          ...this.chartOptions,
-          xaxis: {
-            ...this.chartOptions.xaxis,
-            categories: tanggalFormatted
-          }
-        }
-
-      } catch (error) {
-        console.error('Gagal memuat data harga sawit:', error)
       }
     },
 
@@ -202,41 +151,55 @@ export default {
       try {
         const token = localStorage.getItem('token')
         const response = await axios.get(`${this.apiUrl}/api/artikel`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+          headers: { Authorization: `Bearer ${token}` }
         })
-        const data = response.data
-        this.articles = data.data || data.artikels || data
+        this.articles = response.data.data || response.data.artikels || []
       } catch (error) {
         console.error('Error fetching articles:', error)
       }
     },
 
     goToDetail(id) {
-      if (id) {
-        this.$router.push(`/detail-artikel/${id}`)
-      } else {
-        console.log('Invalid article ID')
-      }
+      if (id) this.$router.push(`/detail-artikel/${id}`)
     },
 
     getImageUrl(artikel) {
       const img = artikel.imageUrl || artikel.image || artikel.image_path || artikel.thumbnail
       if (!img) return require('@/assets/fotosawit.jpg')
-      if (/^(https?:)?\/\//.test(img)) return img
-      return `${this.apiUrl}/storage/${img}`
+      return /^(https?:)?\/\//.test(img) ? img : `${this.apiUrl}/storage/${img}`
     },
 
     truncate(text, maxLength) {
       if (!text) return ''
       return text.length > maxLength ? text.substring(0, maxLength) + '...' : text
+    },
+
+    async fetchHargaSawit() {
+      try {
+        const token = localStorage.getItem('token')
+        const response = await axios.get(`${this.apiUrl}/api/harga`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        const data = response.data.data || []
+        this.series = [{ name: 'Harga Sawit', data: data.map(d => d.harga) }]
+        this.chartOptions = {
+          ...this.chartOptions,
+          xaxis: { categories: data.map(d => this.formatTanggal(d.created_at)) }
+        }
+      } catch (error) {
+        console.error('Gagal memuat data harga sawit:', error)
+      }
+    },
+
+    formatTanggal(tanggal) {
+      const date = new Date(tanggal)
+      const dd = String(date.getDate()).padStart(2, '0')
+      const mm = String(date.getMonth() + 1).padStart(2, '0')
+      return `${dd}/${mm}/${date.getFullYear()}`
     }
   }
 }
 </script>
-
-
 
 <style scoped>
 .main-container {
@@ -246,7 +209,6 @@ export default {
   flex-direction: column;
   align-items: center;
 }
-
 .header {
   background-color: #164b1b;
   width: 100%;
@@ -259,7 +221,6 @@ export default {
   top: 0;
   z-index: 10;
 }
-
 .circle {
   width: 24px;
   height: 24px;
@@ -267,11 +228,9 @@ export default {
   border-radius: 50%;
   margin-right: 8px;
 }
-
 .username {
   font-weight: bold;
 }
-
 .content {
   background: white;
   margin-top: 12px;
@@ -280,32 +239,14 @@ export default {
   border-radius: 16px 16px 0 0;
   padding: 16px;
 }
-
 .image-section {
   border-radius: 16px;
   overflow: hidden;
   margin-bottom: 16px;
 }
-
 .main-image {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  text-decoration: none;
-  color: inherit;
-}
-
-.main-image img {
-  width: 80px;
-  height: 80px;
-  margin-bottom: 8px;
-}
-
-.main-image p {
-  font-size: 14px;
-  margin: 0;
-  color: #000000;
+  width: 100%;
+  border-radius: 12px;
 }
 
 .menu-section h2,
@@ -319,39 +260,50 @@ export default {
 
 .menu-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
+}
+.menu-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+}
+.menu-item img {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 8px;
+}
+.menu-item p {
+  font-size: 14px;
+  margin: 0;
+  
 }
 
 .trending-cards {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 2 kolom */
+  grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
 }
-
 .card {
   background: #f2f2f2;
-  flex: 1;
   border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
 }
-
 .card-image img {
   width: 100%;
   height: 100px;
   object-fit: cover;
 }
-
 .card-content {
   padding: 8px;
 }
-
 .card-content h3 {
   font-size: 14px;
   margin: 4px 0;
 }
-
 .card-content p {
   font-size: 12px;
   color: #666;
@@ -366,10 +318,27 @@ export default {
 .harga-section {
   margin-top: 24px;
 }
-
 .chart-image {
   width: 100%;
   margin-top: 8px;
   border-radius: 12px;
+}
+
+/* Override background menjadi putih (untuk theme light) */
+:deep(.apexcharts-theme-light .apexcharts-tooltip) {
+  background: #fff !important;
+  color: #000 !important;           /* teks utama menjadi hitam */
+}
+
+/* Override label (series name) */
+:deep(.apexcharts-theme-light .apexcharts-tooltip .apexcharts-tooltip-text-y-label) {
+  fill: #000 !important;            /* untuk elemen SVG <tspan> yang pakai fill */
+  color: #000 !important;
+}
+
+/* Override value */
+:deep(.apexcharts-theme-light .apexcharts-tooltip .apexcharts-tooltip-text-value) {
+  fill: #000 !important;
+  color: #000 !important;
 }
 </style>

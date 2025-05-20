@@ -68,8 +68,6 @@ const submitLogin = async () => {
     }
 
   } catch (error) {
-    console.error('Login gagal:', error.response?.data || error.message)
-    alert(error.response?.data?.message || 'Terjadi kesalahan saat login.')
   }
 }
 </script>

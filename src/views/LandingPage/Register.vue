@@ -20,10 +20,12 @@
         </div>
 
         <div>
-          <label class="block text-sm font-semibold mb-1 text-[#134611]">Nomor Telepon</label>
+          <label class="block text-sm font-semibold mb-1 text-[#134b11]">Nomor Telepon</label>
           <input
             type="tel"
             v-model="no_phone"
+            pattern="^08[0-9]{8,12}$"
+            title="Masukkan nomor Handphone"
             class="w-full p-3 bg-[#D9D9D9] rounded-3xl outline-none text-black"
             required
           />
@@ -48,20 +50,6 @@
             required
           />
         </div>
-
-        <div>
-          <label class="block text-sm font-semibold mb-1 text-[#134611]">Role</label>
-          <select
-            v-model="role"
-            class="w-full p-3 bg-[#D9D9D9] rounded-3xl outline-none text-black"
-            required
-          >
-            <option value="" disabled selected>Pilih Role</option>
-            <option value="pengepul">Pengepul</option>
-            <option value="petani">Petani</option>
-          </select>
-        </div>
-
 
         <button
           type="submit"
