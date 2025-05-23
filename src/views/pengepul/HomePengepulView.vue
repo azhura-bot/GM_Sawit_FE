@@ -4,15 +4,14 @@
     <header class="header flex items-center p-4 bg-white shadow">
       <router-link to="/profile" class="inline-block mr-3">
         <img
-          v-if="user.photo"
-          :src="user.photo"
+          :src="profileSrc"
           alt="Foto Profil"
           class="circle"
+          @error="onPhotoError"
         />
-        <div v-else class="circle placeholder"></div>
       </router-link>
       <span class="username font-semibold text-white-800">
-        {{ user.name || 'nama User' }}
+        {{ user.name || 'Nama User' }}
       </span>
     </header>
 
@@ -28,7 +27,7 @@
         <h2>Menu</h2>
         <div class="menu-grid">
           <router-link to="/tugas-utama-pengepul" class="menu-item">
-            <img src="@/assets/icon-tugas.png" alt="Transaksi" />
+            <img src="@/assets/icon-tugas.png" alt="Tugas" />
             <p>Tugas</p>
           </router-link>
           <router-link to="/artikel" class="menu-item">
@@ -58,7 +57,7 @@
           >
             <div class="card-image">
               <img
-                :src="getImageUrl(artikel)"
+                :src="artikel.image_url || defaultArticleImage"
                 alt="gambar artikel"
                 class="object-cover w-full h-full"
               />
@@ -75,13 +74,14 @@
       <section class="harga-section">
         <h2>Harga Hari Ini</h2>
         <h3>Statistik hingga saat ini</h3>
+
         <apexchart
           type="area"
           height="300"
           :options="chartOptions"
           :series="series"
           class="chart-image"
-        />
+        ></apexchart>
       </section>
     </main>
   </div>
@@ -91,58 +91,39 @@
 import ApexCharts from 'vue3-apexcharts'
 import axios from 'axios'
 import defaultPhoto from '@/assets/profile.png'
+import defaultArticleImage from '@/assets/fotosawit.jpg'
 
 export default {
   name: 'MainPage',
   components: { apexchart: ApexCharts },
   data() {
     return {
-      apiUrl: import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000',
-      user: {
-        name: '',
-        photo: ''
-      },
+      apiUrl: import.meta.env.VITE_API_URL || 'https://api.ecopalm.ydns.eu',
+      user: { name: '', photo_url: null },
+      defaultPhoto,
+      defaultArticleImage,
       articles: [],
-      series: [], // akan diisi dari API
+      series: [],
       chartOptions: {
         chart: { id: 'harga-sawit-chart' },
         xaxis: { categories: [] },
         yaxis: {
-          labels: {
-            formatter: val => 'Rp ' + val.toLocaleString('id-ID')
-          }
+          labels: { formatter: val => 'Rp ' + val.toLocaleString('id-ID') }
         },
         dataLabels: {
           enabled: true,
           formatter: val => 'Rp ' + val.toLocaleString('id-ID'),
-          style: {
-            colors: ['#007bff'], // warna biru seperti di gambar
-            fontSize: '14px',
-            fontFamily: 'Arial, sans-serif'
-          }
+          style: { fontSize: '14px', fontFamily: 'Arial, sans-serif' }
         },
         fill: {
           type: 'gradient',
-          gradient: {
-            shade: 'light',
-            type: 'vertical',
-            gradientToColors: ['#81C784'],
-            stops: [0, 100]
-          }
+          gradient: { shade: 'light', type: 'vertical', gradientToColors: ['#81C784'], stops: [0, 100] }
         },
         tooltip: {
           x: { format: 'dd/MM/yyyy HH:mm' },
-          y: {
-            formatter: val => 'Rp ' + val.toLocaleString('id-ID'),
-            title: { formatter: s => `${s}:` }
-          },
-          marker: { show: true, fillColors: ['#0096FF'] },
+          y: { formatter: val => 'Rp ' + val.toLocaleString('id-ID') },
           theme: 'light',
-          style: {
-            textcolor: '#000000',
-            fontSize: '14px',
-            fontFamily: 'Arial, sans-serif'
-          }
+          style: { fontSize: '14px', fontFamily: 'Arial, sans-serif' }
         }
       }
     }
@@ -150,6 +131,11 @@ export default {
   computed: {
     latestArticles() {
       return this.articles.slice(0, 4)
+    },
+    profileSrc() {
+      return this.user.photo_url
+        ? this.user.photo_url
+        : defaultPhoto
     }
   },
   mounted() {
@@ -158,112 +144,75 @@ export default {
     this.fetchHargaSawit()
   },
   methods: {
-  async fetchUser() {
-        const token = localStorage.getItem('token')
-        if (!token) return
-
-        try {
-          const { data: resp } = await axios.get(
-            `${this.apiUrl}/api/profile`,
-            { headers: { Authorization: `Bearer ${token}` } }
-          )
-          const d = resp.data || resp
-          this.user.name = d.name || ''
-          // bangun URL full dari field 'photo' yang di-API
-          this.user.photo = d.photo
-            ? `${this.apiUrl}/storage/${d.photo}`
-            : defaultPhoto
-        } catch (err) {
-          console.error('Gagal fetch user:', err)
-        }
-      },
-
-    formatTanggal(tanggal) {
-      const date = new Date(tanggal)
-      if (isNaN(date.getTime())) return 'Invalid Date'
-
-      const dd = String(date.getDate()).padStart(2, '0')
-      const mm = String(date.getMonth() + 1).padStart(2, '0')
-      const yyyy = date.getFullYear()
-      return `${dd}/${mm}/${yyyy}`
-    },
-
-    async fetchHargaSawit() {
+    async fetchUser() {
+      const token = localStorage.getItem('token')
+      if (!token) return
       try {
-        const token = localStorage.getItem('token')
-        const response = await axios.get(`${this.apiUrl}/api/harga`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+        const res = await axios.get(`${this.apiUrl}/api/profile`, {
+          headers: { Authorization: `Bearer ${token}` }
         })
-
-        const hargaData = response.data.data || []
-
-        // Format tanggal dan harga
-        const tanggalFormatted = hargaData.map(item =>
-          this.formatTanggal(item.created_at)
-        )
-        const hargaValues = hargaData.map(item => item.harga)
-
-        // Update chart
-        this.series = [
-          {
-            name: 'Harga Sawit',
-            data: hargaValues
-          }
-        ]
-
-        this.chartOptions = {
-          ...this.chartOptions,
-          xaxis: {
-            ...this.chartOptions.xaxis,
-            categories: tanggalFormatted
-          }
+        const u = res.data.data
+        this.user.name = u.name
+        this.user.photo_url = u.photo_url
+      } catch (err) {
+        console.error('Error fetching user profile:', err)
+        if (err.response?.status === 401) {
+          localStorage.removeItem('token')
+          this.$router.push('/login')
         }
-
-      } catch (error) {
-        console.error('Gagal memuat data harga sawit:', error)
       }
     },
 
     async fetchArticles() {
       try {
         const token = localStorage.getItem('token')
-        const response = await axios.get(`${this.apiUrl}/api/artikel`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+        const res = await axios.get(`${this.apiUrl}/api/artikel`, {
+          headers: { Authorization: `Bearer ${token}` }
         })
-        const data = response.data
-        this.articles = data.data || data.artikels || data
-      } catch (error) {
-        console.error('Error fetching articles:', error)
+        this.articles = (res.data.data || []).map(a => ({
+          ...a,
+          image_url: a.image ? `${this.apiUrl}/${a.image}` : null
+        }))
+      } catch (err) {
+        console.error('Error fetching articles:', err)
       }
     },
 
     goToDetail(id) {
-      if (id) {
-        this.$router.push(`/detail-artikel/${id}`)
-      } else {
-        console.log('Invalid article ID')
-      }
-    },
-
-    getImageUrl(artikel) {
-      const img = artikel.imageUrl || artikel.image || artikel.image_path || artikel.thumbnail
-      if (!img) return require('@/assets/fotosawit.jpg')
-      if (/^(https?:)?\/\//.test(img)) return img
-      return `${this.apiUrl}/storage/${img}`
+      if (id) this.$router.push(`/detail-artikel/${id}`)
     },
 
     truncate(text, maxLength) {
       if (!text) return ''
       return text.length > maxLength ? text.substring(0, maxLength) + '...' : text
+    },
+
+    async fetchHargaSawit() {
+      try {
+        const token = localStorage.getItem('token')
+        const response = await axios.get(`${this.apiUrl}/api/harga`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        const data = response.data.data || []
+        this.series = [{ name: 'Harga Sawit', data: data.map(d => d.harga) }]
+        this.chartOptions.xaxis.categories = data.map(d => this.formatTanggal(d.created_at))
+      } catch (err) {
+        console.error('Gagal memuat data harga sawit:', err)
+      }
+    },
+
+    formatTanggal(tanggal) {
+      const d = new Date(tanggal)
+      const dd = String(d.getDate()).padStart(2, '0')
+      const mm = String(d.getMonth() + 1).padStart(2, '0')
+      return `${dd}/${mm}/${d.getFullYear()}`
+    },
+    onPhotoError() {
+      this.user.photo_url = defaultPhoto
     }
   }
 }
 </script>
-
 
 <style scoped>
 .main-container {

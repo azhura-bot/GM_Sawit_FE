@@ -3,25 +3,17 @@
     <!-- Header -->
     <header class="header flex items-center p-4 bg-white shadow">
       <router-link to="/profile" class="inline-block mr-3">
-        <!-- jika ada foto, tampilkan; kalau tidak, tampil placeholder putih -->
         <img
-          v-if="user.photo"
-          :src="`${apiUrl}/storage/${user.photo}`"
+          :src="profileSrc"
           alt="Foto Profil"
           class="w-10 h-10 rounded-full object-cover"
+          @error="onPhotoError"
         />
-        <div
-          v-else
-          class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-white"
-        >
-          <span class="text-sm font-bold">?</span>
-        </div>
       </router-link>
       <span class="username font-semibold text-white-800">
-        {{ user.name || 'nama User' }}
+        {{ user.name || 'Nama User' }}
       </span>
     </header>
-
 
     <!-- Content -->
     <main class="content">
@@ -137,6 +129,7 @@
 
 <script>
 import axios from 'axios';
+import placeholder from '@/assets/profile.png';
 
 export default {
   name: 'LaporanView',
@@ -144,10 +137,8 @@ export default {
     return {
       apiUrl: 'https://api.ecopalm.ydns.eu',
       tasks: [],
-      user: {
-        name: '',
-        photo: ''
-      },
+      user: { name: "", photo: null },
+      photoError: false,
       selectedTaskId: '',
       hargaSawit: 0,
       pengepul: { name: '' },
@@ -159,12 +150,20 @@ export default {
         totalHarga: 0,
       },
       errorMessage: '',
-      showSuccessModal: false, // untuk kontrol modal
+      showSuccessModal: false,
     };
   },
   computed: {
     filteredTasks() {
       return this.tasks.filter(t => t.status === 'in_progress');
+    },
+    profileSrc() {
+      if (this.photoError || !this.user.photo_url) {
+        return placeholder;
+      }
+      return this.user.photo_url.startsWith('http')
+      ? this.user.photo_url
+      : `${this.apiUrl}/${this.user.photo_url}`;
     }
   },
   methods: {
@@ -196,7 +195,10 @@ export default {
           `${this.apiUrl}/api/profile`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        this.user = userData.data || userData;
+        const u = userData.data || userData;
+        this.user.name = u.name;
+        this.user.photo_url = u.photo_url;
+        this.pengepul.name = u.name;
         this.pengepul.name = this.user.name;
       } catch (error) {
         console.error(error);
@@ -270,7 +272,6 @@ export default {
 
     closeModal() {
       this.showSuccessModal = false;
-      // Setelah OK, kembalikan user ke halaman home pengepul
       this.$router.push('/home-pengepul');
     },
 
@@ -291,7 +292,12 @@ export default {
       const [ymd] = dateStr.split('T');
       const [y,m,d] = ymd.split('-');
       return `${d}/${m}/${y}`;
+    },
+
+    onPhotoError() {
+      this.photoError = true;
     }
+
   },
   mounted() {
     this.fetchInitialData();

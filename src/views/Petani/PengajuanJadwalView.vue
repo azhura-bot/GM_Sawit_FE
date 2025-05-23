@@ -8,17 +8,14 @@
     <header class="header flex items-center p-4 bg-white shadow">
       <router-link to="/profile" class="inline-block mr-3">
         <img
-          v-if="user.photo"
-          :src="getProfilePhotoUrl(user.photo)"
+          :src="profileSrc"
           alt="Foto Profil"
           class="circle"
-          @error="photoError = true"
-          v-show="!photoError"
+          @error="onPhotoError"
         />
-        <div v-else-if="photoError || !user.photo" class="circle placeholder"></div>
       </router-link>
       <span class="username font-semibold text-white-800">
-        {{ user.name || 'nama User' }}
+        {{ user.name || 'Nama User' }}
       </span>
     </header>
 
@@ -130,15 +127,11 @@ import 'leaflet/dist/leaflet.css'
 import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png?url'
 import iconUrl from 'leaflet/dist/images/marker-icon.png?url'
 import shadowUrl from 'leaflet/dist/images/marker-shadow.png?url'
-
-delete L.Icon.Default.prototype._getIconUrl
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl,
-  iconUrl,
-  shadowUrl,
-})
-
 import Datepicker from 'vue3-datepicker'
+import axios from 'axios'
+import defaultPhoto from '@/assets/profile.png'
+
+L.Icon.Default.mergeOptions({ iconRetinaUrl, iconUrl, shadowUrl })
 
 export default {
   name: "PengajuanJadwalView",
@@ -159,22 +152,48 @@ export default {
       map: null,
       marker: null,
       errorMessage: "",
-      user: {},
-      photoError: false,
+      // user hanya butuh name dan photo_url
+      user: { name: "", photo_url: null },
+      photoError: false
     }
   },
-  created() {
-    const storedUser = JSON.parse(localStorage.getItem("user")) || {}
-    this.user = storedUser
-    this.nama = storedUser.name || ""
-    this.email = storedUser.email || ""
-    this.no_phone = storedUser.no_phone || ""
+  computed: {
+    // gunakan photo_url langsung dari API, fallback ke defaultPhoto
+    profileSrc() {
+      return this.photoError || !this.user.photo_url
+        ? defaultPhoto
+        : this.user.photo_url
+    }
+  },
+  mounted() {
+    // ambil data user dari API saat komponen dipasang
+    this.fetchUserProfile()
+    // inisialisasi form fields jika perlu
+    const stored = JSON.parse(localStorage.getItem("user")) || {}
+    this.nama     = stored.name || ""
+    this.email    = stored.email || ""
+    this.no_phone = stored.no_phone || ""
   },
   methods: {
-    getProfilePhotoUrl(photoPath) {
-      if (photoPath.startsWith('http')) return photoPath
-      return `https://api.ecopalm.ydns.eu/storage/${photoPath}`
+    async fetchUserProfile() {
+      const token = localStorage.getItem("token")
+      if (!token) return
+      try {
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/profile`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        )
+        const u = res.data.data
+        this.user.name      = u.name
+        this.user.photo_url = u.photo_url  // diisi oleh BE
+      } catch (err) {
+        console.error("Gagal mengambil profil:", err)
+      }
     },
+    onPhotoError() {
+      this.photoError = true
+    },
+
     openMapModal() {
       this.isMapOpen = true
       this.$nextTick(this.initMap)

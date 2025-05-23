@@ -7,6 +7,7 @@
           :src="user.photo"
           alt="Foto Profil"
           class="circle"
+          @error="onPhotoError"
         />
         <div v-else class="circle placeholder"></div>
       </router-link>
@@ -113,6 +114,9 @@
 <script>
 import axios from 'axios'
 import { ref, onMounted } from 'vue'
+import defaultPhoto from '@/assets/profile.png'
+
+const API_URL = import.meta.env.VITE_API_URL || 'https://api.ecopalm.ydns.eu'
 
 export default {
   setup() {
@@ -124,23 +128,17 @@ export default {
     const fetchUser = async () => {
       const token = localStorage.getItem('token')
       if (!token) return
-
       try {
-        const res = await axios.get('https://api.ecopalm.ydns.eu/api/profile', {
+        const res = await axios.get(`${API_URL}/api/profile`, {
           headers: { Authorization: `Bearer ${token}` }
         })
-        const fetched = res.data.data || res.data
-        user.value = {
-          ...fetched,
-          photo: fetched.photo ? `https://api.ecopalm.ydns.eu/storage/${fetched.photo}` : ''
-        }
+        const fetched = res.data.data
+        user.value.name = fetched.name
+        user.value.photo = fetched.photo_url
+          ? fetched.photo_url
+          : ''
       } catch (err) {
         console.error('Gagal mengambil user:', err)
-        if (err.response?.status === 401) {
-          alert('Sesi login habis, silakan login ulang.')
-          localStorage.removeItem('token')
-          window.location.href = '/login'
-        }
       }
     }
 
@@ -172,6 +170,10 @@ export default {
       } catch (e) {
         return ''
       }
+    }
+
+    const onPhotoError = () => {
+      user.value.photo = defaultPhoto
     }
 
     onMounted(() => {

@@ -2,12 +2,13 @@
   <div class="main-container">
 
     <header class="header flex items-center p-4 bg-white shadow">
-      <router-link to="/profil" class="inline-block mr-3">
+      <router-link to="/profile" class="inline-block mr-3">
         <img
           v-if="user.photo"
           :src="user.photo"
           alt="Foto Profil"
           class="circle"
+          @error="onPhotoError"
         />
         <div v-else class="circle placeholder"></div>
       </router-link>
@@ -17,15 +18,15 @@
     </header>
 
     <!-- Content -->
-    <main class="content">
+    <main class="content p-4">
       <!-- Judul dan Icon -->
-      <section class="title-with-icon">
-        <img src="@/assets/icon-artikel-trans.png" alt="Icon Artikel" class="icon" />
-        <h2>Artikel</h2>
+      <section class="title-with-icon flex items-center mb-4">
+        <img src="@/assets/icon-artikel-trans.png" alt="Icon Artikel" class="icon w-6 h-6 mr-2" />
+        <h2 class="text-xl font-bold text-gray-800">Artikel</h2>
       </section>
 
       <!-- Search Bar -->
-      <div class="search-bar">
+       <div class="search-bar">
         <input
           type="text"
           placeholder="Search..."
@@ -55,41 +56,36 @@
       <div
         v-for="artikel in filteredArticles"
         :key="artikel.id"
-        class="article-card"
-        @click="goToDetail(artikel.id)"
+        class="article-card bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition mb-6"
       >
-        <img
-          v-if="artikel.image"
-          :src="`${API_URL}/storage/${artikel.image}`"
-          alt="Foto Artikel"
-          class="article-image"
-        />
-        <img
-          v-else
-          :src="require('@/assets/fotosawit.jpg')"
-          alt="Foto Artikel"
-          class="article-image"
-        />
-        <div class="article-content">
-          <h3>{{ artikel.title }}</h3>
-          <p>
-            {{
-              artikel.content
-                ? artikel.content.length > 100
-                  ? artikel.content.substring(0, 100) + '...'
-                  : artikel.content
-                : artikel.description
+        <div class="relative h-40 bg-gray-200 cursor-pointer" @click="goToDetail(artikel.id)">
+          <img
+            v-if="artikel.image"
+            :src="`${API_URL}/storage/${artikel.image}`"
+            alt="Foto Artikel"
+            class="object-cover w-full h-full"
+          />
+          <img
+            v-else
+            src="@/assets/fotosawit.jpg"
+            alt="Foto Artikel"
+            class="object-cover w-full h-full"
+          />
+        </div>
+        <div class="article-content p-4">
+          <h3 class="text-lg font-semibold text-gray-800 mb-2">{{ artikel.title }}</h3>
+          <p class="text-sm text-gray-700">
+            {{ artikel.content
+              ? (artikel.content.length > 100 ? artikel.content.substring(0, 100) + '...' : artikel.content)
+              : artikel.description || ''
             }}
           </p>
         </div>
-        <div class="actions">
-          <router-link
-            :to="`/edit-berita/${artikel.id}`"
-            class="edit-icon"
-          >
+        <div class="actions flex justify-end p-2">
+          <router-link :to="`/edit-berita/${artikel.id}`" class="mr-2">
             <!-- icon edit -->
           </router-link>
-          <button @click.stop="openModal(artikel.id)" class="delete-icon">
+          <button @click="openModal(artikel.id)">
             <!-- icon delete -->
           </button>
         </div>
@@ -110,93 +106,88 @@
 import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
 import HapusBeritaAlert from '@/components/HapusBeritaAlert.vue'
+import defaultPhoto from '@/assets/profile.png'
 
-// API base URL
-const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
-const user = ref({ name: '', photo: '' })
+const API_URL = import.meta.env.VITE_API_URL || 'https://api.ecopalm.ydns.eu'
+
 // State
+const user = ref({ name: '', photo: '' })
 const articles = ref([])
 const searchQuery = ref('')
 const showAlert = ref(false)
 const deleteId = ref(null)
 
+// Fetch user profil
 const fetchUser = async () => {
   const token = localStorage.getItem('token')
   if (!token) return
-
   try {
     const res = await axios.get(`${API_URL}/api/profile`, {
       headers: { Authorization: `Bearer ${token}` }
     })
-    const fetched = res.data.data || res.data
-    user.value = {
-      ...fetched,
-      photo: fetched.photo ? `${API_URL}/storage/${fetched.photo}` : ''
-    }
+    const fetched = res.data.data
+    user.value.name = fetched.name
+    user.value.photo = fetched.photo_url
+      ? fetched.photo_url
+      : ''
   } catch (err) {
     console.error('Gagal mengambil user:', err)
-    if (err.response?.status === 401) {
-      alert('Sesi login habis, silakan login ulang.')
-      localStorage.removeItem('token')
-      window.location.href = '/login'
-    }
   }
 }
 
-// Fetch articles dari API Laravel
+// Fetch articles
 const fetchArticles = async () => {
+  const token = localStorage.getItem('token')
+  if (!token) return
   try {
-    const token = localStorage.getItem('token')
-    if (!token) {
-      console.warn('Token tidak ditemukan, silakan login terlebih dahulu.')
-      return
-    }
-    const response = await axios.get(`${API_URL}/api/artikel`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+    const res = await axios.get(`${API_URL}/api/artikel`, {
+      headers: { Authorization: `Bearer ${token}` }
     })
-    articles.value = response.data.data || response.data
-  } catch (error) {
-    console.error('Error fetching articles:', error)
+    articles.value = res.data.data.map(a => ({
+      ...a,
+      image: a.image ? a.image : ''
+    }))
+  } catch (err) {
+    console.error('Error fetching articles:', err)
   }
 }
 
-// Computed untuk filter search
+// Computed filtered articles
 const filteredArticles = computed(() => {
   if (!searchQuery.value) return articles.value
-  return articles.value.filter((artikel) =>
-    artikel.title.toLowerCase().includes(searchQuery.value.toLowerCase())
+  return articles.value.filter(a =>
+    a.title.toLowerCase().includes(searchQuery.value.toLowerCase())
   )
 })
 
-// Lifecycle hook
+// Lifecycle
 onMounted(() => {
-  fetchArticles()
   fetchUser()
+  fetchArticles()
 })
 
-// Navigasi ke detail
-const goToDetail = (id) => {
-  // Ganti sesuai route detail
+// Handlers
+const goToDetail = id => {
   window.location.href = `/detail-artikel/${id}`
 }
 
-// Modal handlers
-const openModal = (id) => {
+const openModal = id => {
   deleteId.value = id
   showAlert.value = true
 }
 
 const closeModal = () => {
-  deleteId.value = null
   showAlert.value = false
+  deleteId.value = null
 }
 
-// Setelah berhasil hapus
 const handleDeleted = () => {
   closeModal()
-  fetchArticles() // Refresh artikel
+  fetchArticles()
+}
+
+const onPhotoError = () => {
+  user.value.photo = defaultPhoto
 }
 </script>
 

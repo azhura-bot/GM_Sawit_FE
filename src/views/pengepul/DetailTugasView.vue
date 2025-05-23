@@ -4,12 +4,11 @@
     <header class="header flex items-center p-4 bg-white shadow">
       <router-link to="/profile" class="inline-block mr-3">
         <img
-          v-if="user.photo"
-          :src="user.photo"
+          :src="profileSrc"
           alt="Foto Profil"
           class="circle"
+          @error="onPhotoError"
         />
-        <div v-else class="circle placeholder"></div>
       </router-link>
       <span class="username font-semibold text-white-800">
         {{ user.name || 'Nama User' }}
@@ -84,11 +83,16 @@ export default {
       task: null,
       loading: true,
       locationEnabled: false,
-      user: {
-        name: "",
-        photo: ""
-      }
+      user: { name: "", photo_url: null },
     };
+  },
+    computed: {
+    // gunakan photo_url langsung dari API, fallback ke defaultPhoto
+    profileSrc() {
+      return this.photoError || !this.user.photo_url
+        ? defaultPhoto
+        : this.user.photo_url
+    }
   },
   methods: {
     getToken() {
@@ -96,21 +100,22 @@ export default {
     },
 
     async fetchUserProfile() {
-      const token = this.getToken();
-      if (!token) return;
+      const token = localStorage.getItem("token")
+      if (!token) return
       try {
-        const res = await axios.get("https://api.ecopalm.ydns.eu/api/profile", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        const d = res.data.data || res.data;
-        this.user.name = d.name || "";
-        // bangun URL ke storage, asumsikan `photo` = path relatif di `storage/`
-        this.user.photo = d.photo
-          ? `https://api.ecopalm.ydns.eu/storage/${d.photo}`
-          : "";
-      } catch (e) {
-        console.error("Gagal memuat profil user:", e);
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/profile`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        )
+        const u = res.data.data
+        this.user.name      = u.name
+        this.user.photo_url = u.photo_url  // diisi oleh BE
+      } catch (err) {
+        console.error("Gagal mengambil profil:", err)
       }
+    },
+    onPhotoError() {
+      this.photoError = true
     },
 
     async fetchTaskDetail() {

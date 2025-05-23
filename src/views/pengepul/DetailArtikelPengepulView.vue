@@ -4,36 +4,38 @@
     <header class="header flex items-center p-4 bg-white shadow">
       <router-link to="/profile" class="inline-block mr-3">
         <img
-          v-if="user.photo"
-          :src="user.photo"
+          :src="user.photo_url || defaultPhoto"
           alt="Foto Profil"
           class="circle"
         />
-        <div v-else class="circle placeholder"></div>
       </router-link>
       <span class="username font-semibold text-white-800">
-        {{ user.name || 'nama User' }}
+        {{ user.name || 'Nama User' }}
       </span>
     </header>
 
     <!-- Main Content -->
     <main class="content">
-      <!-- Tombol Back dan Gambar -->
-      <div class="top-section">
-        <button class="back-button" @click="goBack">
+      <!-- Tombol Back dan Gambar Artikel -->
+      <div class="top-section flex items-center mb-6">
+        <button class="back-button mr-4" @click="goBack">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
-            viewBox="0 0 24 24" stroke="currentColor">
+               viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M15 19l-7-7 7-7" />
+                  d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <img :src="getImageUrl()" alt="Foto Artikel" class="detail-image" />
+        <img
+          :src="artikel?.image_url"
+          alt="Foto Artikel"
+          class="detail-image rounded-lg shadow"
+        />
       </div>
 
       <!-- Detail Artikel -->
       <div class="detail-content">
-        <h2>{{ artikel?.title || 'Judul Artikel' }}</h2>
-        <p v-html="artikel?.content || artikel?.description || 'Konten tidak tersedia.'"></p>
+        <h2 class="text-2xl font-bold mb-4">{{ artikel?.title || 'Judul Artikel' }}</h2>
+        <div v-html="artikel?.content || artikel?.description || 'Konten tidak tersedia.'" class="prose max-w-none text-[#134611]"></div>
       </div>
     </main>
   </div>
@@ -41,6 +43,7 @@
 
 <script>
 import axios from 'axios'
+import defaultPhoto from '@/assets/profile.png'
 import fallbackImage from '@/assets/fotosawit.jpg'
 
 export default {
@@ -51,8 +54,10 @@ export default {
       artikel: null,
       user: {
         name: '',
-        photo: ''
+        photo_url: null
       },
+      defaultPhoto,
+      fallbackImage
     }
   },
 
@@ -63,54 +68,47 @@ export default {
   },
 
   methods: {
-    async fetchArtikel(id) {
-      const token = localStorage.getItem('token')
-      try {
-        const response = await axios.get(`${this.apiUrl}/api/artikel/${id}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
-        this.artikel = response.data.data || response.data
-      } catch (error) {
-        console.error('Gagal memuat artikel:', error)
-      }
-    },
-
-    goBack() {
-      this.$router.go(-1)
-    },
-
-    getImageUrl() {
-      const img = this.artikel?.image
-              || this.artikel?.image_path
-              || this.artikel?.thumbnail
-
-      if (!img) return fallbackImage
-      if (/^(https?:)?\/\//.test(img)) return img
-      return `${this.apiUrl}/storage/${img}`
-    },
-    
     async fetchUser() {
       const token = localStorage.getItem('token')
-      if (!token) {
-        console.warn('Token tidak ditemukan, user belum login.')
-        return
-      }
+      if (!token) return
 
       try {
-        const response = await axios.get(`${this.apiUrl}/api/profile`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+        const { data } = await axios.get(`${this.apiUrl}/api/profile`, {
+          headers: { Authorization: `Bearer ${token}` }
         })
-        this.user = response.data.data || response.data
-      } catch (error) {
-        console.error('Gagal mendapatkan data user:', error)
-        if (error.response && error.response.status === 401) {
-          alert('Sesi login sudah habis, silakan login ulang.')
+        const u = data.data || data
+        this.user.name      = u.name
+        this.user.photo_url = u.photo_url || null
+      } catch (err) {
+        console.error('Gagal mendapatkan data user:', err)
+        if (err.response?.status === 401) {
           localStorage.removeItem('token')
           this.$router.push('/login')
         }
       }
+    },
+
+    async fetchArtikel(id) {
+        const token = localStorage.getItem('token')
+        try {
+          const { data } = await axios.get(`${this.apiUrl}/api/artikel/${id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          })
+          const a = data.data || data
+
+          // **Mapping image_url sama persis seperti di list**
+          a.image_url = a.image
+            ? `${this.apiUrl}/${a.image}`
+            : this.fallbackImage
+
+          this.artikel = a
+        } catch (err) {
+          console.error('Gagal memuat artikel:', err)
+        }
+      },
+
+    goBack() {
+      this.$router.go(-1)
     }
   }
 }

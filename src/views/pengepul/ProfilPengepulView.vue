@@ -8,6 +8,12 @@
           alt="Foto Profil"
           class="circle"
         />
+        <img
+          v-else
+          :src="defaultPhoto"
+          alt="Default Foto"
+          class="circle"
+        />
         <div v-else class="circle placeholder"></div>
       </router-link>
       <span class="username font-semibold text-white-800">
@@ -85,13 +91,11 @@ export default {
     this.fetchProfile()
 
     const savedUser = localStorage.getItem('user')
-    if (savedUser) {
-      const parsedUser = JSON.parse(savedUser)
-      this.user.name = parsedUser.name || ''
-      this.user.photo = parsedUser.photo
-        ? this.apiUrl + '/storage/' + parsedUser.photo
-        : ''
-    }
+      if (savedUser) {
+        const parsedUser = JSON.parse(savedUser)
+        this.user.name = parsedUser.name || ''
+        this.user.photo = parsedUser.photo_url || parsedUser.photo || ''
+      }
   },
   methods: {
     async fetchProfile() {
@@ -109,7 +113,7 @@ export default {
           name: data.name || '',
           no_phone: data.no_phone || '',
           email: data.email || '',
-          photo: data.photo ? `${this.apiUrl}/storage/${data.photo}` : ''
+          photo: data.photo_url || ''
         }
 
         localStorage.setItem('user', JSON.stringify(data))
@@ -172,6 +176,7 @@ export default {
   }
 }
 </script>
+
 
 <style scoped>
   .main-container {
