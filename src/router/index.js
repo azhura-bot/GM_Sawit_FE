@@ -31,9 +31,9 @@ import EditProfilePengepulView from '@/views/pengepul/EditProfilePengepulView.vu
 import DaftarHarga from '@/views/pengepul/HargaPengepulView.vue'
 
 // Petani
-import HomePetaniView from '@/views/petani/HomePetaniView.vue'
-import RiwayatPetaniView from '@/views/petani/RiwayatPetaniView.vue'
-import PengajuanJadwal from '@/views/petani/PengajuanJadwalView.vue'
+import HomePetaniView from '@/views/Petani/HomePetaniView.vue'
+import RiwayatPetaniView from '@/views/Petani/RiwayatPetaniView.vue'
+import PengajuanJadwal from '@/views/Petani/PengajuanJadwalView.vue'
 
 
 const routes = [
