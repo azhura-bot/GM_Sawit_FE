@@ -1,8 +1,18 @@
 <template>
   <div class="main-container">
     <header class="header">
-      <router-link to="/profile-pengepul" class="circle"></router-link>
-      <span class="username">{{ profile.name || 'Lorem Ipsum' }}</span>
+      <router-link to="/profile" class="inline-block mr-3">
+        <img
+          v-if="user.photo"
+          :src="user.photo"
+          alt="Foto Profil"
+          class="circle"
+        />
+        <div v-else class="circle placeholder"></div>
+      </router-link>
+      <span class="username font-semibold text-white-800">
+        {{ user.name || 'nama User' }}
+      </span>
     </header>
 
     <main class="content">
@@ -11,7 +21,7 @@
       </div>
 
       <section class="info-section">
-        <p class="info-instruction">Informasi Profil</p>
+        <p class="info-instruction">Informasi Profile</p>
 
         <div class="info-group">
           <label>Nama</label>
@@ -21,8 +31,8 @@
 
         <div class="info-group">
           <label>Nomor Telepon</label>
-          <input v-if="isEditing" v-model="profile.no_phone" class="info-value" type="number"/>
-          <div v-else class="info-value">{{ profile.no_phone || 'Tidak ada Nomor Telepon'}}</div>
+          <input v-if="isEditing" v-model="profile.no_phone" class="info-value" type="number" />
+          <div v-else class="info-value">{{ profile.no_phone || 'Tidak ada Nomor Telepon' }}</div>
         </div>
 
         <div class="info-group">
@@ -32,10 +42,9 @@
         </div>
 
         <div v-if="isEditing" class="info-group">
-          <label>Photo</label>
+          <label>Foto</label>
           <input type="file" @change="handleFileUpload" class="info-value" />
         </div>
-
 
         <div class="button-group">
           <button class="edit-button" @click="isEditing ? saveProfile() : toggleEdit()">
@@ -49,7 +58,7 @@
 
 <script>
 import axios from 'axios'
-import defaultPhoto from '@/assets/jay.jpg'
+import defaultPhoto from '@/assets/profile.png'
 
 export default {
   name: 'ProfilePengepulView',
@@ -60,9 +69,13 @@ export default {
         name: '',
         no_phone: '',
         email: '',
-        photo: '',
-        photoFile: null
+        photo: ''
       },
+      user: {
+        name: '',
+        photo: ''
+      },
+      photoFile: null,
       imagePreview: null,
       defaultPhoto,
       apiUrl: import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
@@ -70,32 +83,35 @@ export default {
   },
   mounted() {
     this.fetchProfile()
+
+    const savedUser = localStorage.getItem('user')
+    if (savedUser) {
+      const parsedUser = JSON.parse(savedUser)
+      this.user.name = parsedUser.name || ''
+      this.user.photo = parsedUser.photo
+        ? this.apiUrl + '/storage/' + parsedUser.photo
+        : ''
+    }
   },
   methods: {
     async fetchProfile() {
       const token = localStorage.getItem('token')
-      if (!token) {
-        console.warn('Token tidak tersedia.')
-        return
-      }
+      if (!token) return
 
       try {
         const response = await axios.get(`${this.apiUrl}/api/profile`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+          headers: { Authorization: `Bearer ${token}` }
         })
+
         const data = response.data.data || response.data
 
         this.profile = {
-          ...this.profile,
           name: data.name || '',
           no_phone: data.no_phone || '',
           email: data.email || '',
-          photo: data.photo ? `${this.apiUrl}/storage/${data.photo}` : defaultPhoto
+          photo: data.photo ? `${this.apiUrl}/storage/${data.photo}` : ''
         }
 
-        // Simpan juga ke localStorage agar konsisten dengan komponen lain
         localStorage.setItem('user', JSON.stringify(data))
       } catch (error) {
         console.error('Gagal mengambil data profil:', error)
@@ -114,7 +130,7 @@ export default {
     handleFileUpload(event) {
       const file = event.target.files[0]
       if (file) {
-        this.profile.photoFile = file
+        this.photoFile = file
         this.imagePreview = URL.createObjectURL(file)
       }
     },
@@ -122,13 +138,14 @@ export default {
     async saveProfile() {
       const token = localStorage.getItem('token')
       const formData = new FormData()
+
       formData.append('_method', 'PUT')
       formData.append('name', this.profile.name)
       formData.append('no_phone', this.profile.no_phone)
       formData.append('email', this.profile.email)
 
-      if (this.profile.photoFile) {
-        formData.append('photo', this.profile.photoFile)
+      if (this.photoFile) {
+        formData.append('photo', this.photoFile)
       }
 
       try {
@@ -139,25 +156,22 @@ export default {
           }
         })
 
-        const updatedData = response.data.data
         this.isEditing = false
         this.imagePreview = null
+        this.photoFile = null
 
-        // Perbarui tampilan dan simpan ke localStorage
-        this.fetchProfile()
+        const updatedData = response.data.data
         localStorage.setItem('user', JSON.stringify(updatedData))
+        this.fetchProfile()
       } catch (error) {
         const msg = error.response?.data?.message || 'Terjadi kesalahan saat menyimpan.'
-        console.error(msg)
-        alert('Gagal menyimpan profil: ' + msg)
+        console.error('Gagal menyimpan profile:', msg)
+        alert('Gagal menyimpan profile: ' + msg)
       }
     }
   }
 }
 </script>
-
-
-
 
 <style scoped>
   .main-container {
@@ -181,15 +195,23 @@ export default {
     z-index: 10;
   }
   
-  .circle {
-    width: 24px;
-    height: 24px;
-    background-color: white;
-    border-radius: 50%;
-    margin-right: 8px;
-    cursor: pointer;
-  }
-  
+.circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.placeholder {
+  background-color: #ccc;
+}
+
   .username {
     font-weight: bold;
   }

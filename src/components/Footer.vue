@@ -11,13 +11,7 @@
   
         <!-- Navigasi -->
         <div>
-          <h2 class="font-bold text-lg mb-4">Navigasi</h2>
-          <ul class="space-y-2 text-sm">
-            <li><a href="#" class="hover:underline">Beranda</a></li>
-            <li><a href="#" class="hover:underline">Layanan</a></li>
-            <li><a href="#" class="hover:underline">Artikel</a></li>
-            <li><a href="#" class="hover:underline">Kontak</a></li>
-          </ul>
+          <h2 class="font-bold text-lg mb-4"></h2>
         </div>
   
         <!-- Kontak -->
@@ -25,11 +19,6 @@
           <h2 class="font-bold text-lg mb-4">Hubungi Kami</h2>
           <p class="text-sm">Email: info@sawitgm2.com</p>
           <p class="text-sm">Telepon: +62 812 3456 7890</p>
-          <div class="flex space-x-4 mt-4">
-            <a href="#"><img src="https://www.svgrepo.com/show/475646/facebook-color.svg" alt="Facebook" class="w-5 h-5" /></a>
-            <a href="#"><img src="https://www.svgrepo.com/show/475700/instagram-color.svg" alt="Instagram" class="w-5 h-5" /></a>
-            <a href="#"><img src="https://www.svgrepo.com/show/475689/twitter-color.svg" alt="Twitter" class="w-5 h-5" /></a>
-          </div>
         </div>
       </div>
   

@@ -1,5 +1,21 @@
 <template>
   <div class="main-container">
+
+    <header class="header flex items-center p-4 bg-white shadow">
+      <router-link to="/profil" class="inline-block mr-3">
+        <img
+          v-if="user.photo"
+          :src="user.photo"
+          alt="Foto Profil"
+          class="circle"
+        />
+        <div v-else class="circle placeholder"></div>
+      </router-link>
+      <span class="username font-semibold text-white-800">
+        {{ user.name || 'nama User' }}
+      </span>
+    </header>
+
     <!-- Content -->
     <main class="content">
       <!-- Judul dan Icon -->
@@ -97,18 +113,49 @@ import HapusBeritaAlert from '@/components/HapusBeritaAlert.vue'
 
 // API base URL
 const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
-
+const user = ref({ name: '', photo: '' })
 // State
 const articles = ref([])
 const searchQuery = ref('')
 const showAlert = ref(false)
 const deleteId = ref(null)
 
+const fetchUser = async () => {
+  const token = localStorage.getItem('token')
+  if (!token) return
+
+  try {
+    const res = await axios.get(`${API_URL}/api/profile`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    const fetched = res.data.data || res.data
+    user.value = {
+      ...fetched,
+      photo: fetched.photo ? `${API_URL}/storage/${fetched.photo}` : ''
+    }
+  } catch (err) {
+    console.error('Gagal mengambil user:', err)
+    if (err.response?.status === 401) {
+      alert('Sesi login habis, silakan login ulang.')
+      localStorage.removeItem('token')
+      window.location.href = '/login'
+    }
+  }
+}
+
 // Fetch articles dari API Laravel
 const fetchArticles = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/artikel`)
-    // Jika Backend menggunakan Resource Collection
+    const token = localStorage.getItem('token')
+    if (!token) {
+      console.warn('Token tidak ditemukan, silakan login terlebih dahulu.')
+      return
+    }
+    const response = await axios.get(`${API_URL}/api/artikel`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
     articles.value = response.data.data || response.data
   } catch (error) {
     console.error('Error fetching articles:', error)
@@ -126,6 +173,7 @@ const filteredArticles = computed(() => {
 // Lifecycle hook
 onMounted(() => {
   fetchArticles()
+  fetchUser()
 })
 
 // Navigasi ke detail

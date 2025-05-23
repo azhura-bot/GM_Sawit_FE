@@ -124,14 +124,6 @@
                 </div>
               </div>
               
-              <div class="mt-8 flex flex-col sm:flex-row gap-4">
-                <button class="btn btn-primary bg-gradient-to-r from-green-500 to-green-600 border-0 hover:from-green-600 hover:to-green-700 gap-2">
-                  <i class="fas fa-headset"></i> Konsultasi Gratis
-                </button>
-                <button class="btn bg-transparent border-green-400 text-green-400 hover:bg-green-400 hover:text-green-900 gap-2">
-                  <i class="fas fa-info-circle"></i> Pelajari Lebih Lanjut
-                </button>
-              </div>
             </div>
           </div>
         </div>
@@ -140,7 +132,7 @@
   </section>
 
     <!-- Layanan Kami Section -->
-    <section class="py-16 bg-gray-100">
+    <section class="py-16 bg-gray-100" id="layanan">
       <div class="container mx-auto px-4">
         <div class="text-center mb-12">
           <h2 class="text-3xl font-bold text-green-800">Layanan Kami</h2>
@@ -162,14 +154,6 @@
               <p class="text-gray-600 text-center text-sm">
                 Platform terpadu untuk mengelola seluruh rantai nilai kelapa sawit dari petani hingga pengguna akhir.
               </p>
-              <div class="text-center mt-4">
-                <a href="#" class="text-green-500 inline-flex items-center text-sm font-medium">
-                  Pelajari Lebih Lanjut
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                  </svg>
-                </a>
-              </div>
             </div>
           </div>
 
@@ -185,14 +169,6 @@
               <p class="text-gray-600 text-center text-sm">
                 Pantau tren harga dan dapatkan informasi pasar terbaru untuk keputusan bisnis yang lebih baik.
               </p>
-              <div class="text-center mt-4">
-                <a href="#" class="text-green-500 inline-flex items-center text-sm font-medium">
-                  Pelajari Lebih Lanjut
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                  </svg>
-                </a>
-              </div>
             </div>
           </div>
 
@@ -208,14 +184,6 @@
               <p class="text-gray-600 text-center text-sm">
                 Layanan pengangkutan dan distribusi untuk mempermudah pengiriman dari petani ke pasar.
               </p>
-              <div class="text-center mt-4">
-                <a href="#" class="text-green-500 inline-flex items-center text-sm font-medium">
-                  Pelajari Lebih Lanjut
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                  </svg>
-                </a>
-              </div>
             </div>
           </div>
 
@@ -231,14 +199,6 @@
               <p class="text-gray-600 text-center text-sm">
                 Sistem pembayaran cepat dan aman dengan pencatatan yang terintegrasi ke Sawit.
               </p>
-              <div class="text-center mt-4">
-                <a href="#" class="text-green-500 inline-flex items-center text-sm font-medium">
-                  Pelajari Lebih Lanjut
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                  </svg>
-                </a>
-              </div>
             </div>
           </div>
         </div>
@@ -257,7 +217,7 @@
       <div v-for="i in 20" :key="i" class="particle"></div>
     </div>
     
-    <div class="container mx-auto px-4 relative z-10">
+    <div class="container mx-auto px-4 relative z-10" id="tentang">
       <!-- Header dengan animasi -->
       <div data-aos="fade-down" class="text-center mb-12">
         <h2 class="text-5xl font-bold text-white mb-2 tracking-tight">Tentang Kami</h2>
@@ -364,15 +324,17 @@
               
               <div class="flex flex-wrap justify-center gap-8">
                 <div v-for="member in teamMembers" :key="member.id" 
-                     class="text-center group">
-                  <div class="avatar mb-4 online relative">
-                    <div class="w-24 h-24 rounded-full ring ring-green-400 ring-offset-2 ring-offset-white bg-gradient-to-br from-green-200 to-green-400 flex items-center justify-center text-green-800 font-bold text-2xl group-hover:from-green-300 group-hover:to-green-500 transition-all duration-300 relative overflow-hidden">
-                      {{ member.initials }}
-                      <div class="absolute inset-0 bg-green-600 opacity-0 group-hover:opacity-80 transition-opacity duration-300 flex items-center justify-center">
-                        <i class="fas fa-plus text-white text-2xl"></i>
+                    class="text-center group">
+                    <div class="avatar mb-4 online relative group">
+                      <div class="w-24 h-24 rounded-full ring ring-green-400 ring-offset-2 ring-offset-white bg-gradient-to-br from-green-200 to-green-400 flex items-center justify-center text-green-800 font-bold text-2xl relative overflow-hidden transition-all duration-300 group-hover:from-green-300 group-hover:to-green-500">
+                        <!-- Inisial di tengah -->
+                        <span class="z-10-translate-y-20 relative">{{ member.initials }}</span>
+                        <!-- Overlay hover -->
+                        <div class="absolute inset-0 bg-green-600 opacity-0 group-hover:opacity-80 transition-opacity duration-300 flex items-center justify-center">
+                          <i class="fas fa-plus text-white text-2xl"></i>
+                        </div>
                       </div>
                     </div>
-                  </div>
                   <div class="font-bold text-lg text-gray-800">{{ member.name }}</div>
                   <div class="text-green-600 font-medium">{{ member.position }}</div>
                 </div>
@@ -409,7 +371,7 @@
             </div>
             
             <!-- Contact Info -->
-            <div class="flex group hover:bg-green-50 p-4 rounded-lg transition-colors duration-300">
+            <div class="flex group hover:bg-green-50 p-4 rounded-lg transition-colors duration-300" id="kontak"> 
               <div class="flex-shrink-0 mr-4">
                 <div class="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center text-green-600 group-hover:bg-green-500 group-hover:text-white transition-colors duration-300">
                   <i class="fas fa-phone-alt text-2xl"></i>
@@ -420,25 +382,12 @@
                 <p class="text-gray-700">Email: info@sawit.id</p>
                 <p class="text-gray-700">Telepon: +62 21 5456 7890</p>
                 <div class="flex gap-4 mt-4">
-                  <a href="#" class="btn btn-circle btn-sm bg-green-100 hover:bg-green-500 border-none text-green-600 hover:text-white">
-                    <i class="fab fa-facebook-f"></i>
-                  </a>
-                  <a href="#" class="btn btn-circle btn-sm bg-green-100 hover:bg-green-500 border-none text-green-600 hover:text-white">
-                    <i class="fab fa-instagram"></i>
-                  </a>
-                  <a href="#" class="btn btn-circle btn-sm bg-green-100 hover:bg-green-500 border-none text-green-600 hover:text-white">
-                    <i class="fab fa-twitter"></i>
-                  </a>
                 </div>
               </div>
             </div>
             
             <!-- Consultation Button -->
             <div class="flex items-center justify-center md:justify-end">
-              <button class="btn btn-lg bg-green-600 hover:bg-green-700 border-none text-white gap-2 shadow-lg hover:shadow-green-500/30 transition-all duration-300">
-                <i class="fas fa-calendar-check"></i>
-                Jadwalkan Konsultasi
-              </button>
             </div>
           </div>
         </div>
@@ -453,7 +402,8 @@ export default {
   name: 'TentangKamiPage',
   data() {
     return {
-      imageUrl: 'https://placehold.co/600x400/006400/white',
+      heroBackground: '/sawit.jpeg',
+      imageUrl: '/brt.png',
       features: [
         {
           icon: 'fas fa-check-circle',

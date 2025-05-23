@@ -1,6 +1,7 @@
-<!-- Login.vue -->
 <template>
-  <div class="w-full h-screen bg-cover bg-center relative flex items-center justify-center" style="background-image: url('/sawit1.png')">
+  <div class="w-full h-screen bg-cover bg-center relative flex items-center justify-center" style="background-image: url('/login.jpeg')">
+    <!-- Gradient overlay for better text readability -->
+    <div class="absolute inset-0 bg-gradient-to-b from-green-950/70 to-green-900/50"></div>
     <div class="relative z-10 bg-white py-12 px-8 rounded-3xl w-full max-w-md shadow-lg">
       <h1 class="text-4xl font-bold text-center mb-6 text-[#134611]">Login</h1>
       <form @submit.prevent="submitLogin" class="space-y-4">
@@ -25,10 +26,20 @@
             <a href="#" class="text-blue-600 text-sm hover:underline">Forgot Password?</a>
           </div>
         </div>
-        <button type="submit" class="px-12 py-2 bg-[#134611] text-white rounded-[24px] font-semibold hover:bg-[#2f6d0f] transition mx-auto block">
+        <!-- Login Button -->
+        <button type="submit" class=" w-full px-12 py-2 bg-[#134611] text-white rounded-[24px] font-semibold hover:bg-[#2f6d0f] transition mx-auto block">
           Login
         </button>
       </form>
+      <!-- Additional Buttons -->
+      <div class="mt-6 space-y-4">
+        <!-- Register Button -->
+        <router-link to="/register">
+          <button class="w-full px-12 py-2 bg-green-600 text-white rounded-[24px] font-semibold hover:bg-green-700 transition">
+            Register
+          </button>
+        </router-link>
+      </div>
     </div>
   </div>
 </template>
@@ -44,7 +55,7 @@ const router = useRouter()
 
 const submitLogin = async () => {
   try {
-    const response = await axios.post('http://127.0.0.1:8000/api/login', {
+    const response = await axios.post('https://api.ecopalm.ydns.eu/api/login', {
       email: email.value,
       password: password.value,
     })
@@ -57,21 +68,20 @@ const submitLogin = async () => {
 
     alert('Login berhasil!')
 
-    if (user.role === 'manager') {
-      router.push('/dashboard')
-    } else if (user.role === 'pengepul') {
-      router.push('/home-pengepul')
-    } else if (user.role === 'petani') {
-      router.push('/home-petani')
-    } else {
-      alert('Role tidak dikenali.')
-    }
-
+    if (user.role === 'manager') router.push('/dashboard')
+    else if (user.role === 'pengepul') router.push('/home-pengepul')
+    else if (user.role === 'petani') router.push('/home-petani')
+    else alert('Role tidak dikenali.')
   } catch (error) {
+    console.error('Login error:', error)
   }
 }
-</script>
 
+const loginWithGoogle = () => {
+  window.location.href = 'http://localhost:8000/api/google/redirect'
+}
+
+</script>
 
 <style scoped>
 form {
@@ -79,8 +89,6 @@ form {
   flex-direction: column;
   gap: 15px;
 }
-nav {
-  position: relative;
-  z-index: 20;
-}
+
+/* Keep nav unaffected */
 </style>

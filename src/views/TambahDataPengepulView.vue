@@ -137,7 +137,7 @@ const form = ref({
 
 const submitForm = async () => {
   try {
-    const response = await axios.post('http://127.0.0.1:8000/api/pengepul', {
+    const response = await axios.post('https://api.ecopalm.ydns.eu/api/pengepul', {
       name: form.value.nama,
       // created_at: form.value.tanggal, // Kalau tidak dipakai di backend, abaikan saja
       email: form.value.email,

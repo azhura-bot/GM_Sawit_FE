@@ -1,9 +1,19 @@
 <template>
   <div class="main-container">
     <!-- Header -->
-    <header class="header">
-      <router-link to="/profile-pengepul" class="circle"></router-link>
-      <span class="username">{{ user?.name || 'nama User' }}</span>
+    <header class="header flex items-center p-4 bg-white shadow">
+      <router-link to="/profile" class="inline-block mr-3">
+        <img
+          v-if="user.photo"
+          :src="user.photo"
+          alt="Foto Profil"
+          class="circle"
+        />
+        <div v-else class="circle placeholder"></div>
+      </router-link>
+      <span class="username font-semibold text-white-800">
+        {{ user.name || 'nama User' }}
+      </span>
     </header>
 
     <!-- Main Content -->
@@ -39,7 +49,10 @@ export default {
     return {
       apiUrl: import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000',
       artikel: null,
-      user: null,
+      user: {
+        name: '',
+        photo: ''
+      },
     }
   },
 

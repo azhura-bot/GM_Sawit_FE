@@ -102,7 +102,7 @@ const submitForm = async () => {
   }
 
   try {
-    const { data } = await axios.post('http://127.0.0.1:8000/api/artikel', formData, {
+    const { data } = await axios.post('https://api.ecopalm.ydns.eu/api/artikel', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
         ...getAuthHeaders() // Menambahkan Authorization header

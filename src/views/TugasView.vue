@@ -1,13 +1,7 @@
 <template>
   <div class="flex flex-col md:flex-row h-full min-h-screen bg-gray-50">
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet/dist/leaflet.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css"
-    />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
 
     <!-- Kiri: Konten -->
     <div class="flex-1 p-6 space-y-6">
@@ -27,23 +21,20 @@
         </div>
       </div>
 
-      <!-- Filter Badge -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="bg-pink-200 text-pink-900 px-4 py-2 rounded-full font-semibold text-center w-full">
-          Task yang belum dikerjakan <span class="ml-2 bg-white px-2 py-1 rounded-full">{{ stats.pending }}</span>
-        </div>
-        <div class="bg-lime-100 text-green-900 px-4 py-2 rounded-full font-semibold text-center w-full">
-          Task yang sudah dikerjakan <span class="ml-2 bg-white px-2 py-1 rounded-full">{{ stats.completed }}</span>
-        </div>
-        <div class="bg-blue-100 text-blue-900 px-4 py-2 rounded-full font-semibold text-center w-full">
-          Task yang sedang dikerjakan <span class="ml-2 bg-white px-2 py-1 rounded-full">{{ stats.ongoing }}</span>
-        </div>
+      <!-- Filter Status -->
+      <div class="flex justify-end">
+        <select v-model="selectedStatus" class="order border-gray-300 rounded p-2 text-white bg-[#134611]">
+          <option value="">Semua Status</option>
+          <option value="pending">Menunggu</option>
+          <option value="in_progress">Sedang Dikerjakan</option>
+          <option value="completed">Selesai</option>
+        </select>
       </div>
 
       <!-- List Tugas -->
       <div class="space-y-4">
         <div
-          v-for="task in tasks"
+          v-for="task in filteredTasks"
           :key="task.id"
           class="bg-white rounded-2xl shadow-md p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center"
         >
@@ -51,6 +42,9 @@
             <h3 class="font-bold text-green-900">{{ task.pengepul.name }}</h3>
             <div class="flex">
               <span class="font-semibold text-green-900 w-32">{{ task.janji_temu.nama_petani }}</span>
+            </div>
+            <div class="text-sm text-gray-500">
+              {{ formatDate(task.janji_temu.tanggal) }} {{ formatTime(task.janji_temu.tanggal) }}
             </div>
           </div>
           <span
@@ -63,7 +57,7 @@
       </div>
     </div>
 
-    <!-- Kanan: Map -->
+    <!-- Kanan: Map (tanpa UI tambahan) -->
     <div class="w-full md:w-1/3 p-4 sticky top-0 h-[100vh]">
       <div id="map" class="w-full h-full rounded-2xl overflow-hidden shadow-md"></div>
     </div>
@@ -75,110 +69,145 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 import L from 'leaflet';
 import 'leaflet-routing-machine';
-import { ref, onMounted, nextTick, computed } from 'vue';
+import { ref, onMounted, nextTick, computed, watch } from 'vue';
 import axios from 'axios';
 
 const tasks = ref([]);
+const selectedStatus = ref('');
+let mapInstance = null;
+let markerLayerGroup = null;
+let routingControls = [];
 
 const stats = computed(() => {
   const total = tasks.value.length;
   const pending = tasks.value.filter(t => t.status === 'pending').length;
-  const accepted = tasks.value.filter(t => t.status === 'accepted').length;
   const inProgress = tasks.value.filter(t => t.status === 'in_progress').length;
   const completed = tasks.value.filter(t => t.status === 'completed').length;
-  return {
-    total,
-    pending,
-    ongoing: inProgress,
-    completed,
-    accepted
-  };
+  return { total, pending, ongoing: inProgress, completed };
 });
 
-const statusLabel = status => {
-  switch (status) {
-    case 'pending': return 'Menunggu';
-    case 'accepted': return 'Diterima';
-    case 'rejected': return 'Ditolak';
-    case 'in_progress': return 'Sedang dikerjakan';
-    case 'completed': return 'Selesai';
-    default: return 'Status tidak diketahui';
-  }
-};
+const filteredTasks = computed(() => {
+  const list = selectedStatus.value
+    ? tasks.value.filter(t => t.status === selectedStatus.value)
+    : tasks.value;
+  return [...list].sort((a, b) => {
+    if (a.status === 'pending' && b.status !== 'pending') return -1;
+    if (b.status === 'pending' && a.status !== 'pending') return 1;
+    return 0;
+  });
+});
 
-const badgeClass = status => {
-  return {
-    'bg-blue-100 text-blue-900': status === 'pending',
-    'bg-lime-100 text-green-900': status === 'accepted',
-    'bg-red-100 text-red-900': status === 'rejected',
-    'bg-blue-300 text-blue-900': status === 'in_progress',
-    'bg-yellow-100 text-yellow-900': status === 'completed'
-  };
-};
+  const formatDate = (datetime) => {
+      if (!datetime) return ''
+      try {
+        return new Date(datetime).toLocaleDateString('id-ID', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        })
+      } catch {
+        return ''
+      }
+    }
 
-// Code menampilkan map dan markernya 
+    // Format jam
+    const formatTime = (datetime) => {
+      if (!datetime) return ''
+      const str = datetime.replace('T', ' ')
+      const parts = str.split(' ')
+      if (parts.length < 2) return ''
+      const timePart = parts[1]
+      const [hour, minute] = timePart.split(':')
+      return `${hour.padStart(2,'0')}:${minute.padStart(2,'0')}`
+    }
+
+const statusLabel = status => ({ 'pending':'Menunggu','accepted':'Diterima','rejected':'Ditolak','in_progress':'Sedang dikerjakan','completed':'Selesai' }[status]||'Unknown');
+const badgeClass = status => ({
+  'bg-blue-100 text-blue-900': status==='pending',
+  'bg-lime-100 text-green-900': status==='accepted',
+  'bg-red-100 text-red-900': status==='rejected',
+  'bg-blue-300 text-blue-900': status==='in_progress',
+  'bg-yellow-100 text-yellow-900': status==='completed'
+});
+
 const getMarkerIcon = status => {
-  let iconUrl = '';
-  switch (status) {
-    case 'pending': iconUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png'; break;
-    case 'accepted': iconUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png'; break;
-    case 'rejected': iconUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png'; break;
-    case 'in_progress': iconUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-violet.png'; break;
-    case 'completed': iconUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-yellow.png'; break;
-    default: iconUrl = 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png';
-  }
-  return L.icon({ iconUrl, iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png', shadowSize: [41, 41] });
+  const urls = {
+    pending: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+    accepted:'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
+    rejected:'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+    in_progress:'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-violet.png',
+    completed:'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-yellow.png'
+  };
+  return L.icon({ iconUrl: urls[status]||L.Icon.Default.prototype.options.iconUrl, iconSize:[25,41],iconAnchor:[12,41],popupAnchor:[1,-34],shadowUrl:L.Icon.Default.prototype.options.shadowUrl,shadowSize:[41,41] });
 };
 
-const initMap = () => {
-  const map = L.map('map').setView([-6.5985, 106.7931], 12);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors' }).addTo(map);
+const clearMap = () => {
+  if (markerLayerGroup) markerLayerGroup.clearLayers();
+  routingControls.forEach(ctrl => ctrl.remove());
+  routingControls = [];
+};
 
-  tasks.value.forEach(task => {
-    const latP = parseFloat(task.janji_temu.latitude);
-    const lngP = parseFloat(task.janji_temu.longitude);
-    const latC = parseFloat(task.pul_latitude);
-    const lngC = parseFloat(task.pul_longitude);
+const renderMarkers = () => {
+  clearMap();
+  filteredTasks.value.forEach(task => {
+    const latP = +task.janji_temu.latitude;
+    const lngP = +task.janji_temu.longitude;
+    const latC = +task.pul_latitude;
+    const lngC = +task.pul_longitude;
 
-    // Marker petani
-    L.marker([latP, lngP], { icon: getMarkerIcon(task.status) }).addTo(map)
-      .bindPopup(`<strong>Petani:</strong> ${task.janji_temu.nama_petani}`);
+    // Marker Petani (tampilkan selalu ketika filter completed)
+    if (task.status === 'completed' || task.status !== 'completed') {
+      if (!markerLayerGroup) markerLayerGroup = L.layerGroup().addTo(mapInstance);
+      L.marker([latP, lngP], { icon: getMarkerIcon(task.status) })
+        .bindPopup(`<strong>Task:</strong> ${task.nama_task}<br><strong>Petani:</strong> ${task.janji_temu.nama_petani}<br><strong>Waktu:</strong> ${formatDate(task.janji_temu.tanggal)} ${formatTime(task.janji_temu.tanggal)}`)
+        .addTo(markerLayerGroup);
+    }
 
-    // Marker pengepul
-    if (!isNaN(latC) && !isNaN(lngC)) {
-      L.marker([latC, lngC], { icon: getMarkerIcon('rejected') }) // gunakan warna merah untuk pengepul
-        .addTo(map)
-        .bindPopup(`<strong>Pengepul:</strong> ${task.pengepul.name}`);
+    // Marker Pengepul: hanya ketika bukan completed
+    if (task.status !== 'completed' && !isNaN(latC) && !isNaN(lngC)) {
+      L.marker([latC, lngC], { icon: getMarkerIcon('rejected') })
+        .bindPopup(`<strong>Pengepul:</strong> ${task.pengepul.name}`)
+        .addTo(markerLayerGroup);
 
-      // Routing jika in_progress
+      // Routing hanya untuk in_progress
       if (task.status === 'in_progress') {
-        L.Routing.control({
+        const ctrl = L.Routing.control({
           waypoints: [L.latLng(latC, lngC), L.latLng(latP, lngP)],
-          lineOptions: { styles: [{ color: 'green', weight: 4, opacity: 0.7 }] },
+          lineOptions: { styles: [{ weight: 4, opacity: 0.7 }] },
+          show: false,
+          showAlternatives: false,
           draggableWaypoints: false,
           addWaypoints: false,
+          routeWhileDragging: false,
           createMarker: () => null
-        }).addTo(map);
+        }).addTo(mapInstance);
+        routingControls.push(ctrl);
       }
     }
   });
 };
 
+const initMap = () => {
+  mapInstance = L.map('map').setView([-6.5985, 106.7931], 12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors' })
+    .addTo(mapInstance);
+  renderMarkers();
+};
+
 onMounted(async () => {
   try {
-    const token = localStorage.getItem('token');
-    const response = await axios.get('http://localhost:8000/api/task', { headers: { Authorization: `Bearer ${token}` } });
-    if (response.data.success) {
-      tasks.value = response.data.data;
+    const res = await axios.get('https://api.ecopalm.ydns.eu/api/task', { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+    if (res.data.success) {
+      tasks.value = res.data.data;
       await nextTick();
       initMap();
-    } else {
-      console.error('Data tidak valid:', response.data);
     }
-  } catch (err) {
-    console.error('Gagal memuat data:', err);
+  } catch (e) {
+    console.error(e);
   }
 });
+
+watch(selectedStatus, () => renderMarkers());
 </script>
 
 <style scoped>

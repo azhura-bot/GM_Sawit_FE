@@ -30,7 +30,6 @@ const navbarRoutes = [
   '/',
   '/login',
   '/register',
-  // '/dashboard',
   '/landingpage2',
 ]
 
@@ -48,6 +47,7 @@ const navbarManajerRoutes = [
   '/data-tugas',
   '/tambah-berita',
   '/tambah-pengepul',
+  '/data-profile',
 ]
 
 // Footer hanya muncul di halaman berikut
@@ -63,3 +63,9 @@ const showNavbarManajer = computed(() => {
 })
 const showFooter = computed(() => showFooterRoutes.includes(route.path))
 </script>
+
+<style>
+html {
+  scroll-behavior: smooth;
+}
+</style>

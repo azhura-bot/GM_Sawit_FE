@@ -1,8 +1,25 @@
 <template>
   <div class="main-container">
-    <header class="header">
-      <div class="circle"></div>
-      <span class="username">{{ nama }}</span>
+    <!-- Loading Overlay -->
+    <div v-if="isLoading" class="loading-overlay">
+      <div class="spinner"></div>
+    </div>
+
+    <header class="header flex items-center p-4 bg-white shadow">
+      <router-link to="/profile" class="inline-block mr-3">
+        <img
+          v-if="user.photo"
+          :src="getProfilePhotoUrl(user.photo)"
+          alt="Foto Profil"
+          class="circle"
+          @error="photoError = true"
+          v-show="!photoError"
+        />
+        <div v-else-if="photoError || !user.photo" class="circle placeholder"></div>
+      </router-link>
+      <span class="username font-semibold text-white-800">
+        {{ user.name || 'nama User' }}
+      </span>
     </header>
 
     <main class="content">
@@ -48,12 +65,40 @@
           <div class="form-group">
             <label>Alamat</label>
             <input type="text" v-model="alamat" readonly class="text-[#134611]" />
-            <button type="button" class="btn map-picker" @click="openMapModal">📍 Pilih di Peta</button>
+            <button type="button" class="btn map-picker" @click="openMapModal" :disabled="isLoading">📍 Pilih di Peta</button>
+          </div>
+          <div
+            v-if="errorMessage"
+            class="flex items-start bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-md mb-6"
+            role="alert"
+          >
+            <!-- Ikon peringatan -->
+            <svg class="w-5 h-5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd"
+                d="M18 10c0 4.418-3.582 8-8 8s-8-3.582-8-8 3.582-8 
+                  8-8 8 3.582 8 8zm-8.707 2a.75.75 0 011.414 0v.75a.75.75 
+                  0 11-1.414 0v-.75zm.707-6.25a.75.75 0 00-.75.75v4.5a.75.75 
+                  0 001.5 0v-4.5a.75.75 0 00-.75-.75z"
+                clip-rule="evenodd"
+              />
+            </svg>
+
+            <!-- Pesan error -->
+            <span class="flex-1 text-sm">
+              {{ errorMessage }}
+            </span>
           </div>
 
           <div class="button-group">
-            <button type="button" class="btn cancel" @click="cancelForm">Batal</button>
-            <button type="submit" class="btn submit">Kirim</button>
+            <button type="button" class="btn cancel" @click="cancelForm" :disabled="isLoading">Batal</button>
+            <button
+              type="submit"
+              class="btn submit"
+              :disabled="isLoading"
+            >
+              <span v-if="!isLoading">Kirim</span>
+              <span v-else>Memproses...</span>
+            </button>
           </div>
         </form>
       </section>
@@ -89,27 +134,36 @@ export default {
   components: { Datepicker },
   data() {
     return {
+      isLoading: false,
       isModalOpen: false,
       isMapOpen: false,
       nama: "",
       email: "",
       no_phone: "",
-      tanggal: null, // Date object or string
-      jam: "",     // string 'HH:mm'
+      tanggal: null,
+      jam: "",
       alamat: "",
       latitude: null,
       longitude: null,
       map: null,
       marker: null,
+      errorMessage: "",
+      user: {},
+      photoError: false,
     }
   },
   created() {
-    const user = JSON.parse(localStorage.getItem("user")) || {}
-    this.nama = user.name || ""
-    this.email = user.email || ""
-    this.no_phone = user.no_phone || ""
+    const storedUser = JSON.parse(localStorage.getItem("user")) || {}
+    this.user = storedUser
+    this.nama = storedUser.name || ""
+    this.email = storedUser.email || ""
+    this.no_phone = storedUser.no_phone || ""
   },
   methods: {
+    getProfilePhotoUrl(photoPath) {
+      if (photoPath.startsWith('http')) return photoPath
+      return `https://api.ecopalm.ydns.eu/storage/${photoPath}`
+    },
     openMapModal() {
       this.isMapOpen = true
       this.$nextTick(this.initMap)
@@ -121,7 +175,9 @@ export default {
       const defaultPos = [-6.595, 106.816]
       if (this.map) this.map.remove()
       this.map = L.map("map").setView(defaultPos, 13)
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: '&copy; OpenStreetMap contributors' }).addTo(this.map)
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(this.map)
       this.marker = L.marker(defaultPos, { draggable: true }).addTo(this.map)
       this.map.on("click", e => this.setMarker(e.latlng))
       this.marker.on("dragend", e => this.setMarker(e.target.getLatLng()))
@@ -139,22 +195,35 @@ export default {
         .catch(() => alert("Gagal mendapatkan alamat"))
     },
     handleSubmit() {
-      const token = localStorage.getItem("token")
-      if (!token) return alert("Anda belum login atau token tidak ditemukan")
-      if (!this.tanggal || !this.jam || !this.alamat || !this.no_phone) {
-        return alert("Harap lengkapi semua data terlebih dahulu.")
+      if (this.isLoading) return
+      this.errorMessage = ""
+
+      // Validasi tanggal: harus setelah hari ini
+      const today = new Date()
+      today.setHours(0,0,0,0)
+      const sel = this.tanggal instanceof Date
+        ? new Date(this.tanggal.getFullYear(), this.tanggal.getMonth(), this.tanggal.getDate())
+        : (()=>{
+            const [y,m,d] = this.tanggal.split('-').map(Number)
+            return new Date(y,m-1,d)
+          })()
+      if (!this.tanggal || sel <= today) {
+        this.errorMessage = "Tanggal pengambilan harus setelah hari ini."
+        return
       }
 
-      // Format tanggalWaktu: "YYYY-MM-DD HH:mm:00"
-      let year, month, day
-      if (this.tanggal instanceof Date) {
-        year = this.tanggal.getFullYear()
-        month = String(this.tanggal.getMonth() + 1).padStart(2, '0')
-        day = String(this.tanggal.getDate()).padStart(2, '0')
-      } else {
-        [year, month, day] = this.tanggal.split('-')
+      if (!this.jam || !this.alamat || !this.no_phone) {
+        this.errorMessage = "Harap lengkapi semua data terlebih dahulu."
+        return
       }
-      const [hour, minute] = this.jam.split(':')
+
+      this.isLoading = true
+
+      // Format datetime
+      const year = sel.getFullYear()
+      const month = String(sel.getMonth()+1).padStart(2,'0')
+      const day = String(sel.getDate()).padStart(2,'0')
+      const [hour,minute] = this.jam.split(':')
       const tanggalWaktu = `${year}-${month}-${day} ${hour.padStart(2,'0')}:${minute.padStart(2,'0')}:00`
 
       const payload = {
@@ -168,27 +237,28 @@ export default {
         longitude: this.longitude,
       }
 
-      fetch("http://127.0.0.1:8000/api/janji-temu", {
+      fetch("https://api.ecopalm.ydns.eu/api/janji-temu", {
         method: "POST",
-        mode: "cors",
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
+          "Authorization": `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify(payload),
       })
       .then(async res => {
         const data = await res.json()
         if (!res.ok) {
-          const msg = Object.values(data.errors || {}).flat()[0] || data.message || 'Gagal mengirim data'
-          return alert(msg)
+          this.errorMessage = Object.values(data.errors || {}).flat()[0] || data.message || 'Gagal mengirim data'
         }
         this.isModalOpen = true
       })
       .catch(err => {
         console.error(err)
-        alert("Terjadi kesalahan saat mengirim data")
+        this.errorMessage = "Terjadi kesalahan saat mengirim data"
+      })
+      .finally(() => {
+        this.isLoading = false
       })
     },
     closeModal() {
@@ -199,12 +269,34 @@ export default {
       this.latitude = null
       this.longitude = null
     },
-    cancelForm() { this.$router.go(-1) }
+    cancelForm() {
+      this.$router.go(-1)
+    }
   }
 }
 </script>
 
 <style scoped>
+
+/* Loading overlay & spinner */
+.loading-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(255,255,255,0.7);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 200;
+}
+.spinner {
+  width: 48px; height: 48px;
+  border: 6px solid #ccc;
+  border-top-color: #4b830d;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 /* Styling sebelumnya tetap */
 .main-container {
   background-color: #e6f7cf;

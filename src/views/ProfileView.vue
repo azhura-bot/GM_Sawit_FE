@@ -1,54 +1,166 @@
 <template>
-    <div class="bg-white min-h-screen px-4 py-6">
-      <div class="bg-white rounded-3xl shadow-lg p-6 sm:p-8 w-full max-w-5xl mx-auto">
-        <h2 class="text-3xl font-bold text-green-900 mb-8">Data Personal</h2>
-  
+  <div class="bg-lime-50 min-h-screen p-4 md:p-6">
+    <div class="bg-white rounded-3xl shadow-lg p-6 sm:p-8 w-full max-w-5xl mx-auto">
+      <h2 class="text-3xl font-bold text-green-900 mb-8">Edit Profil</h2>
+
+      <form @submit.prevent="submitForm" enctype="multipart/form-data">
+        <!-- Foto Profil -->
+        <div class="mb-6">
+          <label class="block text-green-900 font-bold mb-1">Foto Profil</label>
+          <div class="flex items-center gap-4">
+            <img
+              v-if="previewPhoto || profilePhotoUrl"
+              :src="previewPhoto || profilePhotoUrl"
+              alt="Preview"
+              class="w-24 h-24 rounded-full object-cover border"
+            />
+            <input type="file" @change="handlePhotoUpload" accept="image/*" />
+          </div>
+        </div>
+
         <!-- Nama Lengkap -->
         <div class="mb-6">
           <label class="block text-green-900 font-bold mb-1">Nama Lengkap</label>
-          <input type="text" class="w-full bg-white text-green-900 px-4 py-3 rounded-full border border-green-200 font-bold" value="Jackson Miguel Wong Ada" disabled />
+          <input
+            v-model="form.name"
+            type="text"
+            class="w-full bg-white text-green-900 px-4 py-3 rounded-full border border-green-200 font-bold"
+          />
         </div>
-  
+
         <!-- Email -->
         <div class="mb-6">
           <label class="block text-green-900 font-bold mb-1">Email</label>
-          <input type="email" class="w-full bg-white text-green-900 px-4 py-3 rounded-full border border-green-200 font-bold" value="example@gmail.com" disabled />
+          <input
+            v-model="form.email"
+            type="email"
+            class="w-full bg-white text-green-900 px-4 py-3 rounded-full border border-green-200 font-bold"
+          />
         </div>
-  
+
         <!-- Nomor Telepon -->
-        <div class="mb-6">
-          <label class="block text-green-900 font-bold mb-1">Nomor Telephone</label>
-          <input type="text" class="w-full bg-white text-green-900 px-4 py-3 rounded-full border border-green-200 font-bold" value="0888-888-999" disabled />
-        </div>
-  
-        <!-- Password Saat Ini -->
         <div class="mb-8">
-          <label class="block text-green-900 font-bold mb-1">Password Saat Ini</label>
-          <div class="relative">
-            <input type="password" class="w-full bg-white text-green-900 px-4 py-3 rounded-full border border-green-200 font-bold pr-12" value="***************" disabled />
-            <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-green-900">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
-            </span>
-          </div>
+          <label class="block text-green-900 font-bold mb-1">Nomor Telepon</label>
+          <input
+            v-model="form.no_phone"
+            type="text"
+            class="w-full bg-white text-green-900 px-4 py-3 rounded-full border border-green-200 font-bold"
+          />
         </div>
-  
+
         <!-- Tombol -->
         <div class="flex flex-wrap justify-end gap-4">
-          <button class="bg-sky-500 hover:bg-sky-600 text-white px-6 py-2 rounded-full font-semibold shadow transition">Edit</button>
-          <button class="bg-green-700 hover:bg-green-800 text-white px-6 py-2 rounded-full font-semibold shadow transition">Terapkan</button>
+          <button
+            type="submit"
+            class="bg-green-700 hover:bg-green-800 text-white px-6 py-2 rounded-full font-semibold shadow transition"
+          >
+            Simpan
+          </button>
         </div>
+      </form>
+    </div>
+
+    <!-- Modal -->
+    <div v-if="showModal" class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-40">
+      <div class="bg-white p-6 rounded-xl shadow-xl max-w-sm w-full text-center">
+        <h3 class="text-xl font-bold text-green-900 mb-4">Notifikasi</h3>
+        <p class="text-green-800 mb-6">{{ modalMessage }}</p>
+        <button
+          @click="showModal = false"
+          class="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-full font-semibold transition"
+        >
+          Tutup
+        </button>
       </div>
     </div>
-  </template>
-  
+  </div>
+</template>
 
 <script setup>
-// Jika ada logika/script, bisa ditulis di sini
-</script>
+import { ref, onMounted, computed } from 'vue'
+import axios from 'axios'
 
-<style scoped>
-/* Jika mau styling tambahan */
-</style>
+const apiUrl = import.meta.env.VITE_API_URL
+
+const user = ref({})
+const form = ref({
+  name: '',
+  email: '',
+  no_phone: ''
+})
+const previewPhoto = ref(null)
+const photoFile = ref(null)
+
+// Modal state
+const showModal = ref(false)
+const modalMessage = ref('')
+
+// computed untuk membentuk URL lengkap foto profil jika user.photo ada
+const profilePhotoUrl = computed(() => {
+  if (user.value.photo) {
+    if (user.value.photo.startsWith('http') || user.value.photo.startsWith('data:')) {
+      return user.value.photo
+    }
+    return `${apiUrl}/storage/${user.value.photo}`
+  }
+  return null
+})
+
+const fetchProfile = async () => {
+  try {
+    const res = await axios.get(`${apiUrl}/api/profile`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    })
+    user.value = res.data.data
+    form.value.name = user.value.name || ''
+    form.value.email = user.value.email || ''
+    form.value.no_phone = user.value.no_phone || ''
+    previewPhoto.value = null
+  } catch (error) {
+    console.error('Gagal mengambil data profil:', error)
+  }
+}
+
+const handlePhotoUpload = (event) => {
+  const file = event.target.files[0]
+  if (file) {
+    photoFile.value = file
+    previewPhoto.value = URL.createObjectURL(file)
+  }
+}
+
+const submitForm = async () => {
+  try {
+    const formData = new FormData()
+    formData.append('_method', 'PUT')
+    formData.append('name', form.value.name)
+    formData.append('email', form.value.email)
+    formData.append('no_phone', form.value.no_phone)
+    if (photoFile.value) {
+      formData.append('photo', photoFile.value)
+    }
+
+    const response = await axios.post(`${apiUrl}/api/profile`, formData, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+
+    user.value = response.data.data
+    previewPhoto.value = null
+    photoFile.value = null
+
+    modalMessage.value = 'Profil berhasil diperbarui.'
+    showModal.value = true
+  } catch (error) {
+    console.error('Gagal menyimpan profil:', error)
+    modalMessage.value = 'Gagal memperbarui profil.'
+    showModal.value = true
+  }
+}
+
+onMounted(() => {
+  fetchProfile()
+})
+</script>

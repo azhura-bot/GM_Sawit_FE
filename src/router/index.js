@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 // Public
-import LandingPage from '@/views/LandingPage/LandingPage.vue'
 import Login from '@/views/LandingPage/Login.vue'
 import Register from '@/views/LandingPage/Register.vue'
 
@@ -16,6 +15,7 @@ import DataStatistikView from '@/views/DataStatistikView.vue'
 import DataJadwalView from '@/views/DataJadwalView.vue'
 import DataTransaksiView from '@/views/DataTransaksiView.vue'
 import DataTugas from '@/views/DataTugas.vue'
+import ProfileView from '@/views/ProfileView.vue'
 
 // Pengepul
 import HomePengepulView from '@/views/pengepul/HomePengepulView.vue'
@@ -37,15 +37,9 @@ import PengajuanJadwal from '@/views/petani/PengajuanJadwalView.vue'
 
 
 const routes = [
-  { path: '/', name: 'landing', component: LandingPage },
+  { path: '/', name: 'landingpage2', component: LandingPage2 },
   { path: '/login', name: 'login', component: Login },
   { path: '/register', name: 'register', component: Register },
-
-  {
-    path: '/landingpage2',
-    name: 'LandingPage2',
-    component: LandingPage2,
-  },
 
   // Manager
   { path: '/dashboard', name: 'dashboard', component: TugasView, meta: { requiresAuth: true, role: 'manager' }},
@@ -58,6 +52,7 @@ const routes = [
   { path: '/data-jadwal', name: 'DataJadwal', component: DataJadwalView, meta: { requiresAuth: true, role: 'manager' }},
   { path: '/data-transaksi', name: 'DataTransaksi', component: DataTransaksiView, meta: { requiresAuth: true, role: 'manager' }},
   { path: '/data-tugas', name: 'DataTugas', component: DataTugas, meta: { requiresAuth: true, role: 'manager' }},
+  { path: '/data-profile', name: 'ProfileView', component: ProfileView, meta: { requiresAuth: true, role: 'manager' }},
 
   // Pengepul
   { path: '/home-pengepul', name: 'HomePengepul', component: HomePengepulView, meta: { requiresAuth: true, role: 'pengepul' }},
@@ -67,8 +62,8 @@ const routes = [
   { path: '/detail-artikel/:id', name: 'DetailArtikel', component: DetailArtikelPengepulView, props: true, meta: { requiresAuth: true, role: ['pengepul', 'petani'] }},
   { path: '/harga-pengepul', name: 'HargaPengepul', component: HargaPengepulView, meta: { requiresAuth: true, role: 'pengepul' }},
   { path: '/laporan-pengepul', name: 'LaporanPengepul', component: LaporanPengepulView, meta: { requiresAuth: true, role: 'pengepul' }},
-  { path: '/profile-pengepul', name: 'ProfilePengepul', component: ProfilPengepulView, meta: { requiresAuth: true, role: 'pengepul' }},
-  { path: '/edit-profile-pengepul', name: 'EditProfilePengepul', component: EditProfilePengepulView, meta: { requiresAuth: true, role: 'pengepul' }},
+  { path: '/profile', name: 'ProfilePengepul', component: ProfilPengepulView, meta: { requiresAuth: true, role: ['pengepul', 'petani'] }},
+  { path: '/edit-profile', name: 'EditProfilePengepul', component: EditProfilePengepulView, meta: { requiresAuth: true, role: ['pengepul', 'petani'] }},
   { path: '/harga', name: 'DaftarHarga', component: DaftarHarga, meta: { requiresAuth: true, role: ['pengepul', 'petani'] }},
 
   // Petani

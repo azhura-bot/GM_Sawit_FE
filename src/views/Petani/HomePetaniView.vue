@@ -1,9 +1,17 @@
 <template>
   <div class="main-container">
     <!-- Header -->
-    <header class="header">
-      <div class="circle"></div>
-      <span class="username">{{ user?.name || 'nama User' }}</span>
+    <header class="header flex items-center p-4 bg-white shadow">
+      <router-link to="/profile" class="inline-block mr-3">
+        <img
+          :src="user.photo || defaultPhoto"
+          alt="Foto Profil"
+          class="circle"
+        />
+      </router-link>
+      <span class="username font-semibold text-white-800">
+        {{ user.name || 'nama User' }}
+      </span>
     </header>
 
     <!-- Content -->
@@ -75,7 +83,6 @@
           :series="series"
           class="chart-image"
         ></apexchart>
-
       </section>
     </main>
   </div>
@@ -84,43 +91,62 @@
 <script>
 import ApexCharts from 'vue3-apexcharts'
 import axios from 'axios'
+import defaultPhoto from '@/assets/profile.png'
 
 export default {
   name: 'MainPage',
   components: { apexchart: ApexCharts },
   data() {
     return {
-      apiUrl: import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000',
-      user: null,
+      apiUrl: import.meta.env.VITE_API_URL || 'https://api.ecopalm.ydns.eu',
+      user: {
+        name: '',
+        photo: ''
+      },
+      defaultPhoto,
       articles: [],
       series: [],
       chartOptions: {
-      chart: { id: 'harga-sawit-chart' },
-      xaxis: { categories: [] },
-      fill: {
-        type: 'gradient',
-        gradient: {
-          shade: 'light',
-          type: 'vertical',
-          gradientToColors: ['#81C784'],
-          stops: [0, 100]
-        }
-      },
-      tooltip: {
-        x: { format: 'dd/MM/yyyy HH:mm' },
-        y: {
-          formatter: val => 'Rp ' + val.toLocaleString('id-ID'),
-          title: { formatter: s => `${s}:` }
+        chart: { id: 'harga-sawit-chart' },
+        xaxis: { categories: [] },
+        yaxis: {
+          labels: {
+            formatter: val => 'Rp ' + val.toLocaleString('id-ID')
+          }
         },
-        marker: { show: true, fillColors: ['#0096FF'] },
-        theme: 'light',
-        style: {
-          textcolor: '#000000',   
-          fontSize: '14px',
-          fontFamily: 'Arial, sans-serif'
+        dataLabels: {
+          enabled: true,
+          formatter: val => 'Rp ' + val.toLocaleString('id-ID'),
+          style: {
+            colors: ['#007bff'],
+            fontSize: '14px',
+            fontFamily: 'Arial, sans-serif'
+          }
+        },
+        fill: {
+          type: 'gradient',
+          gradient: {
+            shade: 'light',
+            type: 'vertical',
+            gradientToColors: ['#81C784'],
+            stops: [0, 100]
+          }
+        },
+        tooltip: {
+          x: { format: 'dd/MM/yyyy HH:mm' },
+          y: {
+            formatter: val => 'Rp ' + val.toLocaleString('id-ID'),
+            title: { formatter: s => `${s}:` }
+          },
+          marker: { show: true, fillColors: ['#0096FF'] },
+          theme: 'light',
+          style: {
+            textcolor: '#000000',
+            fontSize: '14px',
+            fontFamily: 'Arial, sans-serif'
+          }
         }
       }
-    }
     }
   },
   computed: {
@@ -136,14 +162,30 @@ export default {
   methods: {
     async fetchUser() {
       const token = localStorage.getItem('token')
-      if (!token) return
+      if (!token) {
+        console.warn('Token tidak ditemukan, user belum login.')
+        return
+      }
+
       try {
         const response = await axios.get(`${this.apiUrl}/api/profile`, {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         })
         this.user = response.data.data || response.data
+
+        if (this.user.photo) {
+          this.user.photo = `${this.apiUrl}/storage/${this.user.photo}`
+        }
+
       } catch (error) {
         console.error('Gagal mendapatkan data user:', error)
+        if (error.response && error.response.status === 401) {
+          alert('Sesi login sudah habis, silakan login ulang.')
+          localStorage.removeItem('token')
+          this.$router.push('/login')
+        }
       }
     },
 

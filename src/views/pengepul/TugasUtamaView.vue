@@ -1,12 +1,20 @@
 <template>
   <div class="main-container">
-
-    <header class="header">
-      <router-link to="/profile-pengepul" class="circle"></router-link>
-      <span class="username">Lorem Ipsum</span>
+    <header class="header flex items-center p-4 bg-white shadow">
+      <router-link to="/profile" class="inline-block mr-3">
+        <img
+          v-if="user.photo"
+          :src="user.photo"
+          alt="Foto Profil"
+          class="circle"
+        />
+        <div v-else class="circle placeholder"></div>
+      </router-link>
+      <span class="username font-semibold text-white-800">
+        {{ user.name || 'nama User' }}
+      </span>
     </header>
-    
-    <!-- Content -->
+
     <main class="content">
       <section class="task-section">
         <div class="title-with-icon">
@@ -14,12 +22,12 @@
           <h2>Tugas</h2>
         </div>
 
-        <!-- Tugas Baru -->
-        <div class="task-category">
+        <!-- Tugas Baru (pending) -->
+        <div v-if="pendingTasks.length" class="task-category">
           <h3 class="category-title">Tugas yang baru saja masuk</h3>
           <router-link
-            v-for="task in newTasks"
-            :key="task.id"
+            v-for="task in pendingTasks"
+            :key="`pending-${task.id}`"
             :to="`/detail-tugas-pengepul/${task.id}`"
             class="task-card-link"
           >
@@ -42,10 +50,37 @@
           </router-link>
         </div>
 
-        <!-- Tugas Selesai -->
-        <div class="task-category">
-          <h3 class="category-title">Tugas yang sudah diselesaikan</h3>
+        <!-- Tugas Sedang Berjalan (in_progress) -->
+        <div v-if="inProgressTasks.length" class="task-category">
+          <h3 class="category-title">Tugas yang sedang berjalan</h3>
+          <router-link
+            v-for="task in inProgressTasks"
+            :key="`progress-${task.id}`"
+            :to="`/detail-tugas-pengepul/${task.id}`"
+            class="task-card-link"
+          >
+            <div class="task-card">
+              <div class="task-info">
+                <div>
+                  <p class="label">ID Tugas</p>
+                  <p class="value">{{ task.nama_task }}</p>
+                </div>
+                <div class="jam">
+                  <p class="label">Jam</p>
+                  <p class="value">{{ formatTime(task.janji_temu.tanggal) }}</p>
+                </div>
+              </div>
+              <div class="lokasi">
+                <p class="label">Lokasi</p>
+                <p class="value">{{ task.janji_temu.alamat }}</p>
+              </div>
+            </div>
+          </router-link>
+        </div>
 
+        <!-- Tugas Selesai (completed) -->
+        <div v-if="completedTasks.length" class="task-category">
+          <h3 class="category-title">Tugas yang sudah diselesaikan</h3>
           <router-link
             v-for="task in completedTasks"
             :key="`completed-${task.id}`"
@@ -81,53 +116,77 @@ import { ref, onMounted } from 'vue'
 
 export default {
   setup() {
-    const newTasks = ref([])
+    const user = ref({ name: '', photo: '' })
+    const pendingTasks = ref([])
+    const inProgressTasks = ref([])
     const completedTasks = ref([])
 
-    const fetchTasks = async () => {
-      try {
-        const token = localStorage.getItem('token')
-        if (!token) throw new Error('Token tidak ditemukan, silakan login terlebih dahulu.')
+    const fetchUser = async () => {
+      const token = localStorage.getItem('token')
+      if (!token) return
 
-        const response = await axios.get('http://127.0.0.1:8000/api/task/by-pengepul', {
+      try {
+        const res = await axios.get('https://api.ecopalm.ydns.eu/api/profile', {
           headers: { Authorization: `Bearer ${token}` }
         })
-        const tasks = response.data.data || response.data
-
-        // console.log('Tasks:', tasks)  // bisa diaktifkan jika perlu cek data
-
-        newTasks.value = tasks.filter(task => task.status !== 'completed')
-        completedTasks.value = tasks.filter(task => task.status === 'completed')
-      } catch (error) {
-        console.error('Gagal mengambil data tugas:', error)
-        alert('Gagal mengambil data tugas, silakan cek console dan pastikan sudah login.')
+        const fetched = res.data.data || res.data
+        user.value = {
+          ...fetched,
+          photo: fetched.photo ? `https://api.ecopalm.ydns.eu/storage/${fetched.photo}` : ''
+        }
+      } catch (err) {
+        console.error('Gagal mengambil user:', err)
+        if (err.response?.status === 401) {
+          alert('Sesi login habis, silakan login ulang.')
+          localStorage.removeItem('token')
+          window.location.href = '/login'
+        }
       }
     }
 
-    // Fungsi format jam dari string tanggal ISO
+    const fetchTasks = async () => {
+      const token = localStorage.getItem('token')
+      if (!token) return alert('Silakan login terlebih dahulu.')
+
+      try {
+        const res = await axios.get('https://api.ecopalm.ydns.eu/api/task/by-pengepul', {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        const tasks = res.data.data || res.data
+
+        pendingTasks.value = tasks.filter(t => t.status === 'pending')
+        inProgressTasks.value = tasks.filter(t => t.status === 'in_progress')
+        completedTasks.value = tasks.filter(t => t.status === 'completed')
+      } catch (err) {
+        console.error('Gagal mengambil data tugas:', err)
+        alert('Terjadi kesalahan saat mengambil tugas.')
+      }
+    }
+
     const formatTime = (datetime) => {
       if (!datetime) return ''
       try {
-        // Tangani baik yang pakai "T" maupun spasi
-        const t = datetime.includes('T') ? datetime.split('T')[1] : datetime.split(' ')[1]
-        const [h, m] = t.split(':')
-        return h && m ? `${h.padStart(2, '0')}:${m.padStart(2, '0')}` : ''
+        const time = datetime.includes('T') ? datetime.split('T')[1] : datetime.split(' ')[1]
+        const [h, m] = time.split(':')
+        return `${h.padStart(2, '0')}:${m.padStart(2, '0')}`
       } catch (e) {
-        console.error('FormatTime error:', e)
         return ''
       }
     }
 
     onMounted(() => {
+      fetchUser()
       fetchTasks()
     })
 
     return {
-      newTasks,
+      user,
+      pendingTasks,
+      inProgressTasks,
       completedTasks,
-      formatTime,
+      formatTime
     }
-  },
+  }
 }
 </script>
 

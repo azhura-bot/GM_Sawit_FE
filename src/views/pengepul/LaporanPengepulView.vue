@@ -1,10 +1,27 @@
 <template>
   <div class="main-container">
     <!-- Header -->
-    <header class="header">
-      <router-link to="/profile-pengepul" class="circle" />
-      <span class="username">{{ user.name || 'nama User' }}</span>
+    <header class="header flex items-center p-4 bg-white shadow">
+      <router-link to="/profile" class="inline-block mr-3">
+        <!-- jika ada foto, tampilkan; kalau tidak, tampil placeholder putih -->
+        <img
+          v-if="user.photo"
+          :src="`${apiUrl}/storage/${user.photo}`"
+          alt="Foto Profil"
+          class="w-10 h-10 rounded-full object-cover"
+        />
+        <div
+          v-else
+          class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-white"
+        >
+          <span class="text-sm font-bold">?</span>
+        </div>
+      </router-link>
+      <span class="username font-semibold text-white-800">
+        {{ user.name || 'nama User' }}
+      </span>
     </header>
+
 
     <!-- Content -->
     <main class="content">
@@ -18,12 +35,16 @@
         <p class="form-instruction">Masukan data anda pada form dibawah ini</p>
 
         <form @submit.prevent="submitForm">
-          <!-- Dropdown Tugas -->
+          <!-- Dropdown Tugas (hanya in_progress) -->
           <div class="form-group">
             <label>Nama Tugas</label>
             <select v-model="selectedTaskId" @change="onTaskChange">
               <option value="">Pilih tugas</option>
-              <option v-for="task in tasks" :key="task.id" :value="task.id">
+              <option
+                v-for="task in filteredTasks"
+                :key="task.id"
+                :value="task.id"
+              >
                 {{ task.nama_task }}
               </option>
             </select>
@@ -50,32 +71,67 @@
           <!-- Input Jumlah -->
           <div class="form-group">
             <label>Jumlah (kg)</label>
-            <input v-model.number="form.jumlah" type="number" @input="calculateTotal" />
+            <input
+              v-model.number="form.jumlah"
+              type="number"
+              @input="calculateTotal"
+            />
           </div>
 
           <!-- Harga & Total -->
           <div class="form-group">
             <label>Harga Sawit</label>
-            <input type="text" :value="formatRupiah(hargaSawit)" disabled />
+            <input
+              type="text"
+              :value="formatRupiah(hargaSawit)"
+              disabled
+            />
           </div>
           <div class="form-group">
             <label>Total Harga</label>
-            <input type="text" :value="formatRupiah(form.totalHarga)" disabled />
+            <input
+              type="text"
+              :value="formatRupiah(form.totalHarga)"
+              disabled
+            />
           </div>
 
-          <!-- Pesan Error di Bawah Total Harga -->
+          <!-- Pesan Error -->
           <div v-if="errorMessage" class="error-message">
             {{ errorMessage }}
           </div>
 
           <!-- Tombol -->
           <div class="button-group">
-            <button type="button" class="cancel-button" @click="cancelForm">Cancel</button>
+            <button
+              type="button"
+              class="cancel-button"
+              @click="cancelForm"
+            >
+              Cancel
+            </button>
             <button type="submit" class="submit-button">Kirim</button>
           </div>
         </form>
       </section>
     </main>
+
+    <!-- Modal Success -->
+    <div
+      v-if="showSuccessModal"
+      class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+    >
+      <div class="bg-white rounded-lg p-6 w-80 text-center">
+        <h2 class="text-lg font-semibold mb-4 text-[#134611]">Laporan Berhasil</h2>
+        <p class="mb-6 text-[#134611]">Laporan sudah dikirim.</p>
+        <button
+          @click="closeModal"
+          class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+        >
+          OK
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -88,91 +144,88 @@ export default {
     return {
       apiUrl: 'http://127.0.0.1:8000',
       tasks: [],
-      user: { name: '' },
+      user: {
+        name: '',
+        photo: ''
+      },
       selectedTaskId: '',
       hargaSawit: 0,
-      pengepul: {
-        name: '',
-      },
+      pengepul: { name: '' },
       form: {
         namaPetani: '',
         tanggal: '',
         alamat: '',
-        jumlah: '',
-        totalHarga: '',
+        jumlah: 0,
+        totalHarga: 0,
       },
-      errorMessage: ''
+      errorMessage: '',
+      showSuccessModal: false, // untuk kontrol modal
     };
+  },
+  computed: {
+    filteredTasks() {
+      return this.tasks.filter(t => t.status === 'in_progress');
+    }
   },
   methods: {
     async fetchInitialData() {
       try {
         const token = localStorage.getItem('token');
 
-        const { data: taskData } = await axios.get('/api/task/by-pengepul', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        // Data tugas
+        const { data: taskData } = await axios.get(
+          `${this.apiUrl}/api/task/by-pengepul`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
         this.tasks = taskData.data;
 
-        const { data: hargaData } = await axios.get('/api/harga', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        this.hargaSawit = hargaData.data[0]?.harga || 0;
+        // Data harga terbaru
+        const { data: hargaData } = await axios.get(
+          `${this.apiUrl}/api/harga`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        if (hargaData.data.length) {
+          const sorted = hargaData.data.sort(
+            (a, b) => new Date(a.created_at) - new Date(b.created_at)
+          );
+          this.hargaSawit = sorted[sorted.length - 1].harga;
+        }
 
-        const { data: userData } = await axios.get('/api/user', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        console.log('User Data:', userData);
-        this.pengepul.name = userData.name || '';
+        // Profil pengepul
+        const { data: userData } = await axios.get(
+          `${this.apiUrl}/api/profile`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        this.user = userData.data || userData;
+        this.pengepul.name = this.user.name;
       } catch (error) {
         console.error(error);
         this.errorMessage = 'Gagal mengambil data awal';
       }
     },
 
-    async fetchUser() {
-      const token = localStorage.getItem('token')
-      if (!token) {
-        console.warn('Token tidak ditemukan, user belum login.')
-        return
-      }
-
-      try {
-        const response = await axios.get(`${this.apiUrl}/api/profile`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        })
-        this.user = response.data.data || response.data
-      } catch (error) {
-        console.error('Gagal mendapatkan data user:', error)
-        if (error.response && error.response.status === 401) {
-          alert('Sesi login sudah habis, silakan login ulang.')
-          localStorage.removeItem('token')
-          this.$router.push('/login')
-        }
-      }
-    },
-
     async onTaskChange() {
       this.errorMessage = '';
-
-      if (!this.selectedTaskId) return;
-
+      if (!this.selectedTaskId) {
+        Object.assign(this.form, {
+          namaPetani: '',
+          tanggal: '',
+          alamat: '',
+          jumlah: 0,
+          totalHarga: 0
+        });
+        return;
+      }
       try {
         const token = localStorage.getItem('token');
-        const { data } = await axios.get(`/api/task/${this.selectedTaskId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-
-        const janjiTemu = data.data.janji_temu;
-        const pengepul = data.data.pengepul;
-
-        this.form.namaPetani = janjiTemu.nama_petani || '';
-        this.form.tanggal = janjiTemu.tanggal || '';
-        this.form.alamat = janjiTemu.alamat || '';
-        this.pengepul.name = pengepul?.name || 'Tidak diketahui';
-        
+        const { data } = await axios.get(
+          `${this.apiUrl}/api/task/${this.selectedTaskId}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        const janji = data.data.janji_temu;
+        this.form.namaPetani = janji.nama_petani;
+        this.form.tanggal = janji.tanggal;
+        this.form.alamat = janji.alamat;
         this.calculateTotal();
       } catch (error) {
         console.error(error);
@@ -180,46 +233,45 @@ export default {
       }
     },
 
-
     calculateTotal() {
-      if (this.form.jumlah && this.hargaSawit) {
-        this.form.totalHarga = this.form.jumlah * this.hargaSawit;
-      } else {
-        this.form.totalHarga = 0;
-      }
+      this.form.totalHarga = this.form.jumlah * this.hargaSawit;
     },
 
     async submitForm() {
       this.errorMessage = '';
       const token = localStorage.getItem('token');
 
-      if (!this.selectedTaskId && !this.form.jumlah) {
-        this.errorMessage = 'Semua kolom harus diisi';
-        return;
-      }
       if (!this.selectedTaskId) {
         this.errorMessage = 'Kolom Tugas harus diisi';
         return;
       }
-      if (!this.form.jumlah) {
-        this.errorMessage = 'Kolom Jumlah harus diisi';
+      if (!this.form.jumlah || this.form.jumlah <= 0) {
+        this.errorMessage = 'Kolom Jumlah harus diisi dengan angka > 0';
         return;
       }
 
       try {
-        await axios.post('/api/transaksi', {
-          task_id: this.selectedTaskId,
-          jumlah: this.form.jumlah,
-          total_harga: this.form.totalHarga 
-        }, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-
-        this.$router.push('/home-pengepul');
+        await axios.post(
+          `${this.apiUrl}/api/transaksi`,
+          {
+            task_id: this.selectedTaskId,
+            jumlah: this.form.jumlah,
+            total_harga: this.form.totalHarga
+          },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        // Tampilkan modal sukses
+        this.showSuccessModal = true;
       } catch (error) {
         console.error(error);
         this.errorMessage = 'Gagal mengirim transaksi';
       }
+    },
+
+    closeModal() {
+      this.showSuccessModal = false;
+      // Setelah OK, kembalikan user ke halaman home pengepul
+      this.$router.push('/home-pengepul');
     },
 
     cancelForm() {
@@ -227,25 +279,22 @@ export default {
     },
 
     formatRupiah(angka) {
-      if (!angka) return '0';
-      const rounded = Math.floor(angka); // Hilangkan angka di belakang koma
-      return rounded.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+      return angka == null
+        ? '0'
+        : Math.floor(angka)
+            .toString()
+            .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     },
 
     formatTanggal(dateStr) {
       if (!dateStr) return '';
-      // Ubah 'T' jadi spasi, hilangkan bagian desimal dan timezone
-      let cleanStr = dateStr.replace('T', ' ').split('.')[0];
-      const [tanggal] = cleanStr.split(' ');
-      const [year, month, day] = tanggal.split('-');
-      return `${day}/${month}/${year}`;
+      const [ymd] = dateStr.split('T');
+      const [y,m,d] = ymd.split('-');
+      return `${d}/${m}/${y}`;
     }
-
   },
-
   mounted() {
     this.fetchInitialData();
-    this.fetchUser();
   }
 };
 </script>

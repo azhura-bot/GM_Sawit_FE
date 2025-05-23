@@ -29,7 +29,7 @@
             v-model="form.harga"
             type="text"
             placeholder="Perubahan Harga"
-            class="w-full p-3 rounded-full bg-gray-200 focus:outline-none"
+            class="w-full p-3 rounded-full bg-gray-200 focus:outline-none text-[#134611]"
           />
         </div>
 
@@ -53,15 +53,27 @@ export default {
   components: { apexchart: ApexCharts },
   data() {
     return {
-      apiUrl: import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000',
+      apiUrl: import.meta.env.VITE_API_URL || 'https://api.ecopalm.ydns.eu',
       form: { harga: '' },
       series: [
-        { name: 'Harga Sawit', data: [800, 820, 790, 850, 870, 860, 890] }
+        { name: 'Harga Sawit', data: [] }
       ],
       chartOptions: {
         chart: { id: 'harga-sawit-chart' },
-        xaxis: {
-          categories: []
+        xaxis: { categories: [] },
+        yaxis: {
+          labels: {
+            formatter: val => 'Rp ' + val.toLocaleString('id-ID')
+          }
+        },
+        dataLabels: {
+          enabled: true,
+          formatter: val => 'Rp ' + val.toLocaleString('id-ID'),
+          style: {
+            colors: ['#007bff'], // warna biru seperti di gambar
+            fontSize: '14px',
+            fontFamily: 'Arial, sans-serif'
+          }
         },
         fill: {
           type: 'gradient',
@@ -70,6 +82,20 @@ export default {
             type: 'vertical',
             gradientToColors: ['#81C784'],
             stops: [0, 100]
+          }
+        },
+        tooltip: {
+          x: { format: 'dd/MM/yyyy HH:mm' },
+          y: {
+            formatter: val => 'Rp ' + val.toLocaleString('id-ID'),
+            title: { formatter: s => `${s}:` }
+          },
+          marker: { show: true, fillColors: ['#0096FF'] },
+          theme: 'light',
+          style: {
+            textcolor: '#000000',
+            fontSize: '14px',
+            fontFamily: 'Arial, sans-serif'
           }
         }
       }
@@ -91,7 +117,7 @@ export default {
         })
         const data = res.data || []
 
-        console.log('Data API:', data) // Debug: cek isi data dari API
+        console.log('Data API:', data)
 
         // update series data
         this.series = [
@@ -149,5 +175,21 @@ export default {
 </script>
 
 <style scoped>
-/* styling asli dipertahankan */
+/* Override background menjadi putih (untuk theme light) */
+:deep(.apexcharts-theme-light .apexcharts-tooltip) {
+  background: #fff !important;
+  color: #000 !important;           /* teks utama menjadi hitam */
+}
+
+/* Override label (series name) */
+:deep(.apexcharts-theme-light .apexcharts-tooltip .apexcharts-tooltip-text-y-label) {
+  fill: #000 !important;            /* untuk elemen SVG <tspan> yang pakai fill */
+  color: #000 !important;
+}
+
+/* Override value */
+:deep(.apexcharts-theme-light .apexcharts-tooltip .apexcharts-tooltip-text-value) {
+  fill: #000 !important;
+  color: #000 !important;
+}
 </style>

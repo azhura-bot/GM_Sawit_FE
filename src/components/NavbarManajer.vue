@@ -28,11 +28,11 @@
               <h1 class="text-green-900 font-bold">{{ user?.name || '-' }}</h1>
               <p class="text-green-900 text-sm">Manajer</p>
             </div>
-            <router-link to="/profile">
+            <router-link to="/data-profile">
               <img
-                src="https://randomuser.me/api/portraits/men/32.jpg"
+                :src="user && user.photo ? `${apiUrl}/storage/${user.photo}` : defaultPhoto"
                 alt="Profile"
-                class="w-14 h-14 rounded-full hover:brightness-90 transition"
+                class="w-14 h-14 rounded-full object-cover hover:brightness-90 transition"
               />
             </router-link>
           </div>
@@ -43,21 +43,30 @@
     <!-- Sidebar Drawer -->
     <div class="drawer-side z-[100]">
       <label for="my-drawer" class="drawer-overlay"></label>
-      <div class="menu p-4 w-64 min-h-full bg-white text-base-content text-green-900 shadow-xl">
-        <div class="flex flex-col items-center justify-center mb-4">
-          <img src="../assets/logo.png" alt="Logo" class="w-24 mb-2" />
-          <span class="text-lg font-bold">EcoPalm</span>
+      <div class="menu p-4 w-64 min-h-full bg-white text-base-content text-green-900 shadow-xl flex flex-col justify-between">
+        <div>
+          <div class="flex flex-col items-center justify-center mb-4">
+            <img src="../assets/logo.png" alt="Logo" class="w-24 mb-2" />
+            <span class="text-lg font-bold">EcoPalm</span>
+          </div>
+          <ul class="w-full space-y-2">
+            <li><router-link to="/dashboard">Beranda</router-link></li>
+            <li><router-link to="/data-pengepul">Data Pengepul</router-link></li>
+            <li><router-link to="/data-berita">Data Artikel</router-link></li>
+            <li><router-link to="/data-statistik">Data Statistik Harga</router-link></li>
+            <li><router-link to="/data-jadwal">Data Permintaan Jadwal</router-link></li>
+            <li><router-link to="/data-transaksi">Data Transaksi</router-link></li>
+            <li><router-link to="/data-tugas">Data Tugas</router-link></li>
+          </ul>
         </div>
-        <ul class="w-full">
-          <li><a href="/dashboard">Beranda</a></li>
-          <!-- <li><a href="/tugas">Tugas</a></li> -->
-          <li><a href="/data-pengepul">Data Pengepul</a></li>
-          <li><a href="/data-berita">Data Artikel</a></li>
-          <li><a href="/data-statistik"> Data Statistik Harga</a></li>
-          <li><a href="/data-jadwal">Data Permintaan Jadwal</a></li>
-          <li><a href="/data-transaksi">Data Transaksi</a></li>
-          <li><a href="/data-tugas">Data Tugas</a></li>
-        </ul>
+        <div class="mt-6">
+          <button
+            @click="handleLogout"
+            class="w-full text-left px-4 py-2 rounded hover:bg-red-100 text-red-600 font-semibold"
+          >
+            Logout
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -67,41 +76,47 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
+import defaultPhoto from '../assets/profile.png' // fallback photo
 
 const user = ref(null)
 const router = useRouter()
-const apiUrl = 'http://127.0.0.1:8000' // atau sesuaikan base API kamu
+const apiUrl = 'https://api.ecopalm.ydns.eu' // Ganti jika kamu deploy ke domain lain
 
 const fetchUser = async () => {
   const token = localStorage.getItem('token')
-  if (!token) {
-    console.warn('Token tidak ditemukan, user belum login.')
-    return
-  }
+  if (!token) return
 
   try {
     const response = await axios.get(`${apiUrl}/api/profile`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+      headers: { Authorization: `Bearer ${token}` }
     })
     user.value = response.data.data || response.data
   } catch (error) {
-    console.error('Gagal mendapatkan data user:', error)
-    if (error.response && error.response.status === 401) {
-      alert('Sesi login sudah habis, silakan login ulang.')
-      localStorage.removeItem('token')
-      router.push('/login')
+    if (error.response?.status === 401) {
+      handleLogout()
     }
   }
+}
+
+const handleLogout = async () => {
+  const token = localStorage.getItem('token')
+  if (token) {
+    try {
+      await axios.post(`${apiUrl}/api/logout`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+    } catch (e) {
+      console.warn('Logout API gagal, tetap melanjutkan logout lokal.')
+    }
+  }
+  localStorage.removeItem('token')
+  router.push('/login')
 }
 
 onMounted(() => {
   fetchUser()
 })
 </script>
-
-
 
 <style scoped>
 /* Jika ingin memastikan drawer tidak tertimpa konten lain */

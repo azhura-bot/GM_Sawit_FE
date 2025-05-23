@@ -1,9 +1,19 @@
 <template>
   <div class="main-container">
     <!-- Header -->
-    <header class="header">
-      <router-link to="/profile-pengepul" class="circle" />
-      <span class="username">{{ user?.name || 'nama User' }}</span>
+    <header class="header flex items-center p-4 bg-white shadow">
+      <router-link to="/profile" class="inline-block mr-3">
+        <img
+          v-if="user.photo"
+          :src="user.photo"
+          alt="Foto Profil"
+          class="circle"
+        />
+        <div v-else class="circle placeholder"></div>
+      </router-link>
+      <span class="username font-semibold text-white-800">
+        {{ user.name || 'nama User' }}
+      </span>
     </header>
 
     <!-- Content -->
@@ -80,6 +90,7 @@
 <script>
 import ApexCharts from 'vue3-apexcharts'
 import axios from 'axios'
+import defaultPhoto from '@/assets/profile.png'
 
 export default {
   name: 'MainPage',
@@ -87,36 +98,53 @@ export default {
   data() {
     return {
       apiUrl: import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000',
-      user: null,
+      user: {
+        name: '',
+        photo: ''
+      },
       articles: [],
       series: [], // akan diisi dari API
       chartOptions: {
-      chart: { id: 'harga-sawit-chart' },
-      xaxis: { categories: [] },
-      fill: {
-        type: 'gradient',
-        gradient: {
-          shade: 'light',
-          type: 'vertical',
-          gradientToColors: ['#81C784'],
-          stops: [0, 100]
-        }
-      },
-      tooltip: {
-        x: { format: 'dd/MM/yyyy HH:mm' },
-        y: {
-          formatter: val => 'Rp ' + val.toLocaleString('id-ID'),
-          title: { formatter: s => `${s}:` }
+        chart: { id: 'harga-sawit-chart' },
+        xaxis: { categories: [] },
+        yaxis: {
+          labels: {
+            formatter: val => 'Rp ' + val.toLocaleString('id-ID')
+          }
         },
-        marker: { show: true, fillColors: ['#0096FF'] },
-        theme: 'light',
-        style: {
-          textcolor: '#000000',   
-          fontSize: '14px',
-          fontFamily: 'Arial, sans-serif'
+        dataLabels: {
+          enabled: true,
+          formatter: val => 'Rp ' + val.toLocaleString('id-ID'),
+          style: {
+            colors: ['#007bff'], // warna biru seperti di gambar
+            fontSize: '14px',
+            fontFamily: 'Arial, sans-serif'
+          }
+        },
+        fill: {
+          type: 'gradient',
+          gradient: {
+            shade: 'light',
+            type: 'vertical',
+            gradientToColors: ['#81C784'],
+            stops: [0, 100]
+          }
+        },
+        tooltip: {
+          x: { format: 'dd/MM/yyyy HH:mm' },
+          y: {
+            formatter: val => 'Rp ' + val.toLocaleString('id-ID'),
+            title: { formatter: s => `${s}:` }
+          },
+          marker: { show: true, fillColors: ['#0096FF'] },
+          theme: 'light',
+          style: {
+            textcolor: '#000000',
+            fontSize: '14px',
+            fontFamily: 'Arial, sans-serif'
+          }
         }
       }
-    }
     }
   },
   computed: {
@@ -130,29 +158,25 @@ export default {
     this.fetchHargaSawit()
   },
   methods: {
-    async fetchUser() {
-      const token = localStorage.getItem('token')
-      if (!token) {
-        console.warn('Token tidak ditemukan, user belum login.')
-        return
-      }
+  async fetchUser() {
+        const token = localStorage.getItem('token')
+        if (!token) return
 
-      try {
-        const response = await axios.get(`${this.apiUrl}/api/profile`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        })
-        this.user = response.data.data || response.data
-      } catch (error) {
-        console.error('Gagal mendapatkan data user:', error)
-        if (error.response && error.response.status === 401) {
-          alert('Sesi login sudah habis, silakan login ulang.')
-          localStorage.removeItem('token')
-          this.$router.push('/login')
+        try {
+          const { data: resp } = await axios.get(
+            `${this.apiUrl}/api/profile`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          )
+          const d = resp.data || resp
+          this.user.name = d.name || ''
+          // bangun URL full dari field 'photo' yang di-API
+          this.user.photo = d.photo
+            ? `${this.apiUrl}/storage/${d.photo}`
+            : defaultPhoto
+        } catch (err) {
+          console.error('Gagal fetch user:', err)
         }
-      }
-    },
+      },
 
     formatTanggal(tanggal) {
       const date = new Date(tanggal)
@@ -262,12 +286,18 @@ export default {
   z-index: 10;
 }
 .circle {
-  width: 24px;
-  height: 24px;
-  background-color: white;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  margin-right: 8px;
+  object-fit: cover;
+  display: inline-block;
+  vertical-align: middle;
 }
+
+.placeholder {
+  background-color: #ddd;
+}
+
 .username { font-weight: bold; }
 .content {
   background: white;

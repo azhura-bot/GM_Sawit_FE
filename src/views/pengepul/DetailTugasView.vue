@@ -1,14 +1,26 @@
 <template>
   <div class="main-container">
-    <header class="header">
-      <router-link to="/profile-pengepul" class="circle"></router-link>
-      <span class="username">{{ pengepulName }}</span>
+    <!-- Header -->
+    <header class="header flex items-center p-4 bg-white shadow">
+      <router-link to="/profile" class="inline-block mr-3">
+        <img
+          v-if="user.photo"
+          :src="user.photo"
+          alt="Foto Profil"
+          class="circle"
+        />
+        <div v-else class="circle placeholder"></div>
+      </router-link>
+      <span class="username font-semibold text-white-800">
+        {{ user.name || 'Nama User' }}
+      </span>
     </header>
 
-    <main class="content">
-      <section class="title-with-icon">
-        <img src="@/assets/icon-tugas-trans.png" alt="Icon Tugas" class="icon" />
-        <h2> Tugas </h2>
+    <!-- Content -->
+    <main class="content p-4">
+      <section class="title-with-icon mb-4">
+        <img src="@/assets/icon-tugas-trans.png" alt="Icon Tugas" class="icon inline-block mr-2" />
+        <h2 class="inline-block text-xl font-bold">Tugas</h2>
       </section>
 
       <!-- Loading -->
@@ -16,33 +28,45 @@
 
       <!-- Data tugas -->
       <section v-else class="task-category">
-        <div class="category-title">Tugas yang baru saja masuk</div>
+        <div class="category-title font-semibold mb-2">Tugas yang baru saja masuk</div>
 
-        <div class="task-card" v-if="task">
-          <div class="task-info">
-            <div class="label">Nama Tugas</div>
+        <div class="task-card bg-white p-4 rounded shadow" v-if="task">
+          <div class="task-info mb-2">
+            <div class="label font-medium">Nama Tugas</div>
             <div class="value">{{ task.nama_task }}</div>
           </div>
 
-          <div class="task-info">
-            <div class="label">Nama Petani</div>
+          <div class="task-info mb-2">
+            <div class="label font-medium">Nama Petani</div>
             <div class="value">{{ task.janji_temu.nama_petani }}</div>
           </div>
 
-          <div class="task-info">
-            <div class="label">Lokasi</div>
+          <div class="task-info mb-2">
+            <div class="label font-medium">Lokasi</div>
             <div class="value">{{ task.janji_temu.alamat }}</div>
           </div>
 
-          <div class="task-info">
-            <div class="label">Nomor Tlp</div>
+          <div class="task-info mb-4">
+            <div class="label font-medium">Nomor Tlp</div>
             <div class="value">{{ task.janji_temu.no_hp }}</div>
           </div>
-        </div>
 
-        <div class="button-group">
-          <button class="button-accept" @click="handleAccept">Terima</button>
-          <button class="button-back" @click="goBack">Kembali</button>
+          <div class="button-group flex gap-2">
+            <!-- Tombol Terima hanya kalau status 'pending' -->
+            <button
+              v-if="task.status === 'pending'"
+              class="button-accept bg-green-500 text-white px-4 py-2 rounded"
+              @click="handleAccept"
+            >
+              Terima
+            </button>
+            <button
+              class="button-back bg-gray-300 text-gray-700 px-4 py-2 rounded"
+              @click="goBack"
+            >
+              Kembali
+            </button>
+          </div>
         </div>
       </section>
     </main>
@@ -58,161 +82,116 @@ export default {
     return {
       taskId: null,
       task: null,
-      pengepulName: "",
-      trackingInterval: null,
       loading: true,
       locationEnabled: false,
+      user: {
+        name: "",
+        photo: ""
+      }
     };
   },
   methods: {
-    goBack() {
-      this.$router.push("/tugas-utama-pengepul");
-    },
-
     getToken() {
       return localStorage.getItem("token");
     },
 
-    getUser() {
-      const user = localStorage.getItem("user");
-      return user ? JSON.parse(user) : null;
+    async fetchUserProfile() {
+      const token = this.getToken();
+      if (!token) return;
+      try {
+        const res = await axios.get("https://api.ecopalm.ydns.eu/api/profile", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const d = res.data.data || res.data;
+        this.user.name = d.name || "";
+        // bangun URL ke storage, asumsikan `photo` = path relatif di `storage/`
+        this.user.photo = d.photo
+          ? `https://api.ecopalm.ydns.eu/storage/${d.photo}`
+          : "";
+      } catch (e) {
+        console.error("Gagal memuat profil user:", e);
+      }
     },
 
     async fetchTaskDetail() {
+      this.loading = true;
       try {
-        const response = await axios.get(`http://127.0.0.1:8000/api/task/${this.taskId}`, {
-          headers: {
-            Authorization: `Bearer ${this.getToken()}`,
-          },
-        });
-        this.task = response.data.data;
-        this.loading = false;
-      } catch (error) {
-        console.error("Gagal memuat detail tugas:", error);
+        const res = await axios.get(
+          `https://api.ecopalm.ydns.eu/api/task/${this.taskId}`,
+          { headers: { Authorization: `Bearer ${this.getToken()}` } }
+        );
+        this.task = res.data.data;
+      } catch (e) {
+        console.error("Gagal memuat detail tugas:", e);
         alert("Gagal memuat data tugas.");
+      } finally {
+        this.loading = false;
       }
     },
 
     async handleAccept() {
       if (!this.locationEnabled) {
         this.requestLocationPermission(true);
-        return; // Jangan lanjut dulu sebelum izin diaktifkan
-      }
-
-      if (!navigator.geolocation) {
-        alert("Geolocation tidak didukung oleh browser ini.");
         return;
       }
-
+      if (!navigator.geolocation) {
+        alert("Geolocation tidak didukung browser ini.");
+        return;
+      }
       navigator.geolocation.getCurrentPosition(
-        async (position) => {
+        async (pos) => {
           try {
             await axios.post(
-              `http://127.0.0.1:8000/api/task/${this.taskId}/accepted`,
+              `https://api.ecopalm.ydns.eu/api/task/${this.taskId}/accepted`,
               {
-                pul_latitude: position.coords.latitude,
-                pul_longitude: position.coords.longitude,
+                pul_latitude: pos.coords.latitude,
+                pul_longitude: pos.coords.longitude
               },
-              {
-                headers: {
-                  Authorization: `Bearer ${this.getToken()}`,
-                },
-              }
+              { headers: { Authorization: `Bearer ${this.getToken()}` } }
             );
-
-            this.startLocationTracking();
-            alert("Tugas berhasil diterima. Tracking lokasi dimulai.");
-          } catch (error) {
-            console.error("Gagal menerima tugas:", error.response?.data || error);
+            this.task.status = "accepted";
+            alert("Tugas berhasil diterima.");
+          } catch (e) {
+            console.error("Gagal menerima tugas:", e);
             alert("Gagal menerima tugas.");
           }
         },
-        (error) => {
-          alert("Mohon aktifkan lokasi untuk melanjutkan. Silakan izinkan akses lokasi di browser Anda.");
-          console.error("Error mendapatkan lokasi:", error);
+        () => {
+          alert("Mohon izinkan akses lokasi.");
         }
       );
     },
 
     requestLocationPermission(showAlert = false) {
-      if (!navigator.geolocation) {
-        alert("Geolocation tidak didukung oleh browser ini.");
-        return;
-      }
-
+      if (!navigator.geolocation) return;
       navigator.geolocation.getCurrentPosition(
-        () => {
-          this.locationEnabled = true;
-        },
+        () => (this.locationEnabled = true),
         () => {
           this.locationEnabled = false;
-          if (showAlert) {
-            alert("Mohon aktifkan lokasi untuk melanjutkan. Silakan izinkan akses lokasi di browser Anda.");
-          }
+          if (showAlert) alert("Mohon aktifkan lokasi.");
         }
       );
     },
 
-    startLocationTracking() {
-      if (!navigator.geolocation) {
-        console.error("Geolocation tidak didukung browser");
-        return;
-      }
-
-      this.trackingInterval = setInterval(() => {
-        navigator.permissions.query({ name: 'geolocation' }).then((result) => {
-          if (result.state === 'granted') {
-            navigator.geolocation.getCurrentPosition(
-              async (position) => {
-                try {
-                  await axios.put(
-                    `http://127.0.0.1:8000/api/task/${this.taskId}/location`,
-                    {
-                      pul_latitude: position.coords.latitude,
-                      pul_longitude: position.coords.longitude,
-                    },
-                    {
-                      headers: {
-                        Authorization: `Bearer ${this.getToken()}`,
-                      },
-                    }
-                  );
-                } catch (err) {
-                  console.error("Gagal mengirim lokasi:", err);
-                }
-              },
-              (error) => {
-                console.error("Gagal mengambil lokasi:", error.message);
-              }
-            );
-          } else if (result.state === 'denied') {
-            console.warn("Izin lokasi ditolak, hentikan tracking");
-            this.stopLocationTracking();
-            alert("Izin lokasi ditolak, tracking lokasi dihentikan.");
-          }
-          // Kalau state 'prompt' bisa juga minta izin, tapi biasanya terjadi di awal saja
-        });
-      }, 5000);
-    },
-
-    stopLocationTracking() {
-      if (this.trackingInterval) {
-        clearInterval(this.trackingInterval);
-        this.trackingInterval = null;
-      }
-    },
+    goBack() {
+      this.$router.push("/tugas-utama-pengepul");
+    }
   },
-  mounted() {
-    this.taskId = this.$route.params.id;
-    const user = this.getUser();
-    this.pengepulName = user ? user.nama : "Pengepul";
 
+  async mounted() {
+    // 1) set ID
+    this.taskId = this.$route.params.id;
+    // 2) fetch profil user (nama + foto)
+    await this.fetchUserProfile();
+    // 3) fetch detail tugas
     this.fetchTaskDetail();
+    // 4) request izin lokasi
     this.requestLocationPermission();
   },
+
   beforeDestroy() {
-    this.stopLocationTracking();
-  },
+    // kosongkan jika ada interval tracking
+  }
 };
 </script>
 

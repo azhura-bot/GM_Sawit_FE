@@ -1,10 +1,20 @@
 <template>
     <div class="main-container">
       <!-- Header -->
-      <header class="header">
-        <router-link to="/profile-pengepul" class="circle"></router-link>
-        <span class="username">Lorem Ipsum</span>
-      </header>
+      <header class="header flex items-center p-4 bg-white shadow">
+      <router-link to="/profile" class="inline-block mr-3">
+        <img
+          v-if="user.photo"
+          :src="user.photo"
+          alt="Foto Profil"
+          class="circle"
+        />
+        <div v-else class="circle placeholder"></div>
+      </router-link>
+      <span class="username font-semibold text-white-800">
+        {{ user.name || 'nama User' }}
+      </span>
+    </header>
   
       <!-- Content -->
       <main class="content">
@@ -52,9 +62,9 @@
         </form>
       </main>
     </div>
-  </template>
+</template>
   
-  <script>
+<script>
   export default {
     name: 'EditProfilePengepulView',
     data() {
@@ -81,7 +91,7 @@
   </script>
   
  
-  <style scoped>
+<style scoped>
   .main-container {
     background-color: #e6f7cf;
     min-height: 100vh;
@@ -220,5 +230,5 @@
     cursor: pointer;
     width: 45%;
   }
-  </style>
+</style>
   

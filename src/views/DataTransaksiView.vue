@@ -133,7 +133,7 @@ function formatRupiah(angka) {
 
 async function getTransaksi() {
   try {
-    const res = await axios.get('http://127.0.0.1:8000/api/transaksi', {
+    const res = await axios.get('https://api.ecopalm.ydns.eu/api/transaksi', {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -179,7 +179,7 @@ function bukaModal(item) {
 async function simpanPerubahan() {
   try {
     await axios.put(
-      `http://127.0.0.1:8000/api/transaksi/${form.value.id}`,
+      `https://api.ecopalm.ydns.eu/api/transaksi/${form.value.id}`,
       { total_harga: form.value.harga },
       { headers: { Authorization: `Bearer ${token}` } }
     )
@@ -198,7 +198,7 @@ function konfirmasiDelete(item) {
 async function hapusTransaksi() {
   try {
     await axios.delete(
-      `http://127.0.0.1:8000/api/transaksi/${selectedItem.value.id}`,
+      `https://api.ecopalm.ydns.eu/api/transaksi/${selectedItem.value.id}`,
       { headers: { Authorization: `Bearer ${token}` } }
     )
     showDeleteModal.value = false
