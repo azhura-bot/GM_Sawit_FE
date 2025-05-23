@@ -137,21 +137,31 @@ const form = ref({
 
 const submitForm = async () => {
   try {
-    const response = await axios.post('https://api.ecopalm.ydns.eu/api/pengepul', {
-      name: form.value.nama,
-      // created_at: form.value.tanggal, // Kalau tidak dipakai di backend, abaikan saja
-      email: form.value.email,
-      no_phone: form.value.telepon,
-      password: form.value.password,
-      password_confirmation: form.value.password_confirmation,
-    })
-    console.log('Data berhasil ditambahkan:', response.data)
+    const token = localStorage.getItem('token');  // Ambil token dari localStorage
+
+    const response = await axios.post(
+      'https://api.ecopalm.ydns.eu/api/pengepul',
+      {
+        name: form.value.nama,
+        email: form.value.email,
+        no_phone: form.value.telepon,
+        password: form.value.password,
+        password_confirmation: form.value.password_confirmation,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`   // Tambahkan header Authorization
+        }
+      }
+    );
+
+    console.log('Data berhasil ditambahkan:', response.data);
 
     // Redirect ke halaman data-pengepul
-    router.push('/data-pengepul')
+    router.push('/data-pengepul');
   } catch (error) {
-    console.error('Gagal menambahkan data:', error.response?.data || error.message)
-    alert('Gagal menambahkan data! Periksa kembali inputannya.')
+    console.error('Gagal menambahkan data:', error.response?.data || error.message);
+    alert('Gagal menambahkan data! Periksa kembali inputannya.');
   }
 }
 </script>
