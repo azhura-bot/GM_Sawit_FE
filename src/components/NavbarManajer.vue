@@ -30,9 +30,10 @@
             </div>
             <router-link to="/data-profile">
               <img
-                :src="user && user.photo ? `${apiUrl}/storage/${user.photo}` : defaultPhoto"
+                :src="user?.photo_url || defaultPhoto"
                 alt="Profile"
                 class="w-14 h-14 rounded-full object-cover hover:brightness-90 transition"
+                @error="onPhotoError"
               />
             </router-link>
           </div>
@@ -76,11 +77,11 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
-import defaultPhoto from '../assets/profile.png' // fallback photo
+import defaultPhoto from '../assets/profile.png'
 
 const user = ref(null)
 const router = useRouter()
-const apiUrl = 'https://api.ecopalm.ydns.eu' // Ganti jika kamu deploy ke domain lain
+const apiUrl = 'https://api.ecopalm.ydns.eu'
 
 const fetchUser = async () => {
   const token = localStorage.getItem('token')
@@ -111,6 +112,10 @@ const handleLogout = async () => {
   }
   localStorage.removeItem('token')
   router.push('/login')
+}
+
+const onPhotoError = (e) => {
+  e.target.src = defaultPhoto
 }
 
 onMounted(() => {

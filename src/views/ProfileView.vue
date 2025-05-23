@@ -9,12 +9,17 @@
           <label class="block text-green-900 font-bold mb-1">Foto Profil</label>
           <div class="flex items-center gap-4">
             <img
-              v-if="previewPhoto || profilePhotoUrl"
-              :src="previewPhoto || profilePhotoUrl"
+              :src="photoSrc"
               alt="Preview"
               class="w-24 h-24 rounded-full object-cover border"
+              @error="onPhotoError"
             />
-            <input type="file" @change="handlePhotoUpload" accept="image/*" />
+            <input
+              class="p-3 bg-[#D9D9D9] border border-green-800 rounded-3xl text-green-900 outline-none"
+              type="file"
+              @change="handlePhotoUpload"
+              accept="image/*"
+            />
           </div>
         </div>
 
@@ -79,6 +84,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
+import defaultPhoto from '@/assets/profile.png'
 
 const apiUrl = import.meta.env.VITE_API_URL
 
@@ -95,15 +101,10 @@ const photoFile = ref(null)
 const showModal = ref(false)
 const modalMessage = ref('')
 
-// computed untuk membentuk URL lengkap foto profil jika user.photo ada
-const profilePhotoUrl = computed(() => {
-  if (user.value.photo) {
-    if (user.value.photo.startsWith('http') || user.value.photo.startsWith('data:')) {
-      return user.value.photo
-    }
-    return `${apiUrl}/storage/${user.value.photo}`
-  }
-  return null
+const photoSrc = computed(() => {
+  if (previewPhoto.value) return previewPhoto.value
+  if (user.value.photo_url) return user.value.photo_url
+  return defaultPhoto
 })
 
 const fetchProfile = async () => {
@@ -127,6 +128,10 @@ const handlePhotoUpload = (event) => {
     photoFile.value = file
     previewPhoto.value = URL.createObjectURL(file)
   }
+}
+
+const onPhotoError = () => {
+  previewPhoto.value = defaultPhoto
 }
 
 const submitForm = async () => {
