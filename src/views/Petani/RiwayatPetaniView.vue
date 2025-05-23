@@ -123,7 +123,7 @@ export default {
   methods: {
     async fetchJadwals() {
       const token = localStorage.getItem('token');
-      const res = await fetch('/api/janji-temu', {
+      const res = await fetch('https://api.ecopalm.ydns.eu/api/janji-temu', {
         headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' }
       });
       const { data } = await res.json();

@@ -170,7 +170,7 @@ export default {
       this.loading=true;
       try {
         const token=localStorage.getItem('token');
-        const res=await fetch('/api/janji-temu',{ headers:{ 'Authorization':`Bearer ${token}`, 'Accept':'application/json' } });
+        const res=await fetch('https://api.ecopalm.ydns.eu/api/janji-temu',{ headers:{ 'Authorization':`Bearer ${token}`, 'Accept':'application/json' } });
         if(!res.ok) throw new Error(res.status);
         const { data }=await res.json();
         this.jadwals=data;
@@ -181,7 +181,7 @@ export default {
     tutupModal() { this.showModal=false; this.selectedIndex=null; this.alasan=''; },
     async bukaModalTerima(idx) {
       this.selectedIndex=idx; this.showModalTerima=true; this.selectedPengepul=null;
-      try { const token=localStorage.getItem('token'); const res=await fetch('/api/pengepul',{ headers:{ 'Authorization':`Bearer ${token}`, 'Accept':'application/json' } }); if(!res.ok) throw new Error(res.status); this.pengepuls=(await res.json()).data; } catch(e){ console.error(e); alert('Gagal memuat pengepul.'); }
+      try { const token=localStorage.getItem('token'); const res=await fetch('https://api.ecopalm.ydns.eu/api/pengepul',{ headers:{ 'Authorization':`Bearer ${token}`, 'Accept':'application/json' } }); if(!res.ok) throw new Error(res.status); this.pengepuls=(await res.json()).data; } catch(e){ console.error(e); alert('Gagal memuat pengepul.'); }
     },
     tutupModalTerima() { this.showModalTerima=false; this.selectedIndex=null; },
     async konfirmasiTolak() {
@@ -190,7 +190,7 @@ export default {
       try {
         const jadwal=this.paginatedJadwals[this.selectedIndex];
         const token=localStorage.getItem('token');
-        const res=await fetch(`/api/janji-temu/${jadwal.id}/reject`,{ method:'POST', headers:{ 'Authorization':`Bearer ${token}`,'Content-Type':'application/json' }, body: JSON.stringify({ alasan_reject:this.alasan }) });
+        const res=await fetch(`https://api.ecopalm.ydns.eu/api/janji-temu/${jadwal.id}/reject`,{ method:'POST', headers:{ 'Authorization':`Bearer ${token}`,'Content-Type':'application/json' }, body: JSON.stringify({ alasan_reject:this.alasan }) });
         if(!res.ok) throw new Error(res.status);
         jadwal.status='rejected'; this.tutupModal();
       } catch(e){ console.error(e); alert('Gagal menolak jadwal.'); }
@@ -202,7 +202,7 @@ export default {
       try {
         const jadwal=this.paginatedJadwals[this.selectedIndex];
         const token=localStorage.getItem('token');
-        const res=await fetch('/api/task',{ method:'POST', headers:{ 'Authorization':`Bearer ${token}`,'Content-Type':'application/json' }, body:JSON.stringify({ janji_temu_id:jadwal.id, pengepul_id:this.selectedPengepul }) });
+        const res=await fetch('https://api.ecopalm.ydns.eu/api/task',{ method:'POST', headers:{ 'Authorization':`Bearer ${token}`,'Content-Type':'application/json' }, body:JSON.stringify({ janji_temu_id:jadwal.id, pengepul_id:this.selectedPengepul }) });
         if(!res.ok) throw new Error(res.status);
         jadwal.status='approved'; this.tutupModalTerima();
       } catch(e){ console.error(e); alert('Gagal konfirmasi jadwal.'); }

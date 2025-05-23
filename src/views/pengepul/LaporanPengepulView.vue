@@ -142,7 +142,7 @@ export default {
   name: 'LaporanView',
   data() {
     return {
-      apiUrl: 'http://127.0.0.1:8000',
+      apiUrl: 'https://api.ecopalm.ydns.eu',
       tasks: [],
       user: {
         name: '',
