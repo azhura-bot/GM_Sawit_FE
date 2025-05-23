@@ -48,7 +48,7 @@
                 v-model="form.telepon"
                 type="tel"
                 class="input input-bordered rounded-full bg-white text-black placeholder-black"
-                placeholder="+628xxxxxxxxxx"
+                placeholder="08xxx"
                 required
               />
             </div>
