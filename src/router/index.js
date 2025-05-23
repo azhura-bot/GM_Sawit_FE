@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 // Public
 import Login from '@/views/LandingPage/Login.vue'
 import Register from '@/views/LandingPage/Register.vue'
+import Landingpage2 from '@/views/LandingPage/Landingpage2.vue'
 
 // Manager
 import TugasView from '@/views/TugasView.vue'
@@ -27,7 +28,6 @@ import HargaPengepulView from '@/views/pengepul/HargaPengepulView.vue'
 import LaporanPengepulView from '@/views/pengepul/LaporanPengepulView.vue'
 import ProfilPengepulView from '@/views/pengepul/ProfilPengepulView.vue'
 import EditProfilePengepulView from '@/views/pengepul/EditProfilePengepulView.vue'
-import LandingPage2 from '@/views/LandingPage/LandingPage2.vue'
 import DaftarHarga from '@/views/pengepul/HargaPengepulView.vue'
 
 // Petani
@@ -37,7 +37,7 @@ import PengajuanJadwal from '@/views/petani/PengajuanJadwalView.vue'
 
 
 const routes = [
-  { path: '/', name: 'landingpage2', component: LandingPage2 },
+  { path: '/', name: 'Landingpage2', component: Landingpage2 },
   { path: '/login', name: 'login', component: Login },
   { path: '/register', name: 'register', component: Register },
 
