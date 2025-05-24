@@ -17,8 +17,8 @@
         <!-- Kontak -->
         <div>
           <h2 class="font-bold text-lg mb-4">Hubungi Kami</h2>
-          <p class="text-sm">Email: info@sawitgm2.com</p>
-          <p class="text-sm">Telepon: +62 812 3456 7890</p>
+          <p class="text-sm">Email: GMSawitII@gamil.com</p>
+          <p class="text-sm">Telepon: 0823 6465 4019</p>
         </div>
       </div>
   
