@@ -59,23 +59,24 @@
               </td>
               <td class="px-6 py-4">
                 <template v-if="jadwal.status === 'pending'">
-                  <button
-                    class="px-3 py-1 bg-lime-200 text-lime-800 hover:bg-lime-300 rounded text-xs font-semibold"
-                    @click="bukaModalTerima(index)"
-                    :disabled="loading"
-                  >
-                    Terima
-                  </button>
-                  <button
-                    class="px-3 py-1 bg-rose-200 text-rose-700 hover:bg-rose-300 rounded text-xs font-semibold"
-                    @click="bukaModalTolak(index)"
-                    :disabled="loading"
-                  >
-                    Tolak
-                  </button>
+                  <div class="flex gap-2">
+                    <button
+                      class="px-3 py-1 bg-lime-200 text-lime-800 hover:bg-lime-300 rounded text-xs font-semibold"
+                      @click="bukaModalTerima(index)"
+                      :disabled="loading"
+                    >
+                      Terima
+                    </button>
+                    <button
+                      class="px-3 py-1 bg-rose-200 text-rose-700 hover:bg-rose-300 rounded text-xs font-semibold"
+                      @click="bukaModalTolak(index)"
+                      :disabled="loading"
+                    >
+                      Tolak
+                    </button>
+                  </div>
                 </template>
                 <template v-else>
-                  <!-- Kalau mau tampilin dash atau kosong -->
                   <span class="text-[#134611]">Sudah Ambil Tindakan</span>
                 </template>
               </td>
