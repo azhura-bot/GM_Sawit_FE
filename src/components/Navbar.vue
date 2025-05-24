@@ -24,7 +24,7 @@
           <li><a href="#kontak" class="nav-link">Kontak</a></li>
         </ul>
         <!-- Tombol Sign In / Sign Up -->
-        <div class="auth-buttons">
+        <div class="auth-buttons gap-3">
           <router-link to="/login"><button class="auth-btn">Sign In</button></router-link>
           <router-link to="/register"><button class="auth-btn">Sign Up</button></router-link>
         </div>
