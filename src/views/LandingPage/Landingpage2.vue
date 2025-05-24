@@ -326,14 +326,7 @@
                 <div v-for="member in teamMembers" :key="member.id" 
                     class="text-center group">
                     <div class="avatar mb-4 online relative group">
-                      <div class="w-24 h-24 rounded-full ring ring-green-400 ring-offset-2 ring-offset-white bg-gradient-to-br from-green-200 to-green-400 flex items-center justify-center text-green-800 font-bold text-2xl relative overflow-hidden transition-all duration-300 group-hover:from-green-300 group-hover:to-green-500">
-                        <!-- Inisial di tengah -->
-                        <span class="z-10-translate-y-20 relative">{{ member.initials }}</span>
-                        <!-- Overlay hover -->
-                        <div class="absolute inset-0 bg-green-600 opacity-0 group-hover:opacity-80 transition-opacity duration-300 flex items-center justify-center">
-                          <i class="fas fa-plus text-white text-2xl"></i>
-                        </div>
-                      </div>
+
                     </div>
                   <div class="font-bold text-lg text-gray-800">{{ member.name }}</div>
                   <div class="text-green-600 font-medium">{{ member.position }}</div>
@@ -379,8 +372,8 @@
               </div>
               <div>
                 <h4 class="font-semibold text-green-700 mb-2 text-lg">Kontak</h4>
-                <p class="text-gray-700">Email: info@sawit.id</p>
-                <p class="text-gray-700">Telepon: +62 21 5456 7890</p>
+                <p class="text-gray-700">Email: GMSawitII@gmail.com</p>
+                <p class="text-gray-700">Telepon: 082364654019</p>
                 <div class="flex gap-4 mt-4">
                 </div>
               </div>
