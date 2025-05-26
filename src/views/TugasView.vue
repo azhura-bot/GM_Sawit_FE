@@ -57,8 +57,27 @@
     </div>
 
     <!-- Kanan: Map (tanpa UI tambahan) -->
-    <div class="w-full md:w-1/3 p-4 sticky top-0 h-[100vh]">
+    <div class="w-full md:w-1/3 p-4 sticky top-0 h-[100vh] relative">
       <div id="map" class="w-full h-full rounded-2xl overflow-hidden shadow-md"></div>
+      <!-- Legend -->
+      <div class="absolute bottom-4 right-4 bg-white bg-opacity-90 rounded-xl shadow p-3 flex flex-col gap-2 z-10 min-w-[160px]">
+        <div class="flex items-center gap-2">
+          <img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png" width="20" height="32" alt="Pengepul/Ditolak" />
+          <span class="text-sm text-gray-800">Pengepul</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png" width="20" height="32" alt="Selesai/Accepted" />
+          <span class="text-sm text-gray-800">Selesai</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png" width="20" height="32" alt="Sedang Dikerjakan" />
+          <span class="text-sm text-gray-800">Sedang Dikerjakan</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png" width="20" height="32" alt="Pending" />
+          <span class="text-sm text-gray-800">Pending</span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -178,6 +197,8 @@ const renderMarkers = () => {
           draggableWaypoints: false,
           addWaypoints: false,
           routeWhileDragging: false,
+          fitSelectedRoutes: false,
+          collapsible: true,
           createMarker: () => null
         }).addTo(mapInstance);
         routingControls.push(ctrl);
@@ -209,8 +230,16 @@ onMounted(async () => {
 watch(selectedStatus, () => renderMarkers());
 </script>
 
-<style scoped>
+<style>
 #map {
   height: 100%;
+  z-index: 1;
+}
+.leaflet-routing-container {
+  display: none !important;
+}
+.legend-map {
+  z-index: 10;
+  pointer-events: auto;
 }
 </style>
