@@ -75,7 +75,7 @@
         </div>
         <div class="flex items-center gap-2">
           <img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png" width="20" height="32" alt="Pending" />
-          <span class="text-sm text-gray-800">Pending</span>
+          <span class="text-sm text-gray-800">Menunggu</span>
         </div>
       </div>
     </div>
@@ -104,40 +104,40 @@ const stats = computed(() => {
   return { total, pending, ongoing: inProgress, completed };
 });
 
+const statusOrder = { pending: 0, in_progress: 1, completed: 2 };
 const filteredTasks = computed(() => {
-  const list = selectedStatus.value
-    ? tasks.value.filter(t => t.status === selectedStatus.value)
-    : tasks.value;
+  let list = tasks.value;
+  if (selectedStatus.value) {
+    list = list.filter(t => t.status === selectedStatus.value);
+  }
   return [...list].sort((a, b) => {
-    if (a.status === 'pending' && b.status !== 'pending') return -1;
-    if (b.status === 'pending' && a.status !== 'pending') return 1;
-    return 0;
+    return (statusOrder[a.status] ?? 99) - (statusOrder[b.status] ?? 99);
   });
 });
 
-  const formatDate = (datetime) => {
-      if (!datetime) return ''
-      try {
-        return new Date(datetime).toLocaleDateString('id-ID', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-        })
-      } catch {
-        return ''
-      }
-    }
+const formatDate = (datetime) => {
+  if (!datetime) return ''
+  try {
+    return new Date(datetime).toLocaleDateString('id-ID', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    })
+  } catch {
+    return ''
+  }
+}
 
-    // Format jam
-    const formatTime = (datetime) => {
-      if (!datetime) return ''
-      const str = datetime.replace('T', ' ')
-      const parts = str.split(' ')
-      if (parts.length < 2) return ''
-      const timePart = parts[1]
-      const [hour, minute] = timePart.split(':')
-      return `${hour.padStart(2,'0')}:${minute.padStart(2,'0')}`
-    }
+// Format jam
+const formatTime = (datetime) => {
+  if (!datetime) return ''
+  const str = datetime.replace('T', ' ')
+  const parts = str.split(' ')
+  if (parts.length < 2) return ''
+  const timePart = parts[1]
+  const [hour, minute] = timePart.split(':')
+  return `${hour.padStart(2,'0')}:${minute.padStart(2,'0')}`
+}
 
 const statusLabel = status => ({ 'pending':'Menunggu','accepted':'Diterima','rejected':'Ditolak','in_progress':'Sedang dikerjakan','completed':'Selesai' }[status]||'Unknown');
 const badgeClass = status => ({
