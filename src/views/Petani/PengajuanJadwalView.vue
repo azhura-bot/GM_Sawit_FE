@@ -131,7 +131,12 @@ import Datepicker from 'vue3-datepicker'
 import axios from 'axios'
 import defaultPhoto from '@/assets/profile.png'
 
-L.Icon.Default.mergeOptions({ iconRetinaUrl, iconUrl, shadowUrl })
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl,
+  iconUrl,
+  shadowUrl,
+});
 
 export default {
   name: "PengajuanJadwalView",
@@ -203,14 +208,21 @@ export default {
     },
     initMap() {
       const defaultPos = [-6.595, 106.816]
-      if (this.map) this.map.remove()
+      if (this.map) {
+        this.map.remove()
+        this.map = null
+        this.marker = null
+      }
       this.map = L.map("map").setView(defaultPos, 13)
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: '&copy; OpenStreetMap contributors'
       }).addTo(this.map)
+      // Tambahkan marker baru setiap kali modal dibuka
       this.marker = L.marker(defaultPos, { draggable: true }).addTo(this.map)
       this.map.on("click", e => this.setMarker(e.latlng))
       this.marker.on("dragend", e => this.setMarker(e.target.getLatLng()))
+      // Debug log
+      console.log('initMap dipanggil, marker seharusnya muncul')
     },
     setMarker(latlng) {
       this.marker.setLatLng(latlng)

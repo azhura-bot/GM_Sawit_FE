@@ -39,10 +39,9 @@
           class="bg-white rounded-2xl shadow-md p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center"
         >
           <div>
-            <h3 class="font-bold text-green-900">{{ task.pengepul.name }}</h3>
-            <div class="flex">
-              <span class="font-semibold text-green-900 w-32">{{ task.janji_temu.nama_petani }}</span>
-            </div>
+            <div class="font-bold text-green-900 text-lg">{{ task.nama_task }}</div>
+            <div class="text-green-900">Pengepul: <span class="font-semibold">{{ task.pengepul.name }}</span></div>
+            <div class="text-green-900">Petani: <span class="font-semibold">{{ task.janji_temu.nama_petani }}</span></div>
             <div class="text-sm text-gray-500">
               {{ formatDate(task.janji_temu.tanggal) }} {{ formatTime(task.janji_temu.tanggal) }}
             </div>
@@ -123,20 +122,20 @@ const filteredTasks = computed(() => {
 
 const statusLabel = status => ({ 'pending':'Menunggu','accepted':'Diterima','rejected':'Ditolak','in_progress':'Sedang dikerjakan','completed':'Selesai' }[status]||'Unknown');
 const badgeClass = status => ({
-  'bg-blue-100 text-blue-900': status==='pending',
-  'bg-lime-100 text-green-900': status==='accepted',
-  'bg-red-100 text-red-900': status==='rejected',
+  'bg-gray-300 text-gray-800': status==='pending',
   'bg-blue-300 text-blue-900': status==='in_progress',
-  'bg-yellow-100 text-yellow-900': status==='completed'
+  'bg-green-500 text-white': status==='completed',
+  'bg-lime-100 text-green-900': status==='accepted',
+  'bg-red-100 text-red-900': status==='rejected'
 });
 
 const getMarkerIcon = status => {
   const urls = {
-    pending: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+    pending: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png',
+    in_progress: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+    completed: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
     accepted:'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
-    rejected:'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
-    in_progress:'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-violet.png',
-    completed:'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-yellow.png'
+    rejected:'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png'
   };
   return L.icon({ iconUrl: urls[status]||L.Icon.Default.prototype.options.iconUrl, iconSize:[25,41],iconAnchor:[12,41],popupAnchor:[1,-34],shadowUrl:L.Icon.Default.prototype.options.shadowUrl,shadowSize:[41,41] });
 };

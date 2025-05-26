@@ -4,13 +4,11 @@
     <header class="header flex items-center p-4 bg-white shadow">
       <router-link to="/profile" class="inline-block mr-3">
         <img
-          v-if="user.photo"
-          :src="user.photo"
+          :src="user.photo ? user.photo : defaultPhoto"
           alt="Foto Profil"
           class="circle"
           @error="onPhotoError"
         />
-        <div v-else class="circle placeholder"></div>
       </router-link>
       <span class="username font-semibold text-white-800">
         {{ user.name || 'nama User' }}
@@ -60,8 +58,8 @@
       >
         <div class="relative h-40 bg-gray-200 cursor-pointer" @click="goToDetail(artikel.id)">
           <img
-            v-if="artikel.image"
-            :src="`${API_URL}/storage/${artikel.image}`"
+            v-if="artikel.image_url"
+            :src="artikel.image_url"
             alt="Foto Artikel"
             class="object-cover w-full h-full"
           />
@@ -145,7 +143,7 @@ const fetchArticles = async () => {
     })
     articles.value = res.data.data.map(a => ({
       ...a,
-      image: a.image ? a.image : ''
+      image_url: a.image ? `${API_URL}/${a.image}` : null
     }))
   } catch (err) {
     console.error('Error fetching articles:', err)

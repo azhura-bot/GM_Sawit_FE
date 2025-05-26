@@ -1,23 +1,15 @@
 <template>
   <div class="main-container">
-    <header class="header">
+    <header class="header flex items-center p-4 bg-white shadow">
       <router-link to="/profile" class="inline-block mr-3">
         <img
-          v-if="user.photo"
-          :src="user.photo"
+          :src="profileSrc"
           alt="Foto Profil"
           class="circle"
         />
-        <img
-          v-else
-          :src="defaultPhoto"
-          alt="Default Foto"
-          class="circle"
-        />
-        <div v-else class="circle placeholder"></div>
       </router-link>
       <span class="username font-semibold text-white-800">
-        {{ user.name || 'nama User' }}
+        {{ user.name || 'Nama User' }}
       </span>
     </header>
 
@@ -85,6 +77,11 @@ export default {
       imagePreview: null,
       defaultPhoto,
       apiUrl: import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
+    }
+  },
+  computed: {
+    profileSrc() {
+      return this.user.photo ? this.user.photo : this.defaultPhoto
     }
   },
   mounted() {
