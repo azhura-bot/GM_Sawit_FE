@@ -22,7 +22,29 @@
       </div>
 
       <!-- Filter Status -->
-      <div class="flex justify-end">
+      <div class="flex justify-end gap-4 items-center">
+        <div class="flex-1 relative">
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Search task..."
+            class="w-full bg-[#DDF7B1] rounded-full px-4 py-2 text-green-900 outline-none"
+          />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 absolute right-4 top-1/2 transform -translate-y-1/2 text-green-900"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"
+            />
+          </svg>
+        </div>
         <select v-model="selectedStatus" class="order border-gray-300 rounded p-2 text-white bg-[#134611]">
           <option value="">Semua Status</option>
           <option value="pending">Menunggu</option>
@@ -56,26 +78,28 @@
       </div>
     </div>
 
-    <!-- Kanan: Map (tanpa UI tambahan) -->
-    <div class="w-full md:w-1/3 p-4 sticky top-0 h-[100vh] relative">
-      <div id="map" class="w-full h-full rounded-2xl overflow-hidden shadow-md"></div>
-      <!-- Legend -->
-      <div class="absolute bottom-4 right-4 bg-white bg-opacity-90 rounded-xl shadow p-3 flex flex-col gap-2 z-10 min-w-[160px]">
-        <div class="flex items-center gap-2">
-          <img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png" width="20" height="32" alt="Pengepul/Ditolak" />
-          <span class="text-sm text-gray-800">Pengepul</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png" width="20" height="32" alt="Selesai/Accepted" />
-          <span class="text-sm text-gray-800">Selesai</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png" width="20" height="32" alt="Sedang Dikerjakan" />
-          <span class="text-sm text-gray-800">Sedang Dikerjakan</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png" width="20" height="32" alt="Pending" />
-          <span class="text-sm text-gray-800">Menunggu</span>
+    <!-- Kanan: Map -->
+    <div class="w-full md:w-1/3 h-screen sticky top-0">
+      <div class="relative h-full p-4">
+        <div id="map" class="w-full h-full rounded-2xl overflow-hidden shadow-md"></div>
+        <!-- Legend -->
+        <div class="absolute bottom-4 right-4 bg-white bg-opacity-90 rounded-xl shadow p-3 flex flex-col gap-2 z-10 min-w-[160px]">
+          <div class="flex items-center gap-2">
+            <img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png" width="20" height="32" alt="Pengepul/Ditolak" />
+            <span class="text-sm text-gray-800">Pengepul</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png" width="20" height="32" alt="Selesai/Accepted" />
+            <span class="text-sm text-gray-800">Selesai</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png" width="20" height="32" alt="Sedang Dikerjakan" />
+            <span class="text-sm text-gray-800">Sedang Dikerjakan</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png" width="20" height="32" alt="Pending" />
+            <span class="text-sm text-gray-800">Menunggu</span>
+          </div>
         </div>
       </div>
     </div>
@@ -92,6 +116,7 @@ import axios from 'axios';
 
 const tasks = ref([]);
 const selectedStatus = ref('');
+const searchQuery = ref('');
 let mapInstance = null;
 let markerLayerGroup = null;
 let routingControls = [];
@@ -107,9 +132,22 @@ const stats = computed(() => {
 const statusOrder = { pending: 0, in_progress: 1, completed: 2 };
 const filteredTasks = computed(() => {
   let list = tasks.value;
+  
+  // Apply search filter
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase();
+    list = list.filter(t => 
+      t.nama_task.toLowerCase().includes(query) ||
+      t.pengepul.name.toLowerCase().includes(query) ||
+      t.janji_temu.nama_petani.toLowerCase().includes(query)
+    );
+  }
+  
+  // Apply status filter
   if (selectedStatus.value) {
     list = list.filter(t => t.status === selectedStatus.value);
   }
+  
   return [...list].sort((a, b) => {
     return (statusOrder[a.status] ?? 99) - (statusOrder[b.status] ?? 99);
   });
@@ -139,13 +177,12 @@ const formatTime = (datetime) => {
   return `${hour.padStart(2,'0')}:${minute.padStart(2,'0')}`
 }
 
-const statusLabel = status => ({ 'pending':'Menunggu','accepted':'Diterima','rejected':'Ditolak','in_progress':'Sedang dikerjakan','completed':'Selesai' }[status]||'Unknown');
+const statusLabel = status => ({ 'pending':'Menunggu','accepted':'Diterima','rejected':'Ditolak','in_progress':'Sedang Berjalan','completed':'Selesai' }[status]||'Unknown');
 const badgeClass = status => ({
-  'bg-gray-300 text-gray-800': status==='pending',
-  'bg-blue-300 text-blue-900': status==='in_progress',
-  'bg-green-500 text-white': status==='completed',
-  'bg-lime-100 text-green-900': status==='accepted',
-  'bg-red-100 text-red-900': status==='rejected'
+  'bg-gray-100 text-gray-800': status==='pending',
+  'bg-blue-100 text-blue-800': status==='in_progress',
+  'bg-green-100 text-green-800': status==='completed' || status==='accepted',
+  'bg-red-100 text-red-800': status==='rejected'
 });
 
 const getMarkerIcon = status => {
@@ -227,12 +264,13 @@ onMounted(async () => {
   }
 });
 
-watch(selectedStatus, () => renderMarkers());
+watch([selectedStatus, searchQuery], () => renderMarkers());
 </script>
 
 <style>
 #map {
   height: 100%;
+  min-height: calc(100vh - 2rem);
   z-index: 1;
 }
 .leaflet-routing-container {
