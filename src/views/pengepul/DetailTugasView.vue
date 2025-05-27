@@ -74,6 +74,7 @@
 
 <script>
 import axios from "axios";
+import defaultPhoto from '@/assets/profile.png';
 
 export default {
   name: "DetailTugasView",
@@ -84,6 +85,7 @@ export default {
       loading: true,
       locationEnabled: false,
       user: { name: "", photo_url: null },
+      photoError: false,
     };
   },
     computed: {

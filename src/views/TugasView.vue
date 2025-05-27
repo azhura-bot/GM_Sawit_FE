@@ -219,27 +219,43 @@ const renderMarkers = () => {
     }
 
     // Marker Pengepul: hanya ketika bukan completed
+    let pengepulMarker = null;
     if (task.status !== 'completed' && !isNaN(latC) && !isNaN(lngC)) {
-      L.marker([latC, lngC], { icon: getMarkerIcon('rejected') })
-        .bindPopup(`<strong>Pengepul:</strong> ${task.pengepul.name}`)
+      pengepulMarker = L.marker([latC, lngC], { icon: getMarkerIcon('rejected') })
         .addTo(markerLayerGroup);
+    }
 
-      // Routing hanya untuk in_progress
-      if (task.status === 'in_progress') {
-        const ctrl = L.Routing.control({
-          waypoints: [L.latLng(latC, lngC), L.latLng(latP, lngP)],
-          lineOptions: { styles: [{ weight: 4, opacity: 0.7 }] },
-          show: false,
-          showAlternatives: false,
-          draggableWaypoints: false,
-          addWaypoints: false,
-          routeWhileDragging: false,
-          fitSelectedRoutes: false,
-          collapsible: true,
-          createMarker: () => null
-        }).addTo(mapInstance);
-        routingControls.push(ctrl);
-      }
+    // Routing hanya untuk in_progress
+    if (task.status === 'in_progress' && pengepulMarker) {
+      const ctrl = L.Routing.control({
+        waypoints: [L.latLng(latC, lngC), L.latLng(latP, lngP)],
+        lineOptions: { 
+          styles: [{ color: '#3B82F6', weight: 4, opacity: 0.7, className: 'route-line' }],
+          extendToWaypoints: true,
+          missingRouteTolerance: 0
+        },
+        show: false,
+        showAlternatives: false,
+        draggableWaypoints: false,
+        addWaypoints: false,
+        routeWhileDragging: false,
+        fitSelectedRoutes: false,
+        collapsible: true,
+        createMarker: () => null
+      }).addTo(mapInstance);
+
+      ctrl.on('routesfound', function(e) {
+        const route = e.routes[0];
+        const distance = (route.summary.totalDistance / 1000).toFixed(1);
+        const time = Math.round(route.summary.totalTime / 60);
+        pengepulMarker.bindPopup(
+          `<strong>Pengepul:</strong> ${task.pengepul.name}<br>
+          <strong>Jarak:</strong> ${distance} km<br>
+          <strong>Estimasi waktu:</strong> ${time} menit`
+        );
+      });
+
+      routingControls.push(ctrl);
     }
   });
 };
@@ -279,5 +295,19 @@ watch([selectedStatus, searchQuery], () => renderMarkers());
 .legend-map {
   z-index: 10;
   pointer-events: auto;
+}
+.route-tooltip {
+  background: white;
+  border: 1px solid rgba(0,0,0,0.2);
+  border-radius: 6px;
+  padding: 8px 12px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.leaflet-overlay-pane path {
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+.leaflet-overlay-pane path:hover {
+  opacity: 0.9;
 }
 </style>
